@@ -1,0 +1,31 @@
+body{
+    background-color: #D6EDFF;
+}
+
+.transaction-card{
+    background-color: #FFFBD6;
+}
+
+input::-webkit-calendar-picker-indicator {
+    opacity: 0;
+}
+
+.scrollbar::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: #f7f4ed;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+    background: #bfcfc7;
+    border-radius: 100vh;
+    border: 1px solid #f6f7ed;
+}
+
+.scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #f7f4ed;
+}
