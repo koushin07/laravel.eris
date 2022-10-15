@@ -18,7 +18,7 @@
 
 <script setup>
 const props =defineProps({
-    quantity: String,
+    quantity: [String, Number],
     title: String,
 })
 

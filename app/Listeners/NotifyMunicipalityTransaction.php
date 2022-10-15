@@ -2,29 +2,17 @@
 
 namespace App\Listeners;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Events\NewMunicipalityTransaction;
+use App\Notifications\MunicipalityTransactionNotification;
+use Illuminate\Support\Facades\Notification;
 
 class NotifyMunicipalityTransaction
 {
-    /**
-     * Create the event listener.
-     *
-     * @return void
-     */
-    public function __construct()
+    
+    public function handle(NewMunicipalityTransaction $event)
     {
-        //
-    }
-
-    /**
-     * Handle the event.
-     *
-     * @param  object  $event
-     * @return void
-     */
-    public function handle($event)
-    {
-        //
+     Notification::send($event->toNotify, new MunicipalityTransactionNotification($event->toNotify));
     }
 }

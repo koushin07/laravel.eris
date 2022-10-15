@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Broadcast;
 use App\Models\Municipality;
+use App\Models\Office;
+use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,11 +20,12 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
 
-Broadcast::channel('fires', function($user){
+Broadcast::channel('fires', function ($user) {
     return true;
 });
 
-Broadcast::channel('requestSend.{id}', function($user, $id){
-    return $user->municipality_id === Municipality::find($id)->id;
-});
+Broadcast::channel('requestSend.{id}', fn ($user, $id) =>  $user->id == $id);
 
+Broadcast::channel('confirmed.{id}', fn ($user, $id) =>  $user->id == $id);
+
+Broadcast::channel('denied.{id}', fn ($user, $id) => $user->id == $id);

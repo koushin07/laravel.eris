@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Province;
 
 use App\Http\Controllers\Controller;
+use App\Models\AssignOffice;
 use App\Models\Municipality;
 use App\Models\Province;
 use Illuminate\Http\Request;
@@ -16,9 +17,8 @@ class ProvinceController extends Controller
      */
     public function index()
     {
-        return inertia('Provinces',[
-            'provinces' => Province::all(['id', 'province_name']),
-        ]);
+        // dd(auth()->user()->role()->where('role_type', '=', 'RDRRMC_PROVINCE')->exists());
+       return inertia('Province/Dashboard');
     }
 
     /**
@@ -48,11 +48,11 @@ class ProvinceController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($name)
     {
         abort_unless(auth()->check(), 403);
 
-        return Municipality::where('province_id', $id)->get();
+        return AssignOffice::where('province', $name)->get(['id', 'municipality']);
     }
 
     /**

@@ -10,7 +10,9 @@ use App\Models\Municipality;
 use App\Models\Equipment;
 use App\Events\SendMunicipalityRequest;
 use App\Events\NewMunicipalityTransaction;
-
+use App\Models\Borrowing;
+use App\Models\BorrowingDetails;
+use App\Models\Condition;
 
 class MunicipalityTransactionService
 {
@@ -110,6 +112,7 @@ class MunicipalityTransactionService
 
     public function insertData($equipment_id, $municipality_id, $quantity)
     {
+        
 
         /* get data to the equipment table */
         $equipment = Equipment::find($equipment_id);
@@ -130,8 +133,9 @@ class MunicipalityTransactionService
                     'quantity' => $quantity,
                 ]);
             } elseif ($record) {
-                /* fetch the data from municipality_transactions table and update its quantity (old quantity) + (new quanity request) */
-                $record->quantity = $record->quantity + $quantity;
+                if ($record->quantity == 0)
+                    /* fetch the data from municipality_transactions table and update its quantity (old quantity) + (new quanity request) */
+                    $record->quantity = $record->quantity + $quantity;
                 $record->save();
             }
             /* fetch the data from equipment table and update its quantity */
@@ -140,24 +144,20 @@ class MunicipalityTransactionService
         }, 3);
 
 
-        // $owner = Municipality::with(['equipment' => fn ($q) =>  $q->find($equipment_id)])
-        //     ->where('id', '=', $municipality_id)->first();
-
-        // $that = collect([
-        //     'owner' => $owner, //for notif
-        //     'owned' => Equipment::where('municipality_id', $municipality_id)->first(), //reciever of the notifs
-        //     'sender' => Municipality::find(auth()->user()->municipality_id) //sender 
-        // ]);
-        // MunicipalityTransactionEvent::dispatch($that);
-
         /* fetch the owner of the equipment borrowed */
-        $owner = DB::select("SELECT municipalities.id FROM municipalities
-        WHERE municipalities.id = (SELECT equipment.municipality_id 
-        FROM equipment WHERE equipment.id = :equip_id);", [
-            'equip_id' => $request->equipment_id,
+        $owner = Municipality::find($municipality_id);
+
+        $borrow = Equipment::find($equipment_id);
+
+        $toNotify = collect([
+            'owner' => $owner,
+            'borrow' => $borrow
         ]);
         /* fire event */
-        NewMunicipalityTransaction::dispatch($owner);
-        
+        NewMunicipalityTransaction::dispatch($toNotify);
     }
+    // DB::select("SELECT municipalities.* FROM municipalities
+    //     WHERE municipalities.id = (SELECT equipment.municipality_id 
+    //     FROM equipment WHERE equipment.id = :equip_id);", [
+    //         'equip_id' => $equipment_id,])[0]
 }

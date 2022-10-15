@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Equipment extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
         'equipment_name',
@@ -19,7 +19,6 @@ class Equipment extends Model
         'unit',
         'model_number',
         'serial_number',
-        'status',
         'asset_id',
         'remarks',
         'quantity',

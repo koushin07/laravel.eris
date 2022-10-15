@@ -1,4 +1,4 @@
-body{
+.body{
     background-color: #D6EDFF;
 }
 
@@ -29,3 +29,4 @@ input::-webkit-calendar-picker-indicator {
 .scrollbar::-webkit-scrollbar-thumb:hover {
     background: #f7f4ed;
 }
+html { scroll-behavior: smooth;}

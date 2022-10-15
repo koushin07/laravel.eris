@@ -25,7 +25,7 @@ class MTRequest extends FormRequest
     {
         return [
             'equipment_id' => 'required',
-            'municipality_id' => 'required',
+            'owner' => 'required',
             'quantity' => 'required'
         ];
     }

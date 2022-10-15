@@ -9,7 +9,7 @@
                 <div v-if="$page.props.flash.message" class="alert">
                     {{ $page.props.flash.message }}
                 </div>
-                <form class="px-8" @submit.prevent="form.post(route('transactions.store'))">
+                <form class="px-8" @submit.prevent="form.post(route('borrowing.store'))">
                     <div class="grid grid-rows-1 md:grid-rows-3 gap-4 ">
                         <div class="mb-3 w-80 z-40">
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
@@ -21,10 +21,10 @@
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
                                 Province
                             </label>
-                            <ProvinceList @submit="getProvince" :contents="provinces"/>
-                          
+                            <ProvinceList @submit="getProvince" :contents="provinces" />
+
                         </div>
-                        <div class="mb-3 w-80 z-0" >
+                        <div class="mb-3 w-80 z-0">
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
                                 Equipment
                             </label>
@@ -47,11 +47,13 @@
                             Request
                         </button>
                         <label for="default-toggle" class="inline-flex relative items-center cursor-pointer">
-                              <input type="checkbox" @click="Xtransaction=!Xtransaction" id="default-toggle" class="sr-only peer">
+                            <input type="checkbox" @click="Xtransaction=!Xtransaction" id="default-toggle"
+                                class="sr-only peer">
                             <div
                                 class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
                             </div>
-                            <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Cross Transaction</span>
+                            <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Cross
+                                Transaction</span>
                         </label>
 
 
@@ -112,14 +114,14 @@ export default {
     layout: AuthenticatedLayout,
 
     components: {
-    MunicipalityList,
-    EquipmentList,
-    Head,
-    EquipmentModelLists,
-    Receipt,
-    ProvinceList,
+        MunicipalityList,
+        EquipmentList,
+        Head,
+        EquipmentModelLists,
+        Receipt,
+        ProvinceList,
 
-},
+    },
     props: {
         municipalities: [Array, Object],
         provinces: Array,
@@ -130,7 +132,7 @@ export default {
         let name = ref('Equipment Name')
         let list = ref({})
         let allEquipment = ref({})
-    
+
         const receipt = ref({
             equipment: '',
             municipality: '',
@@ -139,7 +141,7 @@ export default {
         })
         let form = useForm(
             {
-                municipality_id: '',
+                owner: '',
                 equipment_id: '',
                 quantity: null,
             }
@@ -158,47 +160,50 @@ export default {
             }).catch(err => console.log(err))
         }
         const getMunicipality = (muni) => {
-            receipt.value.municipality = muni.municipality_name
-            form.municipality_id = muni.id
-            axios.post(`http://127.0.0.1:8000/getEquipment/${muni.id}`)
+            receipt.value.municipality = muni.municipality
+            form.owner = muni.id
+            // console.log(muni)
+            axios.post(`http://127.0.0.1:8000/getEquipment/${muni.municipality}`)
                 .then((res) => {
                     allEquipment.value = res
-
+                    console.log(res)
                 }).catch(err => console.log(err))
         }
 
-        const getProvince = (prov) =>{
-            Inertia.get('/transactions/create', {'province': prov.id},{
-                preserveScroll: true,
-                preserveScroll:true
-            });
+        const getProvince = (prov) => {
+            axios.get(`http://127.0.0.1:8000/transactions/create/${prov.id}`)
+                .then((res) => console.log(res))
+            // Inertia.get('/transactions/create', {'province': prov.id},{
+            //     preserveScroll: true,
+            //     preserveScroll:true
+            // });
             // console.log(prov)
             // axios.get(`http://127.0.0.1:8000/provinces-Municipality/${prov.id}`)
             // .then(res =>props.municipalities =res).catch(err => console.log(err))
         }
 
-        const pick =(equipment) => {
+        const pick = (equipment) => {
             receipt.value.model = equipment.model_number
             receipt.value.serial = equipment.serial_number
             form.equipment_id = equipment.id
         }
 
         const submit = () => {
-            form.post(route('transactions.store'), {
+            form.post(route('borrowing.store'), {
                 onFinish: () => form.reset('equipment_id', 'municipality_id', 'quantity'),
                 preserveScroll: true,
 
             });
         }
 
-        watch(Xtransaction, (isToggle)=>{
+        watch(Xtransaction, (isToggle) => {
             const holder = props.municipalities
-           
-            if(isToggle){
+
+            if (isToggle) {
                 console.log('true')
-               console.log(holder)
+                console.log(holder)
             }
-            if(!isToggle){
+            if (!isToggle) {
                 console.log('false')
             }
         })

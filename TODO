@@ -1,7 +1,14 @@
 
 Todo:
-  ☐  error display
-  ☐  create events for transactions and new insert equipment
-  ☐  websockets and pusher,
-  ☐  landing page
+  ☐  create controllers for all new models **
+    assign_office *
+    office *
+    borrowing *
+    borrow_details *
+    returneds *
+    condition *
+    equipment_owner
+
+  ☐  finalize condition table/model  *
+  ☐  events
   

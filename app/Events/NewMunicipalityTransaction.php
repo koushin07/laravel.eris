@@ -20,8 +20,9 @@ class NewMunicipalityTransaction implements ShouldBroadcast
      * @return void
      */
     public function __construct(
-        public $owner
+        public $toNotify
     ) {
+        
     }
 
     /**
@@ -31,7 +32,8 @@ class NewMunicipalityTransaction implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel(  'requestSend.'.$this->owner[0]->id);
+        // dd($this->toNotify, $this->toNotify->assign);
+        return new PrivateChannel('requestSend.'.$this->toNotify->id);
     }
 
     public function broadcastAs()

@@ -31,10 +31,12 @@ class CreateEquipmentRequest extends FormRequest
             'unit' => 'required',
             'model_number'  => 'required',
             'serial_number'  => 'required',
-            'status'  => 'required',
             'asset_id'  => 'required',
             'remarks'  => 'required',
-            'quantity' =>'required',
+            'serviceable' => 'required',
+            'unusable'=> 'required',
+            'poor' => 'required'
+            
         ];
     }
 }

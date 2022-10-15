@@ -1,20 +1,19 @@
 <script >
 import { Link } from '@inertiajs/inertia-vue3';
 import TransactionCard from './Partials/TransactionCard.vue';
+import { usePage } from '@inertiajs/inertia-vue3';
 
 export default{
     components:{
         Link,
         TransactionCard
     },
-   created(){
-    window.Echo.private(`requestSend.${this.$page.props.auth.user.municipality_id}`)
-    .listen('.Mtransaction.created', (e)=>{
-        console.log('yeys')
-            console.log(e)
-        })
-   },
+    mounted () {
+       
+    },
+  
     setup(){
+       console.log(`this is user ${usePage().props.value.auth.user.id}`)
         return{
 
         }
@@ -25,7 +24,7 @@ export default{
 </script>
 
 <template>
-    <div class="flex">
+    <div class="flex body">
         <!--Sidebar-->
         <div class="flex flex-row z-50">
             <div
@@ -40,11 +39,11 @@ export default{
                         <i class="fa-solid fa-table-list py-4 cursor-pointer hover:text-white"></i>
                         </inertia-link>
                         <!-- :href="route('logout')" method="post" -->
-                        <inertia-link :href="route('province.index')">
+                        <inertia-link :href="route('office.index')">
                         <i class="fa-solid fa-map py-4 cursor-pointer hover:text-white"></i>
                         </inertia-link>
 
-                        <inertia-link :href="route('transactions.create')">
+                        <inertia-link :href="route('borrowing.create')">
                         <i class="fa-solid fa-tty py-4 cursor-pointer hover:text-white"></i>
                         </inertia-link>
 
@@ -59,9 +58,8 @@ export default{
         <div class="flex flex-col pl-14 h-screen scrollbar bg-transparent w-screen sm:w-9/12 overflow-y-auto ">
 
             <div class=" flex-col mx-5 mt-9 max-h-screen content-center">
-                <div class="flex m-4">
-                    EPRRIS
-                </div>
+                <!-- <span
+                            class="text-center font-extrabold text-transparent text-9xl pt-10 bg-clip-text bg-gradient-to-r from-yellow-400 to-red-600">EPRRIS</span> -->
                 <slot />
             </div>
 

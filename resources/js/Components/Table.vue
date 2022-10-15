@@ -81,19 +81,25 @@
 
                         <td scope="row" class="items-center  text-gray-900 whitespace-nowrap dark:text-white">
 
-                            <div class="text-base font-semibold ">{{ body.status }}</div>
+                            <div class="text-base font-semibold ">{{ body.serviceable }}</div>
 
                         </td>
-                        <td scope="row" class="items-center  text-gray-900 whitespace-nowrap dark:text-white ">
+                        <td scope="row" class="items-center  text-gray-900 whitespace-nowrap dark:text-white">
 
-                            <div class="text-base font-semibold">{{ body.quantity }}</div>
+                            <div class="text-base font-semibold ">{{ body.poor }}</div>
 
                         </td>
+                        <td scope="row" class="items-center  text-gray-900 whitespace-nowrap dark:text-white">
+
+                            <div class="text-base font-semibold ">{{ body.unusable }}</div>
+
+                        </td>
+                       
                         <td class="py-4 px-6">
                             <button href="javascript:void(0)" type="button"
                                 class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                               <EditModal :form="body"/>
-                               
+                                <EditModal :form="body" />
+
                             </button>
                             /
                             <a type="button"
@@ -120,6 +126,12 @@
 
                             </div>
                         </td>
+                        <td scope="row" class="items-center  text-gray-900 whitespace-nowrap dark:text-white">
+                            <div class="pl-3">
+                                <div class="text-base font-semibold ml-2"></div>
+
+                            </div>
+                        </td>
                         <td scope="row" class="items-center  text-gray-900 whitespace-nowrap dark:text-white ">
                             <div class="pl-3">
                                 <div class="text-base font-semibold ml-8"></div>
@@ -129,7 +141,7 @@
                         <td class="py-4 px-6">
                             <a href="javascript:void(0)" type="button"
                                 class="font-medium text-blue-600 dark:text-blue-500 hover:underline"></a>
-                            
+
                         </td>
 
 

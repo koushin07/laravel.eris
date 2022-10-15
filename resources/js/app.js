@@ -1,6 +1,7 @@
 import './bootstrap';
 import '../css/app.css';
 import '../css/styles.css';
+import '../css/landing.css';
 
 import { createApp, h } from 'vue';
 import { createInertiaApp, Head, Link } from '@inertiajs/inertia-vue3';

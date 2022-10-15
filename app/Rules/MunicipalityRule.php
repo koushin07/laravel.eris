@@ -2,6 +2,7 @@
 
 namespace App\Rules;
 
+use App\Models\AssignOffice;
 use App\Models\Municipality;
 use Illuminate\Contracts\Validation\Rule;
 
@@ -13,7 +14,7 @@ class MunicipalityRule implements Rule
     public function passes($attribute, $value)
     {
 
-       return  Municipality::find($value) ? true : false; 
+       return  AssignOffice::where('municipality', $value) ? true : false; 
   
     }
 

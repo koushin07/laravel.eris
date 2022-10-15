@@ -11,9 +11,12 @@ use Illuminate\Auth\Events\Registered;
 use App\Rules\MunicipalityRule;
 use App\Providers\RouteServiceProvider;
 use App\Models\User;
-use App\Models\Municipality;
+
 use App\Http\Controllers\Controller;
+use App\Models\AssignOffice;
+use App\Models\Office;
 use App\Models\Province;
+use App\Models\Role;
 
 class RegisteredUserController extends Controller
 {
@@ -24,9 +27,9 @@ class RegisteredUserController extends Controller
      */
     public function create()
     {
+
         return Inertia::render('Auth/Register', [
-            'municipalities' => Municipality::all(),
-            'provinces' => Province::all()
+            'municipalities' => AssignOffice::select(['id', 'municipality'])->get(),
         ]);
     }
 
@@ -46,7 +49,7 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = User::create([
+        $user = Office::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -61,26 +64,26 @@ class RegisteredUserController extends Controller
     public function store_municipality(Request $request)
     {
 
-
-
         $request->validate([
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:offices',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'municipality_id' =>[ new MunicipalityRule ]
+            'municipality_id' => [new MunicipalityRule]
 
         ]);
 
+        // dd($request->municipality_id);
 
-      
-      
-        $user = User::create([
+
+        //   dd('here');
+        $user = Office::create([
             'name' => $request->name,
-            'municipality_id' => $request->municipality_id,
+            'assign' => $request->municipality_id,
             'email' => $request->email,
+            'role_id' => 1,
             'password' => Hash::make($request->password),
         ]);
 
-        event(new Registered($user));
+        // event(new Registered($user));
 
         Auth::login($user);
 

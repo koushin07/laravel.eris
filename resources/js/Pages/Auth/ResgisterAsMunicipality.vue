@@ -71,7 +71,7 @@ const submit = () => {
 
 function getMunicipality(muni) {
   form.municipality_id=muni.id
-  form.name=muni.municipality_name
+  form.name=muni.municipality
 }
 
 </script>

@@ -32,7 +32,6 @@ class EquipmentFactory extends Factory
         ];
 
         return [
-           'municipality_id'=>Municipality::pluck('id')->random(),
            'equipment_name'=>$this->faker->randomElement($tools),
             'code'=>$this->faker->randomDigitNotZero(),
             'asset_desc'=>$this->faker->sentence(),
@@ -40,10 +39,8 @@ class EquipmentFactory extends Factory
             'unit'=>$this->faker->randomDigitNotZero(),
             'model_number'=>$this->faker->randomDigitNotZero(),
             'serial_number'=>$this->faker->randomDigitNotZero(),
-            'status'=>$this->faker->randomElement(['serviceable', 'poor', 'unusable']),
             'asset_id'=>$this->faker->randomNumber(),
             'remarks'=>$this->faker->sentence(),
-            'quantity'=>$this->faker->randomDigitNotZero(),
             
         ];
     }

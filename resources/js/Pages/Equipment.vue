@@ -19,8 +19,9 @@ export default {
     setup() {
         const tableHeader = [
             { name: 'Equipment Name' },
-            { name: 'Status' },
-            { name: 'Quantity' },
+            { name: 'Serviceable' },
+            { name: 'Poor' },
+            { name: 'Unusable' },
             { name: 'Actions' }
         ]
 

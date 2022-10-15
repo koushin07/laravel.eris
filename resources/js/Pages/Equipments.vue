@@ -2,7 +2,7 @@
 
     <Head title="Equipments" />
     <div class="flex justify-between">
-        <button @click="ownEquipment($page.props.auth.user.municipality_id )"
+        <button @click="ownEquipment($page.props.auth.user.id )"
             class=" px-4 bg-white border-transparent mb-2 border-4 rounded-lg content-end">My Inventory</button>
         <button type="button" class="font-medium mb-2 px-4 py-2 border-2 border-transparent bg-white rounded-lg">
             <CreateModal />
@@ -39,14 +39,15 @@ export default {
         const tableHeader = [
             { name: 'Equipment Name' },
 
-            { name: 'Status' },
-            { name: 'Quantity' },
+            { name: 'Serviceable' },
+            { name: 'Poor' },
+            { name: 'Unusable' },
             { name: 'Actions' }
         ]
-       
+
         const ownEquipment = (id) => {
             Inertia.get(usePage().url.value, { owner: id }, {
-            
+
                 preserveState: true
             })
             console.log(id)

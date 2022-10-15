@@ -16,6 +16,9 @@ use App\Http\Requests\MTRequest;
 use App\Http\Controllers\Controller;
 use App\Events\NewMunicipalityTransaction;
 use App\Events\MunicipalityTransactionEvent;
+use App\Models\AssignOffice;
+use App\Models\Borrowing;
+use PhpParser\Node\Expr\Assign;
 
 class MunicipalityTransactionController extends Controller
 {
@@ -54,43 +57,6 @@ class MunicipalityTransactionController extends Controller
     }
 
 
-    public function recieved()
-    {
-        abort_unless(auth()->check(), 403);
-        $borrows = MunicipalityTransaction::select(
-            [
-                'municipality_transactions.id',
-                'municipality_transactions.created_at',
-                'municipality_transactions.quantity',
-                'municipalities.municipality_name',
-                'equipment.equipment_name',
-                'equipment.model_number',
-            ]
-        )
-            ->join('equipment', 'municipality_transactions.equipment_id', '=', 'equipment.id')
-            ->where('equipment.municipality_id', '=', auth()->user()->municipality_id)
-            ->join('municipalities', 'equipment.municipality_id', '=', 'municipalities.id')
-            ->where('confirm', '=', 1)
-            ->skip(0)->limit(5)->get();
-
-        return $borrows;
-    }
-
-    public function sent()
-    {
-        abort_unless(auth()->check(), 403);
-        return MunicipalityTransaction::select([
-            'municipality_transactions.*',
-            'municipalities.municipality_name',
-            'municipalities.id',
-            'equipment.id',
-            'equipment.equipment_name'
-        ])->join('municipalities', 'municipalities.id', '=', 'municipality_transactions.municipality_id')
-            ->where('municipalities.id', auth()->user()->municipality_id)
-            ->join('equipment', 'equipment.id', '=', 'municipality_transactions.equipment_id')
-            ->skip(0)->limit(5)->get();
-    }
-
     /**
      * Show the form for creating a new resource.
      *
@@ -99,10 +65,10 @@ class MunicipalityTransactionController extends Controller
     public function create()
     {
         return inertia('localTransaction', [
-            'municipalities' => Municipality::query()->when(request()->input('province'), function ($q, $id) {
+            'municipalities' => AssignOffice::query()->when(request()->input('province'), function ($q, $id) {
                 $q->where('province_id', $id);
             })->get(),
-            'provinces' => Province::get(['id', 'province_name'])
+            'provinces' => AssignOffice::get(['id', 'province_name'])
             // 'equipments' => Equipment::where('status', 'Serviceable')->with(['municipality' =>
             // fn ($query) => $query->where('province_id',  $this->UserService->getUserProvince(
             //     auth()->user()->municipality_id
@@ -118,6 +84,7 @@ class MunicipalityTransactionController extends Controller
      */
     public function store(MTRequest $request)
     {
+        // dd( $request);
         $request->validated();
         $this->MTService->insertData(
             $request['equipment_id'],
@@ -129,7 +96,7 @@ class MunicipalityTransactionController extends Controller
         //     'equipment_id' => $request->equipment_id,
         //     'quantity' => $request->quantity,
         // ]);
-       
+
         return redirect()->route('transactions.create')->with('message', 'doneeeeeeeee');
     }
 

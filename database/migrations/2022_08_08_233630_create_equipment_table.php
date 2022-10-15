@@ -16,7 +16,7 @@ return new class extends Migration
         
         Schema::create('equipment', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('municipality_id')->constrained();
+            // $table->foreignId('municipality_id')->constrained();
             $table->string('equipment_name');
             $table->string('code');
             $table->string('asset_desc');
@@ -24,10 +24,8 @@ return new class extends Migration
             $table->integer('unit');
             $table->integer('model_number');
             $table->integer('serial_number');
-            $table->string('status');
             $table->integer('asset_id');
             $table->string('remarks');
-            $table->integer('quantity');
             $table->timestamps();
         });
     }

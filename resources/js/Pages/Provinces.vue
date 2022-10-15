@@ -11,7 +11,7 @@
                         <div class="flex justify-between items-center p-2 gap-5" v-for="province in provinces"
                             :key="province.id">
                             <span class="mb-1 text-md font-bold leading-normal dark:text-white text-slate-700">
-                                {{ province.province_name }}
+                                {{ province.province }}
                             </span>
                             <button @click="getProvince(province)" type="button"
                                 class="transition duration-300  ease-in-out hover:scale-125">
@@ -34,7 +34,7 @@
                         <div class="flex justify-between items-center p-2 gap-5" v-if="municipalities.length !==0"
                             v-for="municipality in municipalities" :key="municipality.id">
                             <span class="mb-1 text-md font-bold leading-normal dark:text-white text-slate-700">
-                                {{ municipality.municipality_name }}
+                                {{ municipality.municipality }}
                             </span>
                             <inertia-link :href="route('equipment.show', municipality.id)"
                               class="transition duration-300  ease-in-out hover:scale-125">
@@ -79,8 +79,9 @@ export default {
         ]
 
         const getProvince = (province) => {
-            axios.get(`http://127.0.0.1:8000/province/${province.id}`).then((res) => {
+            axios.get(`http://127.0.0.1:8000/province/${province.province}`).then((res) => {
                 municipalities.value = res.data;
+            
             });
             name.value = province.province_name;
         };

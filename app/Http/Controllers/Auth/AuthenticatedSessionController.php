@@ -36,7 +36,10 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
-
+        // dd(auth()->user());
+        if (auth()->user()->role_id == 2) {
+            return redirect()->route('province.province_dashboard');
+        }
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 

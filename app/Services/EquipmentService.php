@@ -6,9 +6,11 @@ use Request;
 use App\Services\UserService;
 
 use App\Models\borrow;
+use App\Models\Condition;
 use App\Models\User;
 use App\Models\Municipality;
 use App\Models\Equipment;
+use App\Models\EquipmentOwned;
 use Illuminate\Support\Facades\DB;
 
 class EquipmentService
@@ -72,51 +74,84 @@ class EquipmentService
 
     public function checkIfExist($data)
     {
-       
-        $equipment= Equipment::where(
+
+        $equipment = Equipment::where(
             [
                 ['code', $data['code']],
                 ['asset_id', $data['asset_id']],
                 ['unit', $data['unit']],
                 ['model_number', $data['model_number']],
                 ['serial_number', $data['serial_number']]
-            ])->first();
+            ]
+        )->first();
 
-            if($equipment){
-                return false;
-            }
-            $this->insertData($data);
-            return true;
+        if ($equipment) {
+            return false;
+        }
+        $this->insertData($data);
+        return true;
     }
 
     public function insertData($data)
     {
+ 
+        DB::transaction(function () use ($data) {
 
 
+            $equipment = Equipment::where(
+                [
+                    ['equipment_name', $data->equipment_name],
+                    ['code', $data->code],
+                    ['asset_id', $data->asset_id],
+                    ['category', $data->category],
+                    ['unit', $data->unit],
+                    ['model_number',  $data->model_number],
 
-        Equipment::create([
-            'equipment_name' => $data['equipment_name'],
-            'municipality_id' => auth()->user()->municipality_id,
-            'code' => $data['code'],
-            'asset_desc' => $data['asset_desc'],
-            'category' => $data['category'],
-            'unit' => $data['unit'],
-            'model_number' => $data['model_number'],
-            'serial_number' => $data['serial_number'],
-            'status' => $data['status'],
-            'asset_id' => $data['asset_id'],
-            'remarks' => $data['remarks'],
-            'quantity' => $data['quantity'],
-        ]);
+                ]
+            )->firstOr(function () use ($data) {
 
-        // dd($record);
-        // if ($record) {
-        //     $record->quantity = $record->quantity + $data['quantity'];
-        //     $record->save();
+                /* if not exist */
+                $newequipment = Equipment::create([
+                    'equipment_name' => $data->equipment_name,
+                    'code' => $data->code,
+                    'asset_desc' => $data->asset_desc,
+                    'category' => $data->category,
+                    'unit' => $data->unit,
+                    'model_number' => $data->model_number,
+                    'serial_number' => $data->serial_number,
+                    'asset_id' => $data->asset_id,
+                    'remarks' => $data->remarks,
+                ]);
 
-        // }
+                $EOwner = EquipmentOwned::create([
+                    'equipment_id' => $newequipment->id,
+                    'office_id' => auth()->id(),
+                    'quantity' => 1
+                ]);
+                $condition = Condition::create([
+                    'equipment_owner' => $EOwner->id,
+                    'serviceable' => $data->serviceable,
+                    'unusable'=>$data->unusable,
+                    'poor' =>$data->poor
+                ]);
+            });
 
+            if (!is_null($equipment)) {
 
+                $upCondition = EquipmentOwned::select(['conditions.serviceable', 'conditions.unusable', 'conditions.poor'])
+                    ->join('conditions', 'conditions.equipment_owner', 'equipment_owneds.id')->firs()
+                    ->where([
+                        ['equipment_owneds.equipment_id', $equipment->id],
+                        ['equipment_owneds.office_id', auth()->id()]
+                    ])->first();
 
+                if (!is_null($upCondition)) {
+
+                    $upCondition->serviceable += $data->serviceable;
+                    $upCondition->unusable += $data->unusable;
+                    $upCondition->poor += $data->poor;
+                };
+            }
+        }, 3);
     }
 }

@@ -13,6 +13,9 @@ use App\Http\Requests\UpdateEquipmentRequest;
 use App\Http\Requests\CreateEquipmentRequest;
 use App\Http\Controllers\Controller;
 use App\Events\NewEquipmentAdded;
+use App\Models\AssignOffice;
+use App\Models\EquipmentOwned;
+use Illuminate\Support\Facades\DB;
 
 class EquipmentController extends Controller
 {
@@ -23,24 +26,54 @@ class EquipmentController extends Controller
      */
     public function index()
     {
+
+
+        // Equipment::query()
+        //     ->when(
+        //         Request::input('search'),
+        //         function ($q, $search) {
+        //             $q->where('equipment_name', 'like', '%' . $search . '%');
+        //         }
+        //     )->when(
+        //         Request::input('status'),
+        //         function ($q, $status) {
+        //             $q->where('status', 'like', '%' . $status . '%');
+        //         }
+        //     )->when(
+        //         Request::input('owner'),
+        //         function ($q, $owner) {
+        //             $q->Where('municipality_id', auth()->user()->municipality_id);
+        //         }
+        //     )
+        //     ->paginate(10)->onEachSide(1)->withQueryString(),
+        // ->paginate(); 
         return inertia('Equipments', [
-            'equipments' => Equipment::query()
+            'equipments' => DB::table('equipment')->select(
+                [
+                    'equipment.*',
+                    'offices.name as owner',
+                    'conditions.serviceable',
+                    'conditions.unusable',
+                    'conditions.poor',
+
+
+                ]
+            )
+                ->join('equipment_owneds', 'equipment_owneds.equipment_id', '=', 'equipment.id')
+                ->join('conditions', 'conditions.equipment_owner', '=', 'equipment_owneds.id')
+                ->join('offices', 'offices.id', '=', 'equipment_owneds.office_id')
                 ->when(
                     Request::input('search'),
                     function ($q, $search) {
                         $q->where('equipment_name', 'like', '%' . $search . '%');
                     }
                 )->when(
-                    Request::input('status'),
-                    function ($q, $status) {
-                        $q->where('status', 'like', '%' . $status . '%');
-                    }
-                )->when(
-                    Request::input('owner'), 
+                    Request::input('owner'),
                     function ($q, $owner) {
-                    $q->Where('municipality_id', auth()->user()->municipality_id);
-                })
-                ->paginate(10)->onEachSide(1)->withQueryString(),
+                        $q->Where('equipment_owneds.office_id', $owner);
+                    }
+                )
+                ->paginate()->onEachSide(1)->withQueryString(),
 
             'filters' => Request::only(['search', 'status', 'owner'])
         ]);
@@ -65,11 +98,10 @@ class EquipmentController extends Controller
      */
     public function store(CreateEquipmentRequest $request, EquipmentService $equipmentService)
     {
-
+        // dd($request);
+        $request->validated();
         // $this->authorize('municipality');
-        if(!$equipmentService->checkIfExist($request->validated())){
-            return redirect('/dashboard');
-        };
+        $equipmentService->insertData($request);
         NewEquipmentAdded::dispatch();
         return redirect('/equipment');
     }
@@ -82,15 +114,32 @@ class EquipmentController extends Controller
      */
     public function show($id)
     {
-
+        
         return inertia('Equipment', [
-            'name' => Municipality::select('municipality_name')->find($id),
-            'equipments' => Equipment::where('municipality_id', $id)->when(Request::input('search'), function ($q, $search) {
-                $q->where('equipment_name', 'like', '%' . $search . '%');
-            })->when(Request::input('status'), function ($q, $status) {
-                $q->where('status', 'like', '%' . $status . '%');
-            })
+            'name' => AssignOffice::select('municipality')->find($id),
+            'equipments' => DB::table('equipment')->select(
+                [
+                    'equipment.*',
+                    'offices.name as owner',
+                    'conditions.serviceable',
+                    'conditions.unusable',
+                    'conditions.poor',
+
+
+                ]
+            )
+                ->join('equipment_owneds', 'equipment_owneds.equipment_id', '=', 'equipment.id')
+                ->join('conditions', 'conditions.equipment_owner', '=', 'equipment_owneds.id')
+                ->join('offices', 'offices.id', '=', 'equipment_owneds.office_id')
+                ->when(
+                    Request::input('search'),
+                    function ($q, $search) {
+                        $q->where('equipment_name', 'like', '%' . $search . '%');
+                    }
+                )->Where('equipment_owneds.office_id', $id)
                 ->paginate(10)->onEachSide(1)->withQueryString(),
+
+
             'filters' => Request::only(['search', 'status'])
         ]);
     }
@@ -102,10 +151,18 @@ class EquipmentController extends Controller
         return back()->with('success', 'Successfully Updated', 'yes');
     }
 
-    public function getEquipment($id)
+    public function getEquipment($name)
     {
 
         abort_unless(auth()->check(), 403);
+
+        return EquipmentOwned::query()
+            ->join('equipment', 'equipment_owneds.equipment_id', 'equipment.id')
+            ->join('offices', 'offices.id','equipment_owneds.office_id')
+            ->join('assign_offices', 'assign_offices.id', 'offices.assign')
+            ->join('conditions', 'conditions.equipment_owner', 'equipment_owneds.id')
+            ->where('assign_offices.municipality', $name)
+            ->get();
 
         return Equipment::where([['municipality_id', '=', $id], ['status', '=', 'serviceable']])->get();
     }
@@ -114,6 +171,6 @@ class EquipmentController extends Controller
     {
         abort_unless(auth()->check(), 403);
 
-        return Equipment::where([['equipment_name', '=', $name], ['status', '=', 'serviceable']])->get();
+        return Equipment::where('equipment_name', '=', $name)->get();
     }
 }
