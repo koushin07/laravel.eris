@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('returneds', function (Blueprint $table) {
+        Schema::create('borrow_histories', function (Blueprint $table) {
             $table->id();
             $table->boolean('is_returned')->default(false);
             $table->foreignId('borrowing_id')->constrained();
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('returneds');
+        Schema::dropIfExists('borrow_histories');
     }
 };

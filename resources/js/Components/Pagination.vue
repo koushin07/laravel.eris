@@ -1,9 +1,9 @@
     <template>
 
-    <div class="flex items-center justify-center pb-4 lg:px-0 sm:px-6 px-2 ml-2" v-if="links.length>3">
-        <div class="lg:w-3/5 w-full  flex items-center justify-between border-t border-gray-200 dark:border-gray-700">
+
+        <div class="flex justify-center" v-if="links.length>3">
            
-            <div class="sm:flex hidden">
+            <div class="md:flex hidden">
                 <template v-for="(link, key) in links">
                     <Link class="text-sm font-medium leading-none cursor-pointer text-gray-600 " :href="link.url"
                         v-html="link.label" v-if="link.url"
@@ -24,8 +24,8 @@
            
 
         </div>
-        
-    </div>
+
+
    
 </template>
 

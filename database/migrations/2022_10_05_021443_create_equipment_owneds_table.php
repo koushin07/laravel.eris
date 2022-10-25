@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('equipment_id')->constrained();
             $table->foreignId('office_id')->constrained();
-            $table->integer('quantity');
             $table->timestamps();
         });
     }

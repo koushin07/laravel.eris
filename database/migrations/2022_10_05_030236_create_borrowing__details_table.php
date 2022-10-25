@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('borrowing_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('equipment_id')->constrained();
+            $table->foreignId('equipment_owned_id')->constrained();
             $table->foreignId('borrowing_id')->constrained();
             $table->integer('quantity');
             $table->timestamps();

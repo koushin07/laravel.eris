@@ -16,7 +16,6 @@ return new class extends Migration
         
         Schema::create('equipment', function (Blueprint $table) {
             $table->id();
-            // $table->foreignId('municipality_id')->constrained();
             $table->string('equipment_name');
             $table->string('code');
             $table->string('asset_desc');

@@ -23,15 +23,15 @@ use Inertia\Inertia;
 |
 */
 
+// Route::get('/', function () {
+//     return Inertia::render('Welcome', [
+//         'canLogin' => Route::has('login'),
+//         'canRegister' => Route::has('register'),
+//         'laravelVersion' => Application::VERSION,
+//         'phpVersion' => PHP_VERSION,
+//     ]);
+// });
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
-Route::get('/landing', function () {
     return Inertia::render('LandingPage');
 });
 
@@ -41,9 +41,14 @@ Route::get('/landing', function () {
  */
 require __DIR__ . '/auth.php';
 Route::group(['middleware' => 'auth', 'verified'], function () {
-    Route::get('/dashboard', [PagesController::class, 'index'])->name('dashboard');
+
+    Route::group(['middleware' => 'role:RDRRMC_MUNICIPALITY', 'prefix' => 'municipality', 'as' => 'municipality.'], function(){
+        Route::get('/request', [PagesController::class, 'index']);
+        Route::resource('inventory', EquipmentController::class);
+    });
+    
     Route::resource('transactions', MunicipalityTransactionController::class);
-    Route::resource('equipment', EquipmentController::class);
+    
 
     Route::resource('borrowing', BorrowingController::class);
     Route::resource('office', OfficeController::class);

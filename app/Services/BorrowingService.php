@@ -39,7 +39,7 @@ class BorrowingService
                 dd('office is null');
             }
             // if(is_null($record)){
-            //     dd('record is null');
+            //     dd('record i s null');
             // }
 
             // dd($office->id, $data->equipment_id);
@@ -65,9 +65,10 @@ class BorrowingService
                 if ($total > $data->quantity) {
 
                     DB::transaction(function () use ($data, $office) {
+                        // dd($data);
                         $borrow = Borrowing::create([
                             'borrower' => auth()->id(),
-                            'owner' => $data->owner,
+                            'owner' => 2,
                         ]);
 
                         BorrowingDetails::create([

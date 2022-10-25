@@ -10,7 +10,7 @@ class AssignOffice extends Model
 {
     use HasFactory;
 
-    protected $fillable =['municipality', 'province', 'is_rdrrmc'];
+    protected $fillable =['municipality', 'province', 'is_rdrrmc', 'latitude', 'longitude'];
 
     public function office()
     {

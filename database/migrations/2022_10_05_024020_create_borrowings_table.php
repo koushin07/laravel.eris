@@ -15,9 +15,7 @@ return new class extends Migration
     {
         Schema::create('borrowings', function (Blueprint $table) {
             $table->id();
-            $table->boolean('confirmation')->default(false);
             $table->foreignId('borrower')->constrained('offices');
-            $table->foreignId('owner')->constrained('offices');
             $table->timestamps();
         });
     }

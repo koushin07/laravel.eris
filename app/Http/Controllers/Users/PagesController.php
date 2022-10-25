@@ -56,7 +56,7 @@ class PagesController extends Controller
         if ($status) {
             $status = $status[0];
         }
-        return inertia('Dashboard', [
+        return inertia('municipality/RequestPage', [
             'status' => $status
         ]);
     }
@@ -180,6 +180,18 @@ class PagesController extends Controller
 
     public function distance(LocationService $locService)
     {
-      $locService->getDistance();
+        $provinces = array(
+            'camiguin' => ['Catarman', 'Guinsiliban', 'Mahinog', 'Mambajao', 'Sagay'],
+            'Bukidnon' =>['Baungon','Cabanglasan', 'Damulog', 'Dangcagan', 'Don_Carlos', 'Impasug-Ong']
+        );
+
+        foreach($provinces as $key => $province)
+        {
+            foreach($province as $municipality){
+
+                dd($municipality, $key);
+            }
+            dd($province);
+        }
     }
 }

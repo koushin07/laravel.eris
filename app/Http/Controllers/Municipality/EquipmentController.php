@@ -47,7 +47,7 @@ class EquipmentController extends Controller
         //     )
         //     ->paginate(10)->onEachSide(1)->withQueryString(),
         // ->paginate(); 
-        return inertia('Equipments', [
+        return inertia('municipality/InventoryPage', [
             'equipments' => DB::table('equipment')->select(
                 [
                     'equipment.*',
@@ -55,8 +55,6 @@ class EquipmentController extends Controller
                     'conditions.serviceable',
                     'conditions.unusable',
                     'conditions.poor',
-
-
                 ]
             )
                 ->join('equipment_owneds', 'equipment_owneds.equipment_id', '=', 'equipment.id')
@@ -73,7 +71,7 @@ class EquipmentController extends Controller
                         $q->Where('equipment_owneds.office_id', $owner);
                     }
                 )
-                ->paginate()->onEachSide(1)->withQueryString(),
+                ->paginate(5)->onEachSide(1)->withQueryString(),
 
             'filters' => Request::only(['search', 'status', 'owner'])
         ]);
@@ -115,7 +113,7 @@ class EquipmentController extends Controller
     public function show($id)
     {
         
-        return inertia('Equipment', [
+        return inertia('municipality/InventoyPage', [
             'name' => AssignOffice::select('municipality')->find($id),
             'equipments' => DB::table('equipment')->select(
                 [
