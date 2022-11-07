@@ -1,16 +1,50 @@
 <template>
-    <div class="flex justify-between">
-        <span>municipality</span>
-        <span>a</span>
-    </div>
+   
+        <!-- <ul v-if="pending!==null" class=" flex flex-col py-2">
+            <li v-for="send in pending"
+                class=" relative flex justify-between px-4 py-2 pl-0 mb-2 border-0 rounded-xl text-inherit">
+                <div class="flex flex-col">
+                    <h6 class="mb-1 text-sm font-semibold leading-normal dark:text-white text-slate-700">
+                        {{send.equipment}}</h6>
+
+                    <span class="text-xs text-zinc-900 leading-tight ">Borrower: {{ send.borrower }}</span>
+                    <span class="text-xs text-zinc-900 leading-tight ">Quantity: {{ send.quantity }}</span>
+                </div>
+                <div class="flex flex-col space-y-2  items-center text-md leading-normal dark:text-white/80">
+                    <button @click="$emit('accept', send.id)"
+                        class="text-xs text-white bg-green-500 px-2 py-1 rounded-xl hover:scale-110 hover:shadow-lg">
+                        Accept
+                    </button>
+                    <button @click="$emit('deny', send.id)"
+                        class="text-xs text-white bg-red-500 px-2 py-1 rounded-xl hover:scale-110 hover:shadow-lg">
+                        Deny
+                    </button>
+                </div>
+            </li>
+        </ul>
+        <ul class="flex flex-col py-2" v-else>
+            <li class="relative flex justify-between px-4 py-2 pl-0 mb-2 border-0 rounded-xl text-inherit">
+                <div class="flex flex-col">
+                    <h6 class="mb-1 text-sm font-bold leading-normal dark:text-white text-slate-700">
+                        No Pending Request
+                    </h6>
+
+
+                </div>
+            </li>
+        </ul> -->
+
+
 </template>
 
 <script>
 export default {
     setup() {
+const pending = 1
 
-
-        return {}
+        return {
+            pending
+        }
     }
 }
 </script>
