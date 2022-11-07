@@ -20,7 +20,8 @@ class TransactionDenied implements ShouldBroadcast
      * @return void
      */
     public function __construct(
-        public $borrow,
+        public $office,
+        public $unfinish
     )
     {
         
@@ -33,7 +34,7 @@ class TransactionDenied implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('denied.'.$this->borrow->borrower);
+        return new PrivateChannel('denied.'.$this->office->id);
     }
 
     public function broadcastAs()

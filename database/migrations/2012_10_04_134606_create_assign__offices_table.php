@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('municipality')->nullable();
             $table->string('province')->nullable();
             $table->boolean('is_rdrrmc')->default(false);
-            $table->double('latitude');
-            $table->double('longitude');
+            $table->double('latitude')->nullable();
+            $table->double('longitude')->nullable();
             $table->timestamps();
         });
     }

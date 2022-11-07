@@ -1,23 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\Transactions;
+namespace App\Http\Controllers\Borrow;
 
-use Illuminate\Http\Request;
-use App\Models\Province;
-use App\Models\Equipment;
-use App\Http\Requests\Transactions\CrossTransactionRequest;
+use App\Events\NotifyProvince;
+use App\Events\TransactionConfirmed;
+use App\Events\TransactionDenied;
 use App\Http\Controllers\Controller;
-use App\Models\Municipality;
-use App\Services\CrossTransactionService;
+use App\Models\Office;
+use App\Models\UnfinishTransaction;
+use Illuminate\Http\Request;
 
-class CrossTransactionController extends Controller
+class UnfinishTransactionController extends Controller
 {
-    protected $CTService;
-
-    public function __construct(CrossTransactionService $crossTransactionService)
-    {
-        $this->CTService = $crossTransactionService;
-    }
     /**
      * Display a listing of the resource.
      *
@@ -25,8 +19,7 @@ class CrossTransactionController extends Controller
      */
     public function index()
     {
-        
-     
+        //
     }
 
     /**
@@ -36,10 +29,7 @@ class CrossTransactionController extends Controller
      */
     public function create()
     {
-        return view('cross-transaction.create', [
-            'municipalities' => Municipality::get(['id', 'municipality_name']),
-            'equipments' => Equipment::where('status', 'Serviceable')->groupBy('equipment_name')->get('equipment_name'),
-          ]);
+        //
     }
 
     /**
@@ -48,12 +38,9 @@ class CrossTransactionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(CrossTransactionRequest $request)
+    public function store(Request $request)
     {
-        if ($this->CTService->isEquipmentAvailable( $request->validated())) {
-            return back()->with('success', 'Request Sent');
-        }
-       return back()->with('error', 'equipment not available');
+        //
     }
 
     /**
@@ -99,5 +86,29 @@ class CrossTransactionController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function accepted(Request $request)
+    {
+
+        $unfinish = UnfinishTransaction::create([
+            'borrower' => $request->borrower_id,
+            'owner' => auth()->id(),
+            'quantity' => $request->quantity,
+            'equipment' => $request->equipment
+        ]);
+        auth()->user()->unreadNotifications->where('id', $request->notif_id)->markAsRead();
+        TransactionConfirmed::dispatch(Office::find($request->borrower_id), $unfinish);
+        $province = auth()->user()->assign_office()->province;
+        NotifyProvince::dispatch(Office::where([['name', $province], ['assign', 2]])->firt(), $unfinish->equipment);
+        return response()->noContent();
+    }
+    public function deny(Request $request)
+    {
+
+        auth()->user()->unreadNotifications->where('id', $request->notif_id)->markAsRead();
+
+        TransactionDenied::dispatch(Office::find($request->borrower_id), $unfinish);
+        return response()->noContent();
     }
 }

@@ -12,8 +12,12 @@
 
                     </Link>
 
-                    <span v-else-if="key===0"
-                        class="text-sm font-medium leading-none cursor-pointer text-gray-600 dark:text-gray-200   border-t border-transparent  pt-3 mr-4 px-2"
+                    <span v-else-if="key===0" 
+                        class="text-sm font-medium leading-none text-gray-400 cursor-not-allowed dark:text-gray-200   border-t border-transparent  pt-3 mr-4 px-2"
+                        v-html="link.label">
+                    </span>
+                    <span v-else-if="link.url===null"
+                        class="text-sm font-medium leading-none text-gray-400 cursor-not-allowed dark:text-gray-200   border-t border-transparent  pt-3 mr-4 px-2"
                         v-html="link.label">
                     </span>
 

@@ -70,7 +70,7 @@
 
 
 <script>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import AuthenticatedLayout from '@/Layouts/MunicipalityLayout.vue'
 import { Head } from '@inertiajs/inertia-vue3';
 export default {
     layout: AuthenticatedLayout,

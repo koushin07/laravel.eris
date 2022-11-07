@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Municipality;
 
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request as Req;
 use Illuminate\Auth\Events\Validated;
 use App\Services\EquipmentService;
 use App\Models\User;
@@ -15,10 +16,22 @@ use App\Http\Controllers\Controller;
 use App\Events\NewEquipmentAdded;
 use App\Models\AssignOffice;
 use App\Models\EquipmentOwned;
+use App\Services\LocationService;
 use Illuminate\Support\Facades\DB;
 
 class EquipmentController extends Controller
 {
+
+    protected $equipmentService;
+
+
+    public function __construct(EquipmentService $equipmentService)
+    {
+        $this->equipmentService = $equipmentService;
+    }
+
+
+
     /**
      * Display a listing of the resource.
      *
@@ -26,51 +39,25 @@ class EquipmentController extends Controller
      */
     public function index()
     {
-
-
-        // Equipment::query()
-        //     ->when(
-        //         Request::input('search'),
-        //         function ($q, $search) {
-        //             $q->where('equipment_name', 'like', '%' . $search . '%');
-        //         }
-        //     )->when(
-        //         Request::input('status'),
-        //         function ($q, $status) {
-        //             $q->where('status', 'like', '%' . $status . '%');
-        //         }
-        //     )->when(
-        //         Request::input('owner'),
-        //         function ($q, $owner) {
-        //             $q->Where('municipality_id', auth()->user()->municipality_id);
-        //         }
-        //     )
-        //     ->paginate(10)->onEachSide(1)->withQueryString(),
-        // ->paginate(); 
         return inertia('municipality/InventoryPage', [
             'equipments' => DB::table('equipment')->select(
                 [
                     'equipment.*',
                     'offices.name as owner',
-                    'conditions.serviceable',
-                    'conditions.unusable',
-                    'conditions.poor',
+                    'equipment_details.serviceable',
+                    'equipment_details.unusable',
+                    'equipment_details.poor',
                 ]
             )
                 ->join('equipment_owneds', 'equipment_owneds.equipment_id', '=', 'equipment.id')
-                ->join('conditions', 'conditions.equipment_owner', '=', 'equipment_owneds.id')
+                ->join('equipment_details', 'equipment_details.equipment_owner', '=', 'equipment_owneds.id')
                 ->join('offices', 'offices.id', '=', 'equipment_owneds.office_id')
                 ->when(
                     Request::input('search'),
                     function ($q, $search) {
                         $q->where('equipment_name', 'like', '%' . $search . '%');
                     }
-                )->when(
-                    Request::input('owner'),
-                    function ($q, $owner) {
-                        $q->Where('equipment_owneds.office_id', $owner);
-                    }
-                )
+                )->where('equipment_owneds.office_id', auth()->id())
                 ->paginate(5)->onEachSide(1)->withQueryString(),
 
             'filters' => Request::only(['search', 'status', 'owner'])
@@ -84,24 +71,18 @@ class EquipmentController extends Controller
      */
     public function create()
     {
-        dd('yes');
-        //
+        return inertia('municipality/FormPage');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(CreateEquipmentRequest $request, EquipmentService $equipmentService)
+
+    public function store(CreateEquipmentRequest $request)
     {
         // dd($request);
         $request->validated();
-        // $this->authorize('municipality');
-        $equipmentService->insertData($request);
-        NewEquipmentAdded::dispatch();
-        return redirect('/equipment');
+
+        $this->equipmentService->insertData($request);
+        // NewEquipmentAdded::dispatch();
+        return;
     }
 
     /**
@@ -112,22 +93,22 @@ class EquipmentController extends Controller
      */
     public function show($id)
     {
-        
+
         return inertia('municipality/InventoyPage', [
             'name' => AssignOffice::select('municipality')->find($id),
             'equipments' => DB::table('equipment')->select(
                 [
                     'equipment.*',
                     'offices.name as owner',
-                    'conditions.serviceable',
-                    'conditions.unusable',
-                    'conditions.poor',
+                    'equipment_details.serviceable',
+                    'equipment_details.unusable',
+                    'equipment_details.poor',
 
 
                 ]
             )
                 ->join('equipment_owneds', 'equipment_owneds.equipment_id', '=', 'equipment.id')
-                ->join('conditions', 'conditions.equipment_owner', '=', 'equipment_owneds.id')
+                ->join('equipment_details', 'equipment_details.equipment_owner', '=', 'equipment_owneds.id')
                 ->join('offices', 'offices.id', '=', 'equipment_owneds.office_id')
                 ->when(
                     Request::input('search'),
@@ -135,18 +116,31 @@ class EquipmentController extends Controller
                         $q->where('equipment_name', 'like', '%' . $search . '%');
                     }
                 )->Where('equipment_owneds.office_id', $id)
-                ->paginate(10)->onEachSide(1)->withQueryString(),
+                ->paginate(2)->onEachSide(1)->withQueryString(),
 
 
             'filters' => Request::only(['search', 'status'])
         ]);
     }
 
-    public function update(UpdateEquipmentRequest $request, Equipment $equipment)
+    public function update(UpdateEquipmentRequest $request, $id)
     {
-        $this->authorize('update-equipment', $equipment);
-        $equipment->update($request->validated());
-        return back()->with('success', 'Successfully Updated', 'yes');
+        $request->validated();
+        $equipment = Equipment::find($id);
+        $equipment->update([
+            'equipment_name' => $request->equipment_name,
+            'code' => $request->code,
+            'asset_desc' =>$request->asset_desc,
+            'category'=>$request->category,
+            'unit' =>$request->unit,
+            'model_number' =>$request->model_number,
+            'serial_number' =>$request->serial_number,
+            'asset_id' =>$request->asset_id,
+            'remarks' =>$request->remarks,
+        ]);
+        dd($equipment, $request->category);
+        // $equipment->update($request->validated());
+        return ;
     }
 
     public function getEquipment($name)
@@ -156,9 +150,9 @@ class EquipmentController extends Controller
 
         return EquipmentOwned::query()
             ->join('equipment', 'equipment_owneds.equipment_id', 'equipment.id')
-            ->join('offices', 'offices.id','equipment_owneds.office_id')
+            ->join('offices', 'offices.id', 'equipment_owneds.office_id')
             ->join('assign_offices', 'assign_offices.id', 'offices.assign')
-            ->join('conditions', 'conditions.equipment_owner', 'equipment_owneds.id')
+            ->join('equipment_details', 'equipment_details.equipment_owner', 'equipment_owneds.id')
             ->where('assign_offices.municipality', $name)
             ->get();
 
@@ -170,5 +164,44 @@ class EquipmentController extends Controller
         abort_unless(auth()->check(), 403);
 
         return Equipment::where('equipment_name', '=', $name)->get();
+    }
+
+    public function municipalityList($name, $quantity, LocationService $locationService)
+    {
+
+        $quantity = $quantity == null ? 1 : $quantity;
+        return response()->json($locationService->getDistance($name, $quantity));
+    }
+
+    public function CrossMunicipalityList($name, $quantity, LocationService $locationService)
+    {
+
+        $quantity = $quantity == null ? 1 : $quantity;
+        return response()->json($locationService->getDistance($name, $quantity, 'regional'));
+    }
+
+    public function equipmentAttr(Req $request)
+    {
+
+        $validated = $request->validate([
+            'id' => 'required',
+            'equipment_name' => 'required',
+            'serial_number' => ['required', 'numeric'],
+            'unit' => ['required', 'numeric'],
+            'code' => 'required',
+            'model_number' => ['required', 'numeric'],
+            'asset_id' => ['required', 'numeric'],
+            'quantity' => ['required', 'numeric'],
+        ]);
+
+        $status = $this->equipmentService->fulfillTransaction($request);
+
+        if ($status == 200) {
+            return response()->noContent($status);
+        }
+
+        if ($status == 400) {
+            return response()->noContent($status);
+        }
     }
 }

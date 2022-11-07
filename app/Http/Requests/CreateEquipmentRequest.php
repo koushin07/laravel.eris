@@ -24,6 +24,7 @@ class CreateEquipmentRequest extends FormRequest
     public function rules()
     {
         return [
+            
             'equipment_name' => 'required',
             'code'  => 'required',
             'asset_desc'  => 'required',

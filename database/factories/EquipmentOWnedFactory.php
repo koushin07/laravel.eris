@@ -21,7 +21,6 @@ class EquipmentOWnedFactory extends Factory
         return [
             'equipment_id' =>Equipment::pluck('id')->random(),
             'office_id' => Office::pluck('id')->random(),
-            'quantity' => $this->faker->randomDigitNotZero(),
         ];
     }
 }

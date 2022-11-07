@@ -1,9 +1,12 @@
 <?php
+
 namespace App\Services;
+
+use Illuminate\Support\Facades\DB;
 
 class LocationService
 {
-    
+
     public function haversine($latitude1, $longitude1, $latitude2, $longitude2)
     {
 
@@ -20,51 +23,101 @@ class LocationService
         return $d;
     }
 
-    public function geo_location($office)
+    public function fetchAvailableOffices($quantity, $equipment)
     {
-        $provinces = collect([
-            'mis_or' => collect([
-                'Alubijid' => array('lat' => 8.570987484492505, 'long' => 124.47310579251179),
-                'Balingasag ' => array('lat' => 8.742647289896173, 'long' => 124.77435680648715),
-                'balingoan' => array('lat' => 9.00351802981955, 'long' => 124.85641295436021),
-                'binuangan' => array('lat' => 8.921984622151621, 'long' => 124.7856545831952),
-                'CDO' => array('lat' => 8.47676893229092, 'long' => 124.64136559723777),
-                'claveria' => array('lat' => 8.620819700538966, 'long' => 124.9062569831937),
-                'el_salvador' => array('lat' => 8.558615496844213, 'long' => 124.52698286969947),
-                'gingoog' => array('lat' => 8.81648263094006, 'long' => 125.10364655435933),
 
-            ]),
-        ]);
+        return  DB::select(
+            "SELECT
+             o.name AS owner,
+            e.equipment_name,
+            o.id as owner_id,
+            SUM(ed.serviceable) as serviceable,
+            ao.latitude,
+            ao.longitude
+        FROM
+            offices o
+            JOIN equipment_owneds oe ON oe.office_id = o.id
+            JOIN equipment_details ed ON ed.equipment_owner = oe.id
+            JOIN equipment e ON e.id = oe.equipment_id
+            JOIN assign_offices ao ON ao.id = o.assign
+        where
+            e.equipment_name = :equipment
+            AND ed.serviceable >:quantity
+            AND ao.province = :province
+            AND NOT o.assign = :id
+            GROUP BY
+            owner",
+            [
+                'province' => auth()->user()->assign_office()->first('province')->province,
+                'id' => auth()->user()->assign,
+                'quantity' => $quantity,
+                'equipment' => $equipment
+            ],
+            false
 
-
-        //check what province the auth belongs to
-        $myProvince = $provinces->map(function ($province) {
-            if ($province == $office) {
-                return $province;
-            }
-        });
-
-        return $myProvince;
+        );
     }
 
-    public function getDistance()
+    public function fetchCrossOffices($quantity, $equipment)
     {
-        $myProvince = $this->geo_location(auth()->user()->assign_office()->municipality);
-        $myLocation = $myProvince->pluck(auth()->user()->assign_office()->municipality);
-        $myProvince = $myProvince->except(auth()->user()->assign_office()->municipality);
+        return  DB::select(
+            "SELECT 
+                        e.*, 
+                        o.name AS owner,
+                        o.id as owner_id,
+                        SUM(ed.serviceable) as serviceable, 
+                        ao.latitude,
+                        ao.longitude 
+                        FROM equipment e
+                            JOIN equipment_owneds oe ON oe.equipment_id = e.id
+                            JOIN equipment_details ed ON ed.equipment_owner = oe.id
+                            JOIN offices o ON o.id = oe.office_id
+                            JOIN assign_offices ao ON ao.id = o.assign
+                                where e.equipment_name =:equipment
+                                AND     
+                                ed.serviceable > :quantity 
+                                AND NOT
+                                o.assign =:id 
+                                GROUP BY owner",
+            [
+                'id' => auth()->user()->assign,
+                'quantity' => $quantity,
+                'equipment' => $equipment
+            ]
+        );
+    }
 
-       
-        $ditances = array();
-        foreach ($myProvince as $municipality) {
-            $distance = $this->haversine(
-                $myLocation['lat'],
-                $myLocation['long'],
-                $municipality['lat'],
-                $municipality['long']
-            );
-           array_push($ditances, $distance);
+    public function getDistance($name, $quantity, $mode = 'local')
+    {
+        //fetch data
+        //calculate data
+        $distance = collect();
+        $myDistance = auth()->user()->assign_office()->first(['latitude', 'longitude']);
+
+        if ($mode == 'local') {
+            $data = $this->fetchAvailableOffices($quantity, $name);
+            
+        } elseif ($mode == 'regional') {
+            $data = $this->fetchCrossOffices($quantity, $name);
         }
-        sort($ditances);
-        dd($ditances);
+
+        foreach ($data as $datum) {
+
+            $distance->push(
+                [
+                    "municipality" => $datum->owner,
+                    "municipality_id" => $datum->owner_id,
+                    "distance" => round($this->haversine(
+                        $myDistance->latitude,
+                        $myDistance->longitude,
+                        $datum->latitude,
+                        $datum->longitude,
+                    ), 2) ,
+                    "quantity" => $datum->serviceable
+                ]
+            );
+        }
+        $sorted = $distance->sortBy('distance');
+        return $sorted->values()->all();
     }
 }

@@ -1,78 +1,196 @@
 <template>
 
     <ContentBox>
-        <div class="grid grid-cols-3 gap-5 h-full">
-            <form class="flex flex-col col-span-2 justify-between" @submit.prevent="HandleSubmit">
-                <div class="grid gap-10">
-                    <div class="relative flex flex-col z-0  ">
-                        <label for="Equipment" class="text-sm font-bold">Equipment</label>
-                        <div class="relative ">
-                            <input type="search" id="search-dropdown"
-                                class="block  w-full z-20 text-sm border-2 bg-transparent rounded-lg focus:outline-none focus:ring-0  py-2 px-1
-                                "
-                               required>
-                            <button type="submit"
-                                class="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-blue-700 
-                                rounded-r-lg border-2 border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none
-                                 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"><svg
-                                    aria-hidden="true" class="w-5 h-5" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                </svg></button>
-                        </div>
-                    </div>
-                    <div class="relative flex flex-col z-0 w-64 ">
-                        <label for="Quantity" class="text-sm font-bold">Quantity</label>
-                        <input name="Quantity" type="number" v-model="request.quanity"
-                            class="border-2 bg-transparent rounded-lg focus:outline-none focus:ring-0  py-2 px-1" />
-                    </div>
-                </div>
-                <div class="flex justify-between pb-10">
-                    <button type="button" class="w-60 border-2 rounded-md bg-orange-400 py-2"  @click="broadcast">Request</button>
-                    <div class="">
+        <Local-transactions :equipments="equipments" />
+      
 
-                        <input type="radio" name="crosstransaction" id="" class="w-5 h-5 align-middle">
-                        <label class="align-middle">crosstransaction</label>
-
-                    </div>
-
-                </div>
-            </form>
-            <div class="flex flex-col ">
-                <span class="text-lg font-semibold font-sans text-center">Municipalities</span>
-                <div class="box-content border-2 h-full rounded-lg"></div>
-            </div>
-        </div>
     </ContentBox>
-    <ContentBox></ContentBox>
+
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import ContentBox from '../../Components/ContentBox.vue'
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-
+import MunicipalityLayout from '@/Layouts/MunicipalityLayout.vue';
+import EquipmentList from '../../Components/Lists/EquipmentList.vue';
+import axios from 'axios';
+import { usePage } from '@inertiajs/inertia-vue3';
+import LocalTransactions from '@/Components/LocalTransactions.vue';
 export default {
-    layout: AuthenticatedLayout,
+    props: {
+        equipments: Object
+    },
+    components: {
+        ContentBox,
+        EquipmentList,
+        LocalTransactions
+    },
+    layout: MunicipalityLayout,
     setup() {
 
-        const request = ref({
-            equipment: '',  
-            quanity: Number,
-        })
-        const HandleSubmit = async () => {
+      
+
+        const selectAll = ref([])
+        const selectClick = ref(false)
+        const notFound = ref(true)
+        const municipalities = ref([])
+        const equipments = ref({})
+        const quantity = ref();
+        const pendings = ref([]);
+
+        const getEquipment = async (equipment) => {
+            console.log(radio.value)
+            if (quantity.value) {
+                
+                if(!radio.value == false){
+                    await axios.post(`/api/equipment/${equipment.equipment_name}/quantity/${quantity.value}`)
+                    .then((res) => {
+                        console.log(res.data)
+                        equipments.value = equipment
+                        municipalities.value = res.data
+                        notFound.value = false
+                      
+                    })
+                  
+                }else{
+                    await axios.post(`/api/cross/equipment/${equipment.equipment_name}/quantity/${quantity.value}`)
+                    .then((res) => {
+                        console.log(res.data)
+                        equipments.value = equipment
+                        municipalities.value = res.data
+                        notFound.value = false
+                      
+                    })
+                }
+             
+            } else {
+                alert('please fill up quantity field')
+            }
 
         }
+        const setItem = (muni, equipment) => {
+            let date = new Date(new Date().getTime() + (60000 * 10))
+            muni['expiration'] = date
+            muni['equipment'] = equipment //equipments.value.equipment_name 
+            muni['status'] = 'pending'
 
-       
+
+            for (let p in pendings.value) {
+
+                if (pendings.value[p].municipality === muni.municipality && pendings.value[p].equipment === muni.equipment) {
+                    pendings.value.splice(p, 1)
+                    console.log(pendings.value[p])
+                }
+            }
+            pendings.value.push(muni)
+        }
+
+        const handleSelectAll = async () => {
+
+            for (let i in municipalities.value) {
+                selectAll.value[i] = municipalities.value[i].municipality_id
+                setItem(municipalities.value[i], equipments.value.equipment_name)
+
+            }
+            await axios.post(`/api/requestAll`, {
+
+                equipment: equipments.value.equipment_name,
+                municipalities: selectAll.value,
+                quantity: quantity.value,
+
+            }).then((res) => {
+
+
+                municipalities.value = res.data
+
+            }).catch((err) => { console.log(err) })
+        }
+
+        const handleRequest = async (muni) => {
+            municipalities.value = Object.values(municipalities.value).filter((m) => {
+                return m.municipality_id !== muni.municipality_id
+            })
+            setItem(muni, equipments.value.equipment_name)
+
+
+
+            await axios
+                .post(
+                    `/api/${equipments.value.equipment_name}/request/${muni.municipality_id}/${quantity.value}
+                `)
+                .then((res) => {
+                    console.log(res)
+
+                })
+
+        }
+        window.Echo.private(`confirmed.${usePage().props.value.auth.user.id}`)
+            .listen('.equipment.confirmed', (e) => {
+
+                alert('borrow accepted', e)
+
+                Object.values(pendings.value).filter((p) => {
+                    if (e.unfinish.owner === p.municipality_id && e.unfinish.equipment === p.equipment && p.status === 'pending') {
+                        p.status = 'accept'
+                    }
+                })
+
+            })
+        window.Echo.private(`denied.${usePage().props.value.auth.user.id}`)
+            .listen('.equipment.denied', (e) => {
+
+                alert('borrow denied', e)
+
+                Object.values(pendings.value).filter((p) => {
+                    if (e.unfinish.owner === p.municipality_id && e.unfinish.equipment === p.equipment && p.status === 'pending') {
+                        p.status = 'denied'
+                    }
+                })
+
+            })
+        watch(pendings.value, (value) => {
+
+            // console.log('this is value',value)
+            // setWithExpiry('municipality', value, 20)
+
+            window.localStorage.setItem('municipality', JSON.stringify(value))
+        })
+
+
+        onMounted(() => {
+            let exist = JSON.parse(localStorage.getItem('municipality'))
+
+            if (exist !== null) {
+
+                for (let e in exist) {
+
+                    if (new Date(new Date().getTime()) < new Date(exist[e].expiration)) {
+                        console.log('is')
+                        pendings.value.push(exist[e])
+                    }
+
+                }
+
+            }
+        })
+
+
 
         return {
-            request,
-           
+            selectClick,
+            notFound,
+            quantity,
+            getEquipment,
+            municipalities,
+            handleSelectAll,
+            handleRequest,
+            pendings,
+            
+
+
         };
     },
-    components: { ContentBox }
+
 }
 </script>
 

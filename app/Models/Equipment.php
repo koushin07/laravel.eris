@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\EquipmentOwned;
 
 class Equipment extends Model
 {
@@ -12,7 +13,6 @@ class Equipment extends Model
 
     protected $fillable = [
         'equipment_name',
-        'municipality_id',
         'code',
         'asset_desc',
         'category',
@@ -25,8 +25,8 @@ class Equipment extends Model
     ];
 
 
-    public function municipality()
+    public function equipment_owned()
     {
-        return $this->belongsTo(Municipality::class);
+        return $this->hasMany(EquipmentOwned::class);
     }
 }

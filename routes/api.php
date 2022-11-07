@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Municipality\EquipmentController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\MunicipalityTransaction;
+use App\Models\Office;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,9 +22,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-
-Route::get('/users', function(){
+Route::post('/users', function(){
 return User::all();
-})->middleware('auth');
+})->middleware('auth:');
 
-Route::get('/transactions', fn() =>MunicipalityTransaction::with(['equipment', 'municipality'])->take(3)->get()->toJson());
+Route::get('/use', fn()=>auth()->user());

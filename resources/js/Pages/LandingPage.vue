@@ -1,42 +1,68 @@
 <template>
 
+    <section class="full-page flex justify-between " id="home">
+        <div class="flex flex-col animate-fade-in-down">
+            <nav class=" navbar flex  p-7  antialiased font-sans">
+
+                <div class="hidden md:flex space-x-6 text-white">
+                    <a href="#home" class="m-4 my-3 rounded-lg text-xl">Home</a>
+                    <a class=" m-4 my-3 rounded-lg text-xl">Services</a>
+                    <a href="#rdrrmc" class="m-2 my-3 rounded-lg text-xl">About</a>
+                    <a href="#contact" class="m-4 my-3 rounded-lg text-xl">Contact</a>
+                </div>
+            </nav>
+        </div>
 
 
+        <div class="flex m-2 py-10 bg-white animate-fade-in-down">
+
+            <form class="flex flex-col justify-around pt-0 px-14 pb-2 font-sans" @submit.prevent="submit">
+                <h1 class="font-extrabold text-transparent text-center bg-clip-text bg-gradient-to-r from-orange-600 to-pink-400"
+                    style="font-family:Courier; font-size: 3rem;">Login</h1>
+                <h4 v-if="!$page.props.auth.user"
+                    class="font-extrabold text-transparent text-center bg-clip-text bg-gradient-to-r from-orange-600 to-pink-400"
+                    style="font-family:Courier; font-size: 2rem;">Log in to EPRRIS</h4>
+
+                <inertia-link href="/municipality/request"
+                    v-if="$page.props.auth.user && $page.props.auth.user.role_id === 1"
+                    class="font-extrabold text-transparent text-lg text-center bg-clip-text bg-gradient-to-r from-orange-600 to-pink-400"
+                    style="font-family:Courier; ">Click here to re direct</inertia-link>
+
+                <div class="relative flex flex-col z-0  " v-if="!$page.props.auth.user">
+                    <InputLabel for="email" value="email" />
+                    <TextInput id="email" type="email" class="mt-1 block w-full" v-model="form.email" required autofocus
+                        autocomplete="username" />
+
+                    <InputError class="mt-2" :message="form.errors.email" />
+                </div>
+                <div class="relative flex flex-col z-0  pb-10 space-y-2 " v-if="!$page.props.auth.user">
+                    <div class="flex justify-between">
+                        <!-- <label for="password" class="text-sm font-bold">Password</label> -->
+                        <InputLabel for="password" value="Password" />
+                        <a class="text-sm font-bold cursor-pointer" :class="showpassword ? 'text-blue-500' : ''"
+                            type="button" @click="showpassword = !showpassword">show</a>
+                    </div>
 
 
+                    <TextInput id="password" :type="showpassword ? 'text' : 'password'" class="mt-1 block w-full"
+                        v-model="form.password" required autocomplete="current-password" />
+                    <InputError class="mt-2" :message="form.errors.password" />
+                    <!-- <input v-if="showpassword" name="password" type="text" v-model="form.password"
+                        class="border-2 bg-transparent focus:outline-none focus:ring-0 py-2 px-1" />
+                    <input v-else name="password" type="password" v-model="form.password"
+                        class="border-2 bg-transparent focus:outline-none focus:ring-0 py-2 px-1" /> -->
 
-    <section class="full-page" id="home">
-        <nav class=" navbar flex justify-between p-7  antialiased font-sans">
-            <div class="flex text-white text-3xl">EPRRIS-X</div>
-            <div class="hidden md:flex space-x-6 text-white">
-                <a href="#home" class="border-2 p-4 py-3 rounded-lg">Home</a>
-                <a class="border-2 p-4 py-3 rounded-lg">Services</a>
-                <a href="#rdrrmc" class="border-2 p-2 py-3 rounded-lg">About</a>
-                <a href="#contact" class="border-2 p-4 py-3 rounded-lg">Contact</a>
-            </div>
-        </nav>
-        <section class="flex justify-center">
-            <!-- container 1 for text -->
-            <div class="flex flex-col gap-2 ">
-                <div class="grid grid-cols-2 gap-2">
-                    <!-- <span
-                                class="text-center tracking-wide antialiased text-white text-9xl pt-10 font-mono">EPRRIS</span> -->
-                    <h1 class="px-6 tracking-wide definition text-3xl uppercase text-white pt-20">regional
-                        emergency preparedness
-                        and response resources inventory system</h1>
                 </div>
 
-            </div>
+                <button v-if="!$page.props.auth.user" type="submit" class="text-white bg-orange-700 hover:bg-orange-800 focus:ring-4 
+                        focus:ring-orange-300 font-medium text-sm px-5 py-2.5 mx-5 mb-2 
+                        dark:bg-orange-600 dark:hover:bg-orange-700 focus:outline-none dark:focus:ring-orange-800">Sign
+                    in</button>
+            </form>
 
-
-
-
-        </section>
-
-
+        </div>
 
     </section>
-
     <!-- RDRRMC -->
     <div class="body">
         <section class="flex flex-col p-16 py-4 md:py-16 h-fit md:h-screen" id="rdrrmc">
@@ -125,7 +151,7 @@
                     <div class="flex flex-col self-center w-4/5 bg-white px-10 py-16
                      drop-shadow-xl space-y-12 contact h-full">
                         <h2 class="font-bold text-3xl pt-5">Send Message</h2>
-                        <form class="px-5" @submit.prevent="submit">
+                        <!-- <form class="px-5" @submit.prevent="submit">
                             <div class="relative z-0 mb-6 w-full group">
                                 <input type="text" name="full_name" id="floating_email" v-model="form.fullName"
                                     class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-black appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
@@ -138,7 +164,7 @@
                                     Full Name</label>
                             </div>
                             <div class="relative z-0 mb-6 w-full group">
-                                <input  type="email" name="email" id="email" v-model="form.email"
+                                <input type="email" name="email" id="email" v-model="form.email"
                                     class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-black appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                                     placeholder=" " required />
                                 <label for="email" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 
@@ -149,7 +175,8 @@
                                     Email</label>
                             </div>
                             <div class="relative z-0 mb-6 w-full group">
-                                <textarea type="password" name="floating_password" id="floating_password" v-model="form.message"
+                                <textarea type="password" name="floating_password" id="floating_password"
+                                    v-model="form.message"
                                     class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-black appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                                     placeholder=" " required />
                                 <label for="floating_password" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 
@@ -161,7 +188,7 @@
                             </div>
                             <button type="submit" class="mt-5 rounded-md bg-blue-500 px-6 py-2">Send</button>
 
-                        </form>
+                        </form> -->
                     </div>
 
                     <div class="grid grid-cols-2 md:grid-cols-1 self-center md:self-stretch w-4/5 py-20  text-center">
@@ -215,18 +242,41 @@ import DILG from '../../../public/landingpage/logos/agencies/DILG.png'
 import DOH from '../../../public/landingpage/logos/agencies/DOH.png'
 import OCD from '../../../public/landingpage/logos/agencies/OCD.png'
 import PNP from '../../../public/landingpage/logos/agencies/PNP.png'
+
+
+import InputError from '@/Components/InputError.vue';
+import InputLabel from '@/Components/InputLabel.vue';
+import TextInput from '@/Components/TextInput.vue';
+import { ref } from 'vue';
 export default {
+    components: {
+        TextInput,
+        InputLabel,
+        InputError
+
+    },
     setup() {
-
+        const showpassword = ref(false)
         const form = useForm({
-            fullName: '',
             email: '',
-            message: '',
-        })
+            password: '',
+            remember: false
+        });
 
-        const submit = () =>{
-            console.log(form)
-        }
+        const submit = () => {
+            form.post(route('login'), {
+                onFinish: () => form.reset('password'),
+            });
+        };
+        // const form = useForm({
+        //     fullName: '',
+        //     email: '',
+        //     message: '',
+        // })
+
+        // const submit = () => {
+        //     console.log(form)
+        // }
         const agencies = [
             {
                 name: 'Armed Forces of the Philippines (AFP)',
@@ -258,6 +308,7 @@ export default {
 
         ]
         return {
+            showpassword,
             agencies,
             submit,
             form,
@@ -269,7 +320,7 @@ export default {
 <style scoped>
 .full-page {
     background-image: linear-gradient(rgba(0, 0, 0, 0.7),
-            rgba(0, 0, 0, 0.1)), url('landingpage/landingBackground.png');
+            rgba(0, 0, 0, 0.1)), url('landingpage/loginbackground.png');
     height: 100vh;
     background-size: cover;
     background-position: center;

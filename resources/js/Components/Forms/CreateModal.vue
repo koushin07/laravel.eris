@@ -33,7 +33,7 @@
                                                     class="block text-sm font-medium text-gray-700">Equipment
                                                     Name</label>
                                                 <input type="text" name="equipment_name" id="equipment_name"
-                                                    v-model="form.equipment_name"
+                                                    vModel="form.equipment_name"
                                                     class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                                     required="">
                                                 <InputError class="mt-2" :message="form.errors.equipment_name" />
@@ -63,7 +63,7 @@
                                                 <label for="serviceable"
                                                     class="block text-sm font-medium text-gray-700">Seriveable</label>
                                                 <input type="number" name="serviceable" id="serviceable" required=""
-                                                    v-model="form.serviceable"
+                                                    vModel="form.serviceable"
                                                     class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                                 <InputError class="mt-2" :message="form.errors.serviceable" />
                                             </div>
@@ -71,7 +71,7 @@
                                                 <label for="unusable"
                                                     class="block text-sm font-medium text-gray-700">Unusable</label>
                                                 <input type="number" name="unusable" id="unusable" required=""
-                                                    v-model="form.unusable"
+                                                    vModel="form.unusable"
                                                     class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                                 <InputError class="mt-2" :message="form.errors.unusable" />
                                             </div>
@@ -82,7 +82,7 @@
                                                 <label for="poor"
                                                     class="block text-sm font-medium text-gray-700">Poor</label>
                                                 <input type="number" name="poor" id="poor"
-                                                    v-model="form.poor"
+                                                    vModel="form.poor"
                                                     class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                                 <InputError class="mt-2" :message="form.errors.poor" />
                                             </div>
@@ -92,7 +92,7 @@
                                                     class="block text-sm font-medium text-gray-700">Model
                                                     Number</label>
                                                 <input type="number" name="model_number" id="model_number" required=""
-                                                    v-model="form.model_number"
+                                                    vModel="form.model_number"
                                                     class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                                 <InputError class="mt-2" :message="form.errors.model_number" />
                                             </div>
@@ -100,7 +100,7 @@
                                                 <label for="asset_id"
                                                     class="block text-sm font-medium text-gray-700">asset ID</label>
                                                 <input type="number" name="asset_id" id="asset_id" required=""
-                                                    v-model="form.asset_id"
+                                                    vModel="form.asset_id"
                                                     class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                                 <InputError class="mt-2" :message="form.errors.asset_id" />
                                             </div>
@@ -112,7 +112,7 @@
                                                     class="block text-sm font-medium text-gray-700">Serial
                                                     Number</label>
                                                 <input type="number" name="serial_number" id="serial_number"
-                                                    v-model="form.serial_number"
+                                                    vModel="form.serial_number"
                                                     class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                                 <InputError class="mt-2" :message="form.errors.serial_number" />
                                             </div>
@@ -121,7 +121,7 @@
                                             <div class="col-span-6 sm:col-span-3 lg:col-span-2">
                                                 <label for="unit" class="block text-sm font-medium text-gray-700">Unit
                                                 </label>
-                                                <input type="number" name="unit" id="unit" v-model="form.unit"
+                                                <input type="number" name="unit" id="unit" vModel="form.unit"
                                                     class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                                 <InputError class="mt-2" :message="form.errors.unit" />
                                             </div>
@@ -129,7 +129,7 @@
                                             <div class="col-span-6 sm:col-span-3">
                                                 <label for="code" class="block text-sm font-medium text-gray-700">Code
                                                 </label>
-                                                <input type="text" name="code" id="code" v-model="form.code"
+                                                <input type="text" name="code" id="code" vModel="form.code"
                                                     class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                                 <InputError class="mt-2" :message="form.errors.code" />
 
@@ -164,7 +164,7 @@
                                                 class="block text-sm font-medium text-gray-700">Asset
                                                 Description</label>
                                             <input type="text" name="asset_desc" id="asset_desc" required=""
-                                                v-model="form.asset_desc"
+                                                vModel="form.asset_desc"
                                                 class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                             <InputError class="mt-2" :message="form.errors.asset_desc" />
                                         </div>
@@ -173,7 +173,7 @@
                                             <label for="remarks"
                                                 class="block text-sm font-medium text-gray-700">Remarks</label>
                                             <input type="text" name="remarks" id="remarks" required=""
-                                                v-model="form.remarks"
+                                                vModel="form.remarks"
                                                 class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                             <InputError class="mt-2" :message="form.errors.remarks" />
                                         </div>

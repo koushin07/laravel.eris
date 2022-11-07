@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Office;
 
-use App\Http\Controllers\Controller;
-use App\Models\Office;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Models\UnfinishTransaction;
+use App\Models\Office;
+use App\Models\IncidentReport;
+use App\Models\BorrowingDetails;
+use App\Http\Controllers\Controller;
 
 class OfficeController extends Controller
 {
@@ -15,8 +19,31 @@ class OfficeController extends Controller
      */
     public function index()
     {
-        return inertia('Provinces',[
-            'provinces' => AssignOffice::select(['id', 'province'])->get()->unique('province'),
+       
+        return inertia('AccountPage', [
+            'reports' =>  IncidentReport::where([
+                ['reciever', auth()->id()],
+                ['filename', null],
+                ['file_path', null]
+                ])->count(),
+            'status' => DB::select(
+                "SELECT
+                SUM(serviceable + unusable+ poor) AS total,
+                        SUM(serviceable) AS serviceable,
+                        SUM(unusable) AS unusable,
+                        SUM(poor) AS poor
+                      FROM equipment_details ed
+                      JOIN equipment_owneds eo ON eo.id = ed.equipment_owner
+                      JOIN offices o ON o.id = eo.office_id
+                       WHERE o.id = :myid",
+                [
+                    'myid' => auth()->id(),
+                ]
+            )[0],
+            'notification' =>auth()->user()->unreadNotifications()->count(),
+            'unfinish' => UnfinishTransaction::where('owner', auth()->id())->count(),
+            
+
         ]);
     }
 

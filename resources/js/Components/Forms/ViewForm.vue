@@ -9,7 +9,7 @@
                         Name</label>
                     <input type="text" name="equipment_name" id="equipment_name"
                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                        :value="form.equipment_name" required="" disabled>
+                        :v-model="form.equipment_name" required="" disabled>
 
                 </div>
 
@@ -34,7 +34,7 @@
                 <div class="col-span-6 sm:col-span-6 lg:col-span-2">
                     <label for="model_number" class="block text-sm font-medium text-gray-700">Model
                         Number</label>
-                    <input disabled type="number" name="model_number" id="model_number" :value="form.model_number"
+                    <input disabled type="number" name="model_number" id="model_number" :v-model="form.model_number"
                         required=""
                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                 </div>
@@ -44,7 +44,7 @@
                 <div class="col-span-6 sm:col-span-3 lg:col-span-2">
                     <label for="serial_number" class="block text-sm font-medium text-gray-700">Serial
                         Number</label>
-                    <input disabled type="number" name="serial_number" id="serial_number" :value="form.serial_number"
+                    <input disabled type="number" name="serial_number" id="serial_number" :v-model="form.serial_number"
                         required=""
                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                 </div>
@@ -53,7 +53,7 @@
                 <div class="col-span-6 sm:col-span-3 lg:col-span-2">
                     <label for="unit" class="block text-sm font-medium text-gray-700">Unit
                     </label>
-                    <input disabled type="number" name="unit" id="unit" :value="form.unit" required=""
+                    <input disabled type="number" name="unit" id="unit" :v-model="form.unit" required=""
                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                 </div>
 
@@ -62,7 +62,7 @@
                     </label>
                     <input disabled type="text" name="code" id="code"
                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                        :value="form.code" required="">
+                        :v-model="form.code" required="">
 
                 </div>
                 <div class="col-span-6 sm:col-span-3">
@@ -70,7 +70,7 @@
                     </label>
                     <input disabled type="number" name="asset_id" id="asset_id"
                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                        :value="form.asset_id" required="">
+                        :v-model="form.asset_id" required="">
 
                 </div>
 
@@ -98,13 +98,13 @@
             <div class="col-span-6">
                 <label for="asset_desc" class="block text-sm font-medium text-gray-700">Asset
                     Description</label>
-                <input disabled type="text" name="asset_desc" id="asset_desc" :value="form.asset_desc" required=""
+                <input disabled type="text" name="asset_desc" id="asset_desc" :v-model="form.asset_desc" required=""
                     class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
             </div>
 
             <div class="col-span-6">
                 <label for="remarks" class="block text-sm font-medium text-gray-700">Remarks</label>
-                <input disabled type="text" name="remarks" id="remarks" :value="form.remarks" required=""
+                <input disabled type="text" name="remarks" id="remarks" :v-model="form.remarks" required=""
                     class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
             </div>
 

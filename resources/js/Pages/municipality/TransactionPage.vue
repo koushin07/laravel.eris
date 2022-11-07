@@ -1,11 +1,14 @@
 <template>
-<Head title="Tansaction"/>
+
+    <Head title="Tansaction" />
     <Content-box>
         <!-- grid grid-cols-5 gap-2 -->
 
         <!-- Requests -->
         <div class="flex flex-col col-span-2  overflow-hidden h-full ">
-            <span class="text-lg font-semibold font-sans text-center">Requests</span>
+            <span class="text-lg font-semibold font-sans text-center" v-if="notifications.length === 0">No Equipment
+                Request Accepted</span>
+            <span class="text-lg font-semibold font-sans text-center" v-else>Requests</span>
             <div class=" flex flex-col justify-between overflow-y-auto border-2 rounded-lg    space-y-2 scrollbar">
                 <div v-for="(notification, key ) in notifications" :key="key"
                     class="rounded-lg p-4  relative text-center flex justify-between pr-2 border-b pb-2 border-red-200 last:border-transparent">
@@ -26,10 +29,10 @@
 
                     <div class="flex flex-col justify-between space-y-2">
                         <button
-                            @click="accept(notification.data.equipment, notification.data.borrower_id, notification.id, notification.data.borrower[0].municipality)"
+                            @click="accept(notification.data.equipment, notification.data.borrower_id, notification.id, notification.data.borrower[0].municipality, notification.data.quantity)"
                             class=" text-sm  hover:bg-green-600  text-center bg-green-500 px-2 rounded-lg text-white tracking-wide">Accept</button>
                         <button
-                            @click="deny(notification.data.equipment, notification.data.borrower_id, notification.id, notification.data.borrower[0].municipality)"
+                            @click="deny(notification.data.equipment, notification.data.borrower_id, notification.id, notification.data.borrower[0].municipality, notification.data.quantity)"
                             class="text-sm  hover:bg-red-600  text-center bg-red-500 px-2 rounded-lg text-white tracking-wide">Deny
 
                         </button>
@@ -43,69 +46,19 @@
 
 
         </div>
-        <!-- End of Request -->
-        <!-- Equipments -->
-        <!-- <div class="flex flex-col col-span-3  overflow-hidden h-[280px] ">
-                    <span class="text-lg font-semibold font-sans text-center">Requests</span>
-                    <div
-                        class="flex  flex-col justify-between overflow-y-auto border-2 rounded-lg space-y-2 scrollbar">
-                        <button
-                            class="hover:bg-orange-300 rounded-lg p-4  relative text-center flex justify-between pr-2 border-b pb-2 border-red-200 last:border-transparent">
-
-                         
-                            <div class="grid grid-cols-1">
-                                <span class="text-xs text-gray-700 text-start">Equipment</span>
-                                <span class="font-bold text-sm text-gray-700 ">Assault Rescue Harness
-                                   
-                                </span>
-                            </div>
-                            
-                            <div class="grid grid-cols-1">
-                                <span class="text-xs text-gray-700 text-start">Availabe</span>
-                                <span class="font-bold text-sm text-gray-700 ">123
-                                   
-                                </span>
-                            </div>
-                            <div class="grid grid-cols-1">
-                                <span class="text-xs text-gray-700 text-start">Serial</span>
-                                <span class="font-bold text-sm text-gray-700 ">3123
-                                   
-                                </span>
-                            </div>
-                            <div class="grid grid-cols-1">
-                                <span class="text-xs text-gray-700 text-start">Model</span>
-                                <span class="font-bold text-sm text-gray-700 ">3123
-                                   
-                                </span>
-                            </div>
-                            <div class="grid grid-cols-1">
-                                <span class="text-xs text-gray-700 text-start">Asset</span>
-                                <span class="font-bold text-sm text-gray-700 ">3123
-                                   
-                                </span>
-                            </div>
-
-                        </button>
-                     
-                       
-
-
-                    </div>
-                </div> -->
-        <!-- End of Equipment -->
-
 
 
 
     </Content-box>
     <Content-box>
+        <h1 class="text-semibold text-center tex-lg pb-10">U</h1>
         <div class="grid grid-cols-5 gap-5 place-content-center">
             <div class=" flex flex-col z-0  justify-between col-span-2">
-                <div class="flex flex-col  overflow-hidden h-[280px] ">
+                <div class="flex flex-col  overflow-hidden h-[480px] ">
 
                     <div class="flex flex-col justify-between overflow-y-auto border-2 rounded-lg  space-y-2 scrollbar">
 
-                        <button v-for="(unfin, key) in unfinish" @click="openForm(unfin.equipment, unfin.id)"
+                        <button v-for="(unfin, key) in unfinish" :key="key" @click="openForm(unfin.equipment, unfin.id)"
                             class="flex justify-between  border-b  p-4 hover:bg-slate-200 border-grey-200 last:border-transparent">
 
                             <div class="grid grid-cols-1 text-start">
@@ -122,13 +75,12 @@
                     </div>
                 </div>
             </div>
-            <div class=" flex flex-col z-0  justify-between col-span-3">
+            <div class=" flex flex-col z-0 h-full  justify-between col-span-3">
                 <div class="flex flex-col  overflow-hidden h-full ">
 
                     <form v-if="toggleForm" @submit.prevent="handleSubmit"
-                        class=" flex flex-col justify-between overflow-y-auto border-2 rounded-lg  space-y-2 scrollbar p-5 " 
-                        :class="toggleForm ? 'animate-fade-in-down' : 'animate-fade-out-up'">
-                        <div class="flex flex-row justify-between"> 
+                        class=" flex flex-col animate-fade-in-down justify-between overflow-y-auto border-2 rounded-lg  space-y-2 scrollbar p-5 ">
+                        <div class="flex flex-row justify-between">
                             <h1 class="font-bold text-2xl font-sans antialiased capitalize">
                                 {{ equipmentAttr.equipment_name }}</h1>
 
@@ -186,6 +138,32 @@
         </div>
     </Content-box>
 
+
+    <Content-box>
+        <h1 class="text-semibold text-center tex-lg pb-10"> Equipment Borrow type</h1>
+        <Unfinish-transaction :borrowings="borrowings" />
+    </Content-box>
+    <Content-box>
+        <!-- <h1 class="font-semibold text-xl text-center">Incident Report</h1>
+        <div class="box-content rounded-lg p-10 border-2 border-gray-500 h-fit  ">
+            <div class="grid grid-rows-2 gap-10">
+                <div class="flex flex-row justify-around">
+                    <div class="flex flex-col">
+                        <label class="text-sm font-bold">Quantity</label>
+                        <input type="number"
+                            class="border-b-2 border-0  px-2 py-1  focus:ring-0  focus:border-b-blue-600">
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-sm font-bold">Quantity</label>
+                        <input type="number" 
+                            class="border-b-2 border-0  px-2 py-1  focus:ring-0  focus:border-b-blue-600">
+                    </div>
+                </div>
+            </div>
+
+        </div> -->
+        <Incident-report :reports="reports"/>
+    </Content-box>
 </template>
 
 <script>
@@ -195,13 +173,18 @@ import axios from 'axios';
 import { ref } from 'vue';
 import { Inertia } from '@inertiajs/inertia'
 import { Head, useForm } from '@inertiajs/inertia-vue3';
+import UnfinishTransaction from '@/Components/Transactions/UnfinishTransaction.vue';
+import IncidentReport from '@/Components/Transactions/IncidentReport.vue';
 
 
 export default {
     layout: MunicipalityLayout,
+    components: { ContentBox, Head, UnfinishTransaction, IncidentReport },
     props: {
         notifications: Array,
         unfinish: Array,
+        borrowings: Array,
+        reports: Array,
     },
     setup() {
 
@@ -216,13 +199,14 @@ export default {
             quantity: null
         })
 
+
         const handleSubmit = async () => {
             equipmentAttr.post(route('api.attrs'), {
                 onError: (e) => {
                     alert(Object.values(e))
                 },
                 preserveScroll: true,
-                onFinish: ()=>{
+                onFinish: () => {
                     toggleForm.value = !toggleForm.value
                 }
             })
@@ -231,6 +215,7 @@ export default {
         }
         const selectedEquipment = ref('')
         const toggleForm = ref(false)
+        const toggleBorrowing = ref(false)
 
         const openForm = (equipment, id) => {
 
@@ -240,8 +225,11 @@ export default {
             toggleForm.value = !toggleForm.value
         }
 
-        const accept = async (equip, id, notify_id, muni) => {
+
+
+        const accept = async (equip, id, notify_id, muni, quantity) => {
             await axios.post(`/api/accepted`, {
+                quantity: quantity,
                 equipment: equip,
                 borrower_id: id,
                 notif_id: notify_id,
@@ -252,9 +240,10 @@ export default {
             })
         }
 
-        const deny = async (equip, id, notify_id, muni) => {
+        const deny = async (equip, id, notify_id, muni, quantity) => {
+            console.log(quantity)
             await axios.post(`/api/deny`, {
-
+                quantity: quantity,
                 equipment_name: equip,
                 borrower_id: id,
                 notif_id: notify_id,
@@ -273,9 +262,10 @@ export default {
             openForm,
             selectedEquipment,
             handleSubmit,
+            toggleBorrowing,
         };
     },
-    components: { ContentBox, Head }
+  
 }
 </script>
 

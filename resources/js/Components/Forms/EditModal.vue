@@ -18,42 +18,59 @@
                         leave-to="opacity-0 scale-95">
                         <DialogPanel
                             class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                            <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
-                                Equipmet Details
+                            <DialogTitle as="h3" class="flex flex-row justify-between mx-4">
+
+                                <span class="text-lg font-medium leading-6 text-gray-900"> Equipmet Details</span>
+                                <button class="grid place-content-center hover:scale-110 hover:text-orange-500"
+                                    @click="closeModal">
+                                    <i class="fa-solid fa-x text-lg"></i>
+
+                                </button>
+
                             </DialogTitle>
                             <div class="mt-2">
 
 
-                                <form action="" method="POST">
+                                <form @submit.prevent="handleSubmit">
 
                                     <div class="">
                                         <div class="px-4 py-5 bg-white sm:p-6">
                                             <div class="grid grid-cols-6 gap-6">
-                                                <div class="col-span-6 sm:col-span-3">
+                                                <div class="col-span-6 sm:col-span-6">
                                                     <label for="equipment_name"
                                                         class="block text-sm font-medium text-gray-700">Equipment
                                                         Name</label>
                                                     <input type="text" name="equipment_name" id="equipment_name"
                                                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                                        :value="form.equipment_name" required="">
+                                                        v-model="updateForm.equipment_name" required="">
 
                                                 </div>
 
-                                                <div class="col-span-6 sm:col-span-3">
-                                                    <label for="status"
-                                                        class="block text-sm font-medium text-gray-700">Status</label>
-                                                    <select name="status" id="status"
-                                                        class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                                        required="">
-                                                        <option value="status" selected disabled hidden>
-                                                            {{ form.status }}
-                                                        </option>
-                                                        <option value="Serviceable">Serviceable</option>
-                                                        <option value="Poor">Poor</option>
-                                                        <option value="Unusable">Unusable</option>
-
-
-                                                    </select>
+                                                <div class="col-span-6 flex flex-col ">
+                                                    <span class="text-sm text-slate-500 ">Status</span>
+                                                    <div class="flex flex-row space-x-6 border-t-2">
+                                                        <div class="col-span-6 sm:col-span-6 lg:col-span-2">
+                                                            <label for="model_number"
+                                                                class="block text-sm font-medium text-gray-700">Serviceable</label>
+                                                            <input type="number" name="model_number" id="model_number"
+                                                                v-model="updateForm.serviceable" required=""
+                                                                class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                                        </div>
+                                                        <div class="col-span-6 sm:col-span-6 lg:col-span-2">
+                                                            <label for="model_number"
+                                                                class="block text-sm font-medium text-gray-700">Unusable</label>
+                                                            <input type="number" name="model_number" id="model_number"
+                                                                v-model="updateForm.unusable" required=""
+                                                                class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                                        </div>
+                                                        <div class="col-span-6 sm:col-span-6 lg:col-span-2">
+                                                            <label for="model_number"
+                                                                class="block text-sm font-medium text-gray-700">Poor</label>
+                                                            <input type="number" name="model_number" id="model_number"
+                                                                v-model="updateForm.poor" required=""
+                                                                class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                                        </div>
+                                                    </div>
                                                 </div>
 
 
@@ -63,7 +80,7 @@
                                                         class="block text-sm font-medium text-gray-700">Model
                                                         Number</label>
                                                     <input type="number" name="model_number" id="model_number"
-                                                        :value="form.model_number" required=""
+                                                        v-model="updateForm.model_number" required=""
                                                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                                 </div>
 
@@ -74,7 +91,7 @@
                                                         class="block text-sm font-medium text-gray-700">Serial
                                                         Number</label>
                                                     <input type="number" name="serial_number" id="serial_number"
-                                                        :value="form.serial_number" required=""
+                                                        v-model="updateForm.serial_number" required=""
                                                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                                 </div>
 
@@ -83,7 +100,7 @@
                                                     <label for="unit"
                                                         class="block text-sm font-medium text-gray-700">Unit
                                                     </label>
-                                                    <input type="number" name="unit" id="unit" :value="form.unit"
+                                                    <input type="number" name="unit" id="unit" v-model="updateForm.unit"
                                                         required=""
                                                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                                 </div>
@@ -94,7 +111,7 @@
                                                     </label>
                                                     <input type="text" name="code" id="code"
                                                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                                        :value="form.code" required="">
+                                                        v-model="updateForm.code" required="">
 
                                                 </div>
                                                 <div class="col-span-6 sm:col-span-3">
@@ -103,7 +120,7 @@
                                                     </label>
                                                     <input type="number" name="asset_id" id="asset_id"
                                                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                                        :value="form.asset_id" required="">
+                                                        v-model="updateForm.asset_id" required="">
 
                                                 </div>
 
@@ -115,14 +132,17 @@
                                             <div class="col-span-6 sm:col-span-3">
                                                 <label for="category"
                                                     class="block text-sm font-medium text-gray-700">Category</label>
-                                                <select id="category" name="category" required=""
-                                                    class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+
+                                                <select
+                                                    class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                                    v-model="updateForm.category" required>
                                                     <option value="none" selected disabled hidden>
-                                                        {{ form.category }}
+                                                        {{ updateForm.category }}
                                                     </option>
-                                                    <option value="Category1">Category 1</option>
-                                                    <option value="Category2">Category 2</option>
-                                                    <option value="Category3">Category 3</option>
+                                                    <option>category1</option>
+                                                    <option>category2</option>
+                                                    <option>category3</option>
+
                                                 </select>
                                             </div>
 
@@ -134,15 +154,15 @@
                                                     class="block text-sm font-medium text-gray-700">Asset
                                                     Description</label>
                                                 <input type="text" name="asset_desc" id="asset_desc"
-                                                    :value="form.asset_desc" required=""
+                                                    v-model="updateForm.asset_desc" required=""
                                                     class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                             </div>
 
                                             <div class="col-span-6">
                                                 <label for="remarks"
                                                     class="block text-sm font-medium text-gray-700">Remarks</label>
-                                                <input type="text" name="remarks" id="remarks" :value="form.remarks"
-                                                    required=""
+                                                <input type="text" name="remarks" id="remarks"
+                                                    v-model="updateForm.remarks" required=""
                                                     class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                             </div>
 
@@ -156,17 +176,18 @@
 
 
                                     </div>
+                                    <div class=" mr-7 flex justify-end">
+
+                                        <button type="submit"
+                                            class="inline-flex  justify-center rounded-md border border-transparent bg-orange-200 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
+                                            Update
+                                        </button>
+                                    </div>
                                 </form>
 
                             </div>
 
-                            <div class="mt-4">
 
-                                <button type="submit" @click="closeModal"
-                                    class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
-                                    Okay
-                                </button>
-                            </div>
                         </DialogPanel>
                     </TransitionChild>
                 </div>
@@ -177,6 +198,7 @@
     
 <script setup>
 import { ref } from 'vue'
+import { useForm } from '@inertiajs/inertia-vue3';
 import {
     TransitionRoot,
     TransitionChild,
@@ -185,9 +207,35 @@ import {
     DialogTitle,
 } from '@headlessui/vue'
 
-defineProps({
+const props = defineProps({
     form: Object
 })
+
+const updateForm = useForm({
+    equipment_id: props.form.id,
+    equipment_name: props.form.equipment_name,
+    code: props.form.code,
+    asset_desc: props.form.asset_desc,
+    category: props.form.category,
+    unit: props.form.unit,
+    model_number: props.form.model_number,
+    serial_number: props.form.serial_number,
+    asset_id: props.form.asset_id,
+    remarks: props.form.remarks,
+    serviceable: props.form.serviceable,
+    unusable: props.form.unusable,
+    poor: props.form.poor
+})
+
+function handleSubmit() {
+    updateForm.put(route('municipality.inventory.update', props.form.id), {
+        onError: (e) => {
+            alert(Object.values(e))
+
+
+        },
+    })
+}
 const isOpen = ref(false)
 
 function closeModal() {
@@ -196,5 +244,6 @@ function closeModal() {
 function openModal() {
     isOpen.value = true
 }
+
 </script>
     

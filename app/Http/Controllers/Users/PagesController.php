@@ -20,44 +20,12 @@ class PagesController extends Controller
     function index()
     {
 
-
-        //     [
-        //         'status' => DB::select(
-        //             "SELECT
-        //   SUM(quantity) AS total,
-        //   SUM(CASE when status = 'serviceable' AND municipality_id = :Sid then quantity else 0 end) AS serviceable,
-        //   SUM(CASE when status = 'poor'  AND municipality_id = :Pid   then quantity else 0 end) AS poor,
-        //   SUM(CASE when status = 'unusable'  AND municipality_id = :Uid  then quantity else 0 end) as unusable
-        //   FROM equipment
-        //   WHERE municipality_id = :myid
-        //   order BY total",
-        //             [
-        //                 'myid' => auth()->user()->municipality_id,
-        //                 'Sid' => auth()->user()->municipality_id,
-        //                 'Pid' => auth()->user()->municipality_id,
-        //                 'Uid' => auth()->user()->municipality_id
-        //             ]
-        //         )[0],
-        //     ]
-        $status = DB::select(
-            "SELECT
-        Serviceable + Unusable + Poor AS total,
-        SUM(serviceable) AS Serviceable, 
-        SUM(unusable) AS Unusable, 
-        SUM(poor) AS Poor FROM conditions
-        JOIN equipment_owneds ON equipment_owneds.id = conditions.equipment_owner
-        WHERE office_id = :myid
-        GROUP BY total",
-            [
-                'myid' => auth()->id(),
-
-            ]
-        );
-        if ($status) {
-            $status = $status[0];
-        }
         return inertia('municipality/RequestPage', [
-            'status' => $status
+            'equipments' => DB::table('equipment')
+                ->join('equipment_owneds', 'equipment_owneds.equipment_id', '=', 'equipment.id')
+                ->whereNot('equipment_owneds.office_id', '=', auth()->id())
+                ->select('equipment_name')
+                ->groupBy('equipment_name')->get(),
         ]);
     }
     public function returnedChart()
@@ -182,12 +150,11 @@ class PagesController extends Controller
     {
         $provinces = array(
             'camiguin' => ['Catarman', 'Guinsiliban', 'Mahinog', 'Mambajao', 'Sagay'],
-            'Bukidnon' =>['Baungon','Cabanglasan', 'Damulog', 'Dangcagan', 'Don_Carlos', 'Impasug-Ong']
+            'Bukidnon' => ['Baungon', 'Cabanglasan', 'Damulog', 'Dangcagan', 'Don_Carlos', 'Impasug-Ong']
         );
 
-        foreach($provinces as $key => $province)
-        {
-            foreach($province as $municipality){
+        foreach ($provinces as $key => $province) {
+            foreach ($province as $municipality) {
 
                 dd($municipality, $key);
             }

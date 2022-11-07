@@ -29,3 +29,9 @@ Broadcast::channel('requestSend.{id}', fn ($user, $id) =>  $user->id == $id);
 Broadcast::channel('confirmed.{id}', fn ($user, $id) =>  $user->id == $id);
 
 Broadcast::channel('denied.{id}', fn ($user, $id) => $user->id == $id);
+
+Broadcast::channel('borrowing.{id}', fn($user, $id)=>  $user->id ==  $id);
+
+Broadcast::channel('child.transacton.{id}', fn($user, $id) => $user->id == $id);
+
+Broadcast::channel('incident.report.{id}', fn($user, $id) => $user->id == $id);

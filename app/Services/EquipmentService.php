@@ -3,114 +3,52 @@
 namespace App\Services;
 
 use Request;
-use App\Services\UserService;
-
-use App\Models\borrow;
-use App\Models\Condition;
-use App\Models\User;
-use App\Models\Municipality;
-use App\Models\Equipment;
-use App\Models\EquipmentOwned;
 use Illuminate\Support\Facades\DB;
+
+use App\Services\UserService;
+use App\Models\borrow;
+use App\Models\User;
+use App\Models\UnfinishTransaction;
+use App\Models\Municipality;
+use App\Models\EquipmentOwned;
+use App\Models\EquipmentDetail;
+use App\Models\Equipment;
+use App\Models\Condition;
+use App\Models\BorrowingDetails;
+use App\Models\Borrowing;
 
 class EquipmentService
 {
 
-    protected $UserService;
+    
 
-    public function __construct(UserService $UserService)
-    {
-        $this->UserService = $UserService;
-    }
-
-
-    public function getEquipmentByName($name)
-    {
-        return Equipment::where('equipment_name', $name);
-    }
-
-    public function getEquipmentStatus($status = 'serviceable')
-    {
-        return Equipment::where('status', $status);
-    }
-
-    public function getEquipmentByMunicipalityId($id)
-    {
-        return Equipment::select('equipment.*')
-            ->where('equipment.municipality_id', $id);
-    }
-
-
-    public function getMunicipalityEquipment($municipality, $equipment, $by = 'name')
-    {
-        if ($by == 'name') {
-            return Equipment::select(
-                [
-                    'equipment.municipality_id',
-                    'equipment.id',
-                    'equipment.equipment_name',
-                    'equipment.quantity'
-                ]
-            )
-                ->where('equipment.equipment_name', '=', $equipment)
-                ->join('municipalities', 'equipment.municipality_id', '=', 'municipalities.id')
-                ->where('municipalities.municipality_name', '=', $municipality)
-                ->join('provinces', 'municipalities.province_id', '=', 'provinces.id');
-        } elseif ($by == 'id') {
-            return Equipment::select(
-                [
-                    'equipment.municipality_id',
-                    'equipment.id',
-                    'equipment.equipment_name',
-                    'municipalities.municipality_name'
-                ]
-            )
-                ->where('equipment.id', '=', $equipment)
-                ->join('municipalities', 'equipment.municipality_id', '=', 'municipalities.id')
-                ->where('municipalities.id', '=', $municipality)
-                ->join('provinces', 'municipalities.province_id', '=', 'provinces.id');
-        }
-    }
-
-    public function checkIfExist($data)
+    public function checkEquipmentAttrs($data)
     {
 
-        $equipment = Equipment::where(
+        return Equipment::where(
             [
-                ['code', $data['code']],
-                ['asset_id', $data['asset_id']],
-                ['unit', $data['unit']],
-                ['model_number', $data['model_number']],
-                ['serial_number', $data['serial_number']]
+                ['equipment_name', $data->equipment_name],
+                ['code', $data->code],
+                ['asset_id', $data->asset_id],
+                ['category', $data->category],
+                ['unit', $data->unit],
+                ['model_number',  $data->model_number],
+
             ]
         )->first();
-
-        if ($equipment) {
-            return false;
-        }
-        $this->insertData($data);
-        return true;
     }
 
     public function insertData($data)
     {
- 
+
         DB::transaction(function () use ($data) {
 
 
-            $equipment = Equipment::where(
-                [
-                    ['equipment_name', $data->equipment_name],
-                    ['code', $data->code],
-                    ['asset_id', $data->asset_id],
-                    ['category', $data->category],
-                    ['unit', $data->unit],
-                    ['model_number',  $data->model_number],
+            $equipment = $this->checkEquipmentAttrs($data);
 
-                ]
-            )->firstOr(function () use ($data) {
 
-                /* if not exist */
+
+            if (is_null($equipment)) {
                 $newequipment = Equipment::create([
                     'equipment_name' => $data->equipment_name,
                     'code' => $data->code,
@@ -126,20 +64,17 @@ class EquipmentService
                 $EOwner = EquipmentOwned::create([
                     'equipment_id' => $newequipment->id,
                     'office_id' => auth()->id(),
-                    'quantity' => 1
+
                 ]);
-                $condition = Condition::create([
+                $EDetail = EquipmentDetail::create([
                     'equipment_owner' => $EOwner->id,
                     'serviceable' => $data->serviceable,
-                    'unusable'=>$data->unusable,
-                    'poor' =>$data->poor
+                    'unusable' => $data->unusable,
+                    'poor' => $data->poor
                 ]);
-            });
-
-            if (!is_null($equipment)) {
-
-                $upCondition = EquipmentOwned::select(['conditions.serviceable', 'conditions.unusable', 'conditions.poor'])
-                    ->join('conditions', 'conditions.equipment_owner', 'equipment_owneds.id')->firs()
+            } else {
+                $upCondition = EquipmentDetail::select(['equipment_details.*', 'equipment_owneds.*'])
+                    ->join('equipment_owneds', 'equipment_details.equipment_owner', '=', 'equipment_owneds.id')
                     ->where([
                         ['equipment_owneds.equipment_id', $equipment->id],
                         ['equipment_owneds.office_id', auth()->id()]
@@ -150,8 +85,61 @@ class EquipmentService
                     $upCondition->serviceable += $data->serviceable;
                     $upCondition->unusable += $data->unusable;
                     $upCondition->poor += $data->poor;
+                    $upCondition->save();
                 };
             }
         }, 3);
+    }
+
+    public function fulfillTransaction($data)
+    {
+        /*
+ objectives
+ KWAON ANG EQUIPMENT NGA NAA ANA NA PROPERTIES UBAN ANG OWNED EQUIPMENT
+ */
+
+
+        $equipment = Equipment::select(['equipment.*', 'equipment_owneds.office_id'])->where(
+            [
+                ['equipment_name', $data->equipment_name],
+                ['code', $data->code],
+                ['asset_id', $data->asset_id],
+
+                ['unit', $data->unit],
+                ['model_number',  $data->model_number],
+
+            ]
+        )->join('equipment_owneds', 'equipment_owneds.equipment_id', '=', 'equipment.id')
+            ->where('equipment_owneds.office_id', '=', auth()->id())
+            ->first();
+
+        if (!is_null($equipment)) {
+
+            DB::transaction(function () use ($data, $equipment) {
+
+                $unfinish = UnfinishTransaction::find($data->id);
+
+                $borrowing = Borrowing::create([
+                    'borrower' => $unfinish->borrower,
+                ]);
+                $EquipOwned = EquipmentOwned::query()
+                    ->where([
+                        ['office_id', $unfinish->owner],
+                        ['equipment_id', $equipment->id]
+                    ])->first();
+
+                $details = BorrowingDetails::create([
+                    'equipment_owned_id' => $EquipOwned->id,
+                    'quantity' => $data->quantity,
+                    'borrowing_id' => $borrowing->id,
+                ]);
+
+                $unfinish->delete();
+                return 200;
+            }, 3);
+        } else {
+            dd($data);
+            return 404;
+        }
     }
 }

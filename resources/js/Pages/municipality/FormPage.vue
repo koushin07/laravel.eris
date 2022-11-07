@@ -1,6 +1,6 @@
 <template>
     <ContentBox>
-        
+
         <form class="h-full " @submit.prevent="handleSubmit">
             <div class="flex flex-row justify-between">
                 <h1 class="font-bold text-2xl font-sans antialiased">Update Inventory</h1>
@@ -11,66 +11,53 @@
                 <div class="grid grid-cols-3 gap-2">
                     <div class="flex flex-col col-span-2">
                         <label class="text-sm font-bold">Equipment Name</label>
-                        <input type="text" v-model="form.equipment.name" required
+                        <input type="text" v-model="form.equipment_name" required
                             class="border-2 rounded-md px-2 py-1  focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-300">
                     </div>
                     <div class="flex flex-col">
                         <label class="text-sm font-bold">Category</label>
-                        <select class="form-select appearance-none
-                            block
-                            w-full
-                            px-3
-                            py-1.5
-                            text-base
-                            font-normal
-                            text-gray-700
-                            bg-white bg-clip-padding bg-no-repeat
-                            border border-solid border-gray-300
-                            rounded
-                            transition
-                            ease-in-out
-                            m-0
-                            focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                            v-model="form.equipment.category" required>
-                            <option disabled value="">Please select one</option>
+                        <select class="form-select border-2 rounded-md px-2 py-1  focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-300"
+                            v-model="form.category" required>
+                           
                             <option>category1</option>
                             <option>category2</option>
                             <option>category3</option>
 
                         </select>
+                     
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2">
                     <div class="flex flex-col">
                         <label class="text-sm font-bold">Serviceable</label>
-                        <input type="number" v-model="form.detailEquipment.serviceable" required
+                        <input type="number" v-model="form.serviceable" required
                             class="border-2 rounded-md px-2 py-1  focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-300">
                     </div>
                     <div class="flex flex-col">
                         <label class="text-sm font-bold">Unusable</label>
-                        <input type="number" v-model="form.detailEquipment.unusable" required
+                        <input type="number" v-model="form.unusable" required
                             class="border-2 rounded-md px-2 py-1  focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-300">
                     </div>
                     <div class="flex flex-col">
                         <label class="text-sm font-bold">Poor</label>
-                        <input type="number" v-model="form.detailEquipment.poor " required
+                        <input type="number" v-model="form.poor" required
                             class="border-2 rounded-md px-2 py-1  focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-300">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-2">
                     <div class="flex flex-col">
                         <label class="text-sm font-bold">Serial Number</label>
-                        <input type="number" v-model="form.equipment.serial_number" required
+                        <input type="number" v-model="form.serial_number" required
                             class="border-2 rounded-md px-2 py-1  focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-300">
                     </div>
                     <div class="flex flex-col">
                         <label class="text-sm font-bold">Code</label>
-                        <input type="text" v-model="form.equipment.code" required
+                        <input type="text" v-model="form.code" required
                             class="border-2 rounded-md px-2 py-1  focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-300">
                     </div>
                     <div class="flex flex-col">
                         <label class="text-sm font-bold">Asset ID</label>
-                        <input type="number" v-model="form.equipment.asset_id" required
+                        <input type="number" v-model="form.asset_id" required
                             class="border-2 rounded-md px-2 py-1  focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-300">
                     </div>
                 </div>
@@ -78,30 +65,30 @@
                 <div class="grid grid-cols-3 gap-2">
                     <div class="flex flex-col">
                         <label class="text-sm font-bold">Unit</label>
-                        <input type="number" v-model="form.equipment.unit" required
+                        <input type="number" v-model="form.unit" required
                             class="border-2 rounded-md px-2 py-1  focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-300">
                     </div>
                     <div class="flex flex-col">
                         <label class="text-sm font-bold">Model Number</label>
-                        <input type="number" v-model="form.equipment.model_number" required
+                        <input type="number" v-model="form.model_number" required
                             class="border-2 rounded-md px-2 py-1  focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-300">
                     </div>
                     <div class="flex flex-col">
                         <label class="text-sm font-bold">Quantity</label>
-                        <input type="number" v-model="form.equipment.quantity" required
+                        <input type="number" v-model="form.quantity" required
                             class="border-2 rounded-md px-2 py-1  focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-300">
                     </div>
                 </div>
 
                 <div class="flex flex-col">
                     <label class="text-sm font-bold">Remarks</label>
-                    <textarea type="text" v-model="form.equipment.remarks" required
+                    <textarea type="text" v-model="form.remarks" required
                         class="border-2 rounded-md px-2 py-1  focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-300">
                     </textarea>
                 </div>
                 <div class="flex flex-col">
                     <label class="text-sm font-bold">Asset Desciption</label>
-                    <textarea type="text" v-model="form.equipment.asset_desc" required
+                    <textarea type="text" v-model="form.asset_desc" required
                         class="border-2 rounded-md px-2 py-1  focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-300">
                     </textarea>
                 </div>
@@ -109,82 +96,90 @@
             </div>
         </form>
     </ContentBox>
-   
+    <Content-box>
+
+    </Content-box>
+
 </template>
 
 <script>
 import axios from 'axios';
-import { ref } from 'vue';
-import ContentBox from '../../components/ContentBox.vue';
-import VueCookies from 'vue-cookies'
-import { useAuthStore } from '../../stores/authUser'
+import { ref, computed } from 'vue';
+import { useForm } from '@inertiajs/inertia-vue3';
+import ContentBox from '../../Components/ContentBox.vue';
+import municipalityLayout from '@/Layouts/MunicipalityLayout.vue'
+import InputError from '@/Components/InputError.vue';
+
 
 export default {
-    components: { ContentBox },
+    layout: municipalityLayout,
+    components: { ContentBox, InputError },
     setup() {
-        const auth = useAuthStore()
-        const form = ref({
-            equipment:
-            {
-                owner: auth.user.id,
-                name: '',
-                code: '',
-                asset_desc: '',
-                category: '',
-                unit: null,
-                model_number: null,
-                serial_number: null,
-                asset_id: null,
-                remarks: '',
-            },
-            office:
-            {
-                email: window.localStorage.getItem('email'),
 
-            },
-            detailEquipment:
-            {
-                serviceable: null,
-                unusable: null,
-                poor: null
-            }
+        const form = useForm({
 
-
-
-
+            equipment_name: '',
+            code: '',
+            asset_desc: '',
+            category: '',
+            unit: null,
+            model_number: null,
+            serial_number: null,
+            asset_id: null,
+            remarks: '',
+            serviceable: null,
+            unusable: null,
+            poor: null
         })
-        const handleSubmit = async () => {
-            const cookie = VueCookies.get('access_token')
-            console.log(JSON.stringify(form.value))
-            await axios.post('/owned/create',
-                JSON.stringify(form.value), {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${cookie}`
-                }
-            }
-            ).then((res) => {
 
+        const handleSubmit = () => {
+            form.post(route('municipality.inventory.store'), {
+                onError: (e) => {
+                    alert(Object.values(e))
+                    form.clearErrors()
 
-            }).catch((err) => {
-                if (err.request.status == 401) {
-                    const refresh = VueCookies.get('refresh_token')
-                    axios.get('/auth/refresh_token', {
-                        headers: {
-                            'Authorization': `Bearer ${refresh}`
-                        }
-                    }).then((res) => {
-                        VueCookies.remove('access_token')
-                        VueCookies.set('access_token', res.data.ACCESS_TOKEN)
-                        this.handleSubmit
-                    })
-                }
+                },
+               
             })
+
+            //  form.get('/municipality/inventory/store',{
+            //     onFinish: ()=> {
+            //         /* reset only has error */
+            //         form.reset()
+            //     }
+            //  })
+            // const cookie = VueCookies.get('access_token')
+            // console.log(JSON.stringify(form.value))
+            // await axios.post('/owned/create',
+            //     JSON.stringify(form.value), {
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         'Authorization': `Bearer ${cookie}`
+            //     }
+            // }
+            // ).then((res) => {
+
+
+            // }).catch((err) => {
+            //     if (err.request.status == 401) {
+            //         const refresh = VueCookies.get('refresh_token')
+            //         axios.get('/auth/refresh_token', {
+            //             headers: {
+            //                 'Authorization': `Bearer ${refresh}`
+            //             }
+            //         }).then((res) => {
+            //             VueCookies.remove('access_token')
+            //             VueCookies.set('access_token', res.data.ACCESS_TOKEN)
+            //             this.handleSubmit
+            //         })
+            //     }
+            // })
 
         }
 
         return {
             form,
+
             handleSubmit
         }
     },

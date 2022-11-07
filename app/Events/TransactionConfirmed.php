@@ -20,7 +20,8 @@ class TransactionConfirmed implements ShouldBroadcast
      * @return void
      */
     public function __construct(
-        public $borrow
+        public $office,
+        public $unfinish
     )
     {
         
@@ -33,7 +34,7 @@ class TransactionConfirmed implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('confirmed.'.$this->borrow->borrower);
+        return new PrivateChannel('confirmed.'.$this->office->id);
     }
 
     public function broadcastAs()

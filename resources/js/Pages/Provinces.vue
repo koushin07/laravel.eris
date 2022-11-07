@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import AuthenticatedLayout from '@/Layouts/MunicipalityLayout.vue';
 
 import {  ref } from 'vue';
 import Table from '@/Components/Table.vue';

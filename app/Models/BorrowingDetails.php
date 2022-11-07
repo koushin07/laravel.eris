@@ -10,7 +10,7 @@ use App\Models\Borrowing;
 class BorrowingDetails extends Model
 {
     use HasFactory;
-    protected $fillable= ['equipment_id', 'borrowing_id', 'quantity'];
+    protected $fillable= ['equipment_owned_id', 'borrowing_id', 'quantity'];
 
     public function equipment_owned()
     {

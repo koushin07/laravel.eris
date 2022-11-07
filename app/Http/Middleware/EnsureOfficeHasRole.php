@@ -18,7 +18,7 @@ class EnsureOfficeHasRole
     public function handle(Request $request, Closure $next, string $role)
     {
 
-        if (!is_null($request->user()->role()->where('role_type', $role))) {
+        if ($request->user()->role()->where('role_type', $role)->exists()) {
             return $next($request);
         }
         abort(403);

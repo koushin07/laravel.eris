@@ -1,14 +1,14 @@
 <template>
-     <div class=" box-border bg-white h-full p-10 md:col-span-3 ">
-        <slot/>
+    <div class=" box-border bg-white h-full p-10 md:col-span-3 ">
+        <slot />
 
-</div>
+    </div>
 </template>
 
 <script>
 export default {
-    setup () {
-        
+    setup() {
+
 
         return {}
     }

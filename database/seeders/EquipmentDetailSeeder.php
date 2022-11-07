@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\Returned;
+use App\Models\EquipmentDetail;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class ReturnedSeeder extends Seeder
+class EquipmentDetailSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,6 +15,6 @@ class ReturnedSeeder extends Seeder
      */
     public function run()
     {
-        Returned::factory(1)->create();
+       EquipmentDetail::factory(5000)->create();
     }
 }

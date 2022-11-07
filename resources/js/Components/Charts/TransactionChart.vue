@@ -16,7 +16,7 @@ export default {
         onMounted(()=>{
             const ctx = document.getElementById('transaction')
             const transaction = new Chart(ctx, {
-                type: 'bar',
+                type: 'line',
                 data: {
                     labels: ['Total', 'denied', 'confirmed'],
                     datasets: [{

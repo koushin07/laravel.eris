@@ -16,7 +16,10 @@ return new class extends Migration
         Schema::create('borrow_histories', function (Blueprint $table) {
             $table->id();
             $table->boolean('is_returned')->default(false);
-            $table->foreignId('borrowing_id')->constrained();
+            $table->foreignId('borrowing_detail_id')->constrained();
+            $table->integer('serviceable');
+            $table->integer('poor');
+            $table->integer('unusable');
             $table->timestamps();
         });
     }

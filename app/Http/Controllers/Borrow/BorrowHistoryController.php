@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Borrow;
 
 use App\Http\Controllers\Controller;
-use App\Models\Returned;
+use App\Models\BorrowHistory;
 use Illuminate\Http\Request;
 
-class ReturnedController extends Controller
+class BorrowHistoryController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -36,16 +36,22 @@ class ReturnedController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        BorrowHistory::create([
+            'borrowing_detail_id' => $request->id,
+            'is_return' =>true,
+            'serviceable' => $request->serviceable,
+            'unusable' => $request->unusable,
+            'poor'=>$request->poor
+        ]);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Returned  $returned
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Returned $returned)
+    public function show($id)
     {
         //
     }
@@ -53,10 +59,10 @@ class ReturnedController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Returned  $returned
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Returned $returned)
+    public function edit($id)
     {
         //
     }
@@ -65,10 +71,10 @@ class ReturnedController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Returned  $returned
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Returned $returned)
+    public function update(Request $request, $id)
     {
         //
     }
@@ -76,10 +82,10 @@ class ReturnedController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Returned  $returned
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Returned $returned)
+    public function destroy($id)
     {
         //
     }

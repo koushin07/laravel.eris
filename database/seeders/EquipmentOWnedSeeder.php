@@ -13,8 +13,8 @@ class EquipmentOWnedSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run()   
     {
-        EquipmentOwned::factory(1)->create();
+        EquipmentOwned::factory(5000)->create();
     }
 }

@@ -7,8 +7,9 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\Assign_Office;
 use App\Models\Municipality;
+use App\Models\Assign_Office;
+use App\Models\AssignOffice;
 
 
 class Office extends Authenticatable
@@ -47,14 +48,11 @@ class Office extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function municipality()
-    {
-        return $this->belongsTo(Municipality::class);
-    }
+
 
     public function assign_office()
     {
-        return $this->hasMany(Assign_Office::class);
+        return $this->belongsTo(AssignOffice::class, 'assign', 'id');
     }
     public function role()
     {

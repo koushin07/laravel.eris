@@ -4,15 +4,21 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-use App\Models\AssignOffice;
 use Illuminate\Database\Seeder;
+use Database\Seeders\RoleSeeder;
 use Database\Seeders\ReturnedSeeder;
+use Database\Seeders\EquipmentOWnedSeeder;
+use Database\Seeders\EquipmentDetailSeeder;
 use App\Models\Office;
-use App\Models\MunicipalityTransaction;
-use App\Models\Municipality;
+use App\Models\EquipmentOwned;
+use App\Models\Equipment;
+use App\Models\AssignOffice;
+use App\Models\EquipmentDetail;
 
 class DatabaseSeeder extends Seeder
 {
+
+    
     /**
      * Seed the application's database.
      *
@@ -21,40 +27,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
 
-
-        // $this->call(AssignOfficeSeeder::class);
         $this->call(RoleSeeder::class);
-        // Office::create([
-        //     'name' => 'municipality',
-        //     'email' => 'municipality@rdrrmc.com',
-        //     'password' => bcrypt("municipality"), // password
-        //     'assign' => 1, 
-        //     'role_id' => 1,
-        // ]);
-        // Office::create([
-        //     'name' => 'naawan',
-        //     'email' => 'naawan@rdrrmc.com',
-        //     'password' => bcrypt("naawan"), // password
-        //     'assign' => 1, 
-        //     'role_id' => 1,
-        // ]);
-        // AssignOffice::create([
-        //     'municipality'=> null,
-        //     'province' => 'Lanao del Norte'
-        // ]);
-        // Office::create([
-        //     'name' => 'naawan',
-        //     'email' => 'province@rdrrmc.com',
-        //     'password' => bcrypt("province"), // password
-        //     'assign' => 11, 
-        //     'role_id' => 2,
-        // ]);
-        // $this->call(equipmentSeeder::class);
-        // $this->call(EquipmentOWnedSeeder::class);
-        // $this->call(BorrowingSeeder::class);
-        // $this->call(BorrowingDetailsSeeder::class);
-        // $this->call(ReturnedSeeder::class);
-        // $this->call(ConditionSeeder::class);
         $provinces = array(
             'camiguin' => [
                 'Catarman' => [9.12435874658949, 124.675557898537],
@@ -111,64 +84,127 @@ class DatabaseSeeder extends Seeder
                 'Tubod' => [8.044721354, 123.7897]
             ],
             'Misamis_Occidental' => [
-                'Aloran'=>[8.416144119654293, 123.82097266785125],
-                'Baliangao'=>[8.66029439147963, 123.60293303716983],
-                'Bonifacio'=>[8.052701339925473, 123.61382578134362],
-                'Calamba'=>[8.56078950963135, 123.64400780576152],
-                'Clarin'=>[8.200152623838322, 123.86211469668577],
-                'Concepcion'=>[8.421332481543317, 123.60475078326022],
-                'Don_Victoriano_Chiongbian'=>[8.247318151716952, 123.56861744086278],
-                'Jimenez'=>[8.33538217308207, 123.84018126785095],
-                'Lopez_Jaena'=>[8.526282591550816, 123.75060798134567],
-                'Oroquieta'=>[8.48567386723216, 123.80813953901638],
-                'Ozamiz'=>[8.151137500890195, 123.85020198319152],
-                'Panaon'=>[8.36550576113419, 123.83822045066216],
-                'Plaridel'=>[8.621735367444177, 123.70984192367548],
-                'Sapang_Dalaga'=>[8.542611009682343, 123.56757826785186],
-                'Sinacaban'=>[8.285601433349727, 123.84261783901543],
-                'Tangub'=>[8.061306241959048, 123.75147742552053],
-                'Tudela'=>[8.241466148188001, 123.84749825435657]
+                'Aloran' => [8.416144119654293, 123.82097266785125],
+                'Baliangao' => [8.66029439147963, 123.60293303716983],
+                'Bonifacio' => [8.052701339925473, 123.61382578134362],
+                'Calamba' => [8.56078950963135, 123.64400780576152],
+                'Clarin' => [8.200152623838322, 123.86211469668577],
+                'Concepcion' => [8.421332481543317, 123.60475078326022],
+                'Don_Victoriano_Chiongbian' => [8.247318151716952, 123.56861744086278],
+                'Jimenez' => [8.33538217308207, 123.84018126785095],
+                'Lopez_Jaena' => [8.526282591550816, 123.75060798134567],
+                'Oroquieta' => [8.48567386723216, 123.80813953901638],
+                'Ozamiz' => [8.151137500890195, 123.85020198319152],
+                'Panaon' => [8.36550576113419, 123.83822045066216],
+                'Plaridel' => [8.621735367444177, 123.70984192367548],
+                'Sapang_Dalaga' => [8.542611009682343, 123.56757826785186],
+                'Sinacaban' => [8.285601433349727, 123.84261783901543],
+                'Tangub' => [8.061306241959048, 123.75147742552053],
+                'Tudela' => [8.241466148188001, 123.84749825435657]
             ],
             'Misamis_Oriental' => [
-                'Alubijid'=>[8.570881411117911, 124.47318091387639],
-                'Balingasag'=>[8.742594269003574, 124.77435680648715],
-                'Balingoan'=>[9.004110322753089, 124.85040532552486],
-                'Binuangan'=>[8.922148738663214, 124.7857456745521], 
-                'Claveria'=>[8.620957599589877, 124.90629989853512],
-                'El_Salvador'=>[8.558668543645254, 124.52686485251054],
-                'Gingoog'=>[8.816461426804523, 125.10360363901789],
-                'Gitagum'=>[8.594193369613, 124.40598004271205],
-                'Initao'=>[8.498565229939835, 124.30410428134576], 
-                'Jasaan'=>[8.651641566774916, 124.7557631813462],
-                'Kinoguitan'=>[8.983157052180387, 124.79184845251251],
-                'Lagonglong'=>[8.806254519671132, 124.78789221018236],
-                'Laguindingan'=>[8.573754167405554, 124.44236528319347],
-                'Libertad'=>[8.563240652465401, 124.35208418319361],
-                'Lugait'=>[8.344020032973939, 124.25958384799932],
-                'Magsaysay'=>[9.020048801420009, 125.18226035066533],
-                'Manticao'=>[8.404175039283011, 124.28826991387548],
-                'Medina'=>[8.911760383419256, 125.02486863504262],
-                'Naawan'=>[8.433781099013249, 124.29021002367465],
-                'Opol'=>[8.521273001927467, 124.57416045435787],
-                'Salay'=>[8.85837261008757, 124.7861790236766],
-                'Sugbongcogon'=>[8.956856353778111, 124.78829653901852],
-                'Tagoloan'=>[8.53963298182018, 124.75380442552257],
+                'Alubijid' => [8.570881411117911, 124.47318091387639],
+                'Balingasag' => [8.742594269003574, 124.77435680648715],
+                'Balingoan' => [9.004110322753089, 124.85040532552486],
+                'Binuangan' => [8.922148738663214, 124.7857456745521],
+                'Claveria' => [8.620957599589877, 124.90629989853512],
+                'El_Salvador' => [8.558668543645254, 124.52686485251054],
+                'Gingoog' => [8.816461426804523, 125.10360363901789],
+                'Gitagum' => [8.594193369613, 124.40598004271205],
+                'Initao' => [8.498565229939835, 124.30410428134576],
+                'Jasaan' => [8.651641566774916, 124.7557631813462],
+                'Kinoguitan' => [8.983157052180387, 124.79184845251251],
+                'Lagonglong' => [8.806254519671132, 124.78789221018236],
+                'Laguindingan' => [8.573754167405554, 124.44236528319347],
+                'Libertad' => [8.563240652465401, 124.35208418319361],
+                'Lugait' => [8.344020032973939, 124.25958384799932],
+                'Magsaysay' => [9.020048801420009, 125.18226035066533],
+                'Manticao' => [8.404175039283011, 124.28826991387548],
+                'Medina' => [8.911760383419256, 125.02486863504262],
+                'Naawan' => [8.433781099013249, 124.29021002367465],
+                'Opol' => [8.521273001927467, 124.57416045435787],
+                'Salay' => [8.85837261008757, 124.7861790236766],
+                'Sugbongcogon' => [8.956856353778111, 124.78829653901852],
+                'Tagoloan' => [8.53963298182018, 124.75380442552257],
                 // 'Talisayan'=>[],
-                'Villanueva'=>[8.58624380552895, 124.77038329668744],
+                'Villanueva' => [8.58624380552895, 124.77038329668744],
             ]
 
         );
 
+        $assignRdrrmc = AssignOffice::create([
+            'is_rdrrmc' => true,
+        ]);
+        Office::create([
+            'name' => 'RDRRMC',
+            'email' => 'RDRRMC' . "@gov.ph",
+            'password' => bcrypt('RDRRMC'),
+            'assign' => $assignRdrrmc->id,
+            'role_id' => 3
+        ]);
 
         foreach ($provinces as $province => $municipalities) {
+            $provAssign = AssignOffice::create([
+                'province' => $province,
+            ]);
+            Office::create([
+                'name' => $province,
+                'email' => $province . "@gov.ph",
+                'password' => bcrypt($province),
+                'assign' => $provAssign->id,
+                'role_id' => 2,
+            ]);
             foreach ($municipalities as $municipality => $coordinate) {
-                AssignOffice::create([
+                $count = 1;
+                $assign =  AssignOffice::create([
                     'municipality' => $municipality,
                     'province' => $province,
                     'latitude' => $coordinate[0],
                     'longitude' => $coordinate[1]
                 ]);
+                $email = Office::where('email', $municipality . '@gov.ph')->first();
+                if ($email) {
+                    Office::create([
+                        'name' => $municipality,
+                        'email' => $municipality . "" . $count . "@gov.ph",
+                        'password' => bcrypt($municipality),
+                        'assign' => $assign->id,
+                        'role_id' => 1,
+                    ]);
+                    $count++;
+                } else {
+                    Office::create([
+                        'name' => $municipality,
+                        'email' => $municipality . "@gov.ph",
+                        'password' => bcrypt($municipality),
+                        'assign' => $assign->id,
+                        'role_id' => 1,
+                    ]);
+                }
             }
         }
+        $this->call(equipmentSeeder::class);
+        // $this->call(EquipmentOWnedSeeder::class);
+        // $this->call(EquipmentDetailSeeder::class);
+
+        $equipment = Equipment::all();
+        $office = Office::where('role_id', 1)->get();
+
+        $equipment->each(function ($eq) use($office) {
+            EquipmentOwned::create([
+                'equipment_id' => $eq->id,
+                'office_id' => $office->random()->id
+            ]);
+        });
+
+        $owned = EquipmentOwned::all();
+        $owned->each(function ($ow) {
+            EquipmentDetail::create([
+                'equipment_owner' => $ow->id,
+                'serviceable' => rand(1, 500),
+                'unusable' => rand(1, 500),
+                'poor' =>rand(1, 500),
+            ]);
+        });
     }
 }

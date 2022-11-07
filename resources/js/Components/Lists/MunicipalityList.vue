@@ -7,7 +7,7 @@
         >
           <ComboboxInput
             class="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
-            :displayValue="(municipality) => municipality.municipality"
+            :displayValue="(municipality) => municipality.name"
             @change="query = $event.target.value"
           />
           <ComboboxButton
@@ -42,7 +42,7 @@
               :key="municipality.id"
               :value="municipality"
               v-slot="{ selected, active }"
-              @click="label()"
+              @click="label()" @keyup.enter="label()"
             >
               <li
                 class="relative cursor-default select-none py-2 pl-10 pr-4"
@@ -55,7 +55,7 @@
                   class="block truncate"
                   :class="{ 'font-medium': selected, 'font-normal': !selected }"
                 >
-                  {{ municipality.municipality }}
+                  {{ municipality.name }}
                 </span>
                 <span
                   v-if="selected"
@@ -97,7 +97,7 @@ let filteredMuni = computed(() =>
   query.value === ''
     ? props.contents
     : props.contents.filter((municipality) =>
-        municipality.municipality
+        municipality.name
           .toLowerCase()
           .replace(/\s+/g, '')
           .includes(query.value.toLowerCase().replace(/\s+/g, ''))

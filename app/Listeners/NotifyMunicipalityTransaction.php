@@ -2,17 +2,20 @@
 
 namespace App\Listeners;
 
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use App\Events\NewMunicipalityTransaction;
 use App\Notifications\MunicipalityTransactionNotification;
-use Illuminate\Support\Facades\Notification;
+use App\Events\NewMunicipalityTransaction;
+use App\Events\BorrowRequestRecieve;
 
 class NotifyMunicipalityTransaction
 {
     
-    public function handle(NewMunicipalityTransaction $event)
+    public function handle(BorrowRequestRecieve $event)
     {
-     Notification::send($event->toNotify, new MunicipalityTransactionNotification($event->toNotify));
+
+     Notification::sendNow($event->office, 
+     new MunicipalityTransactionNotification($event->equipment, $event->quantity));
     }
 }

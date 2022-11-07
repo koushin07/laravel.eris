@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Events\BorrowRequestRecieve;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -20,7 +21,8 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
-        NewMunicipalityTransaction::class => [
+       
+        BorrowRequestRecieve::class => [
             NotifyMunicipalityTransaction::class
         ],
     ];

@@ -21,5 +21,8 @@ class RoleSeeder extends Seeder
         Role::create([
             'role_type'=>'RDRRMC_PROVINCE',
         ]);
+        Role::create([
+            'role_type'=>'RDRRMC',
+        ]);
     }
 }

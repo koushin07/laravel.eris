@@ -34,7 +34,7 @@
                             <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
                                 Quantity
                             </label>
-                            <input v-model="form.quantity"
+                            <input vModel="form.quantity"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 id="username" type="number" placeholder="Quantity">
                         </div>
@@ -105,7 +105,7 @@ import EquipmentList from '@/Components/Lists/EquipmentList.vue';
 import { useForm, Head } from '@inertiajs/inertia-vue3';
 import { ref, watch } from 'vue';
 import axios from 'axios';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import AuthenticatedLayout from '@/Layouts/MunicipalityLayout.vue';
 import EquipmentModelLists from '../Components/Transactions/EquipmentModelLists.vue';
 import Receipt from '../Components/Receipt.vue';
 import ProvinceList from '@/Components/Lists/ProvinceList.vue';
