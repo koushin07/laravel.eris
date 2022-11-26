@@ -10,11 +10,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Municipality;
 use App\Models\Assign_Office;
 use App\Models\AssignOffice;
-
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Office extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasUuids;
 
     /**
      * The attributes that are mass assignable.
@@ -25,7 +25,10 @@ class Office extends Authenticatable
         'assign',
         'name',
         'email',
+        'address',
+        'contact',
         'password',
+        'must_reset_password',
         'role_id'
     ];
 
@@ -47,7 +50,6 @@ class Office extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-
 
 
     public function assign_office()

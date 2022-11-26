@@ -13,6 +13,10 @@ module.exports = {
         extend: {
             fontFamily: {
                 sans: ["Nunito", ...defaultTheme.fontFamily.sans],
+                roman:"Times New Roman, Times, serif",
+                arial: "Arial, sans-serif",
+                american: "American Typewriter, serif",
+                tohama: "font-family: Tahoma, sans-serif",
             },
             keyframes: {
                 wiggle: {

@@ -2,10 +2,11 @@
 
 namespace App\Http\Middleware;
 
-use App\Providers\RouteServiceProvider;
-use Closure;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use Closure;
+use App\Providers\RouteServiceProvider;
+use App\Models\Role;
 
 class RedirectIfAuthenticated
 {
@@ -23,7 +24,13 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                return redirect(RouteServiceProvider::HOME);
+                if (Auth::user()->role()->where('role_type', Role::ADMIN)->exists()) {
+                    return redirect(RouteServiceProvider::ADMIN);
+                } elseif (Auth::user()->role()->where('role_type', Role::PROVINCE)->exists()) {
+                    return redirect(RouteServiceProvider::PROVINCE);
+                } else {
+                    return redirect(RouteServiceProvider::HOME);
+                }
             }
         }
 

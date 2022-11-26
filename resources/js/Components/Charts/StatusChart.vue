@@ -44,18 +44,29 @@ export default {
                         y: {
                             beginAtZero: true
                         },
-                       
+
                     },
-                    plugins:{
-                        legend:{
-                            display: false,
-                            title:{
-                                display: false
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                return tooltipItem.yLabel;
                             }
                         }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false,
+                            title: {
+                                display: false
+                            },
+                            labels:{
+                                boxHeight: 0
+                            }
+
+                        }
                     }
-                   
-                }
+
+                },
             });
             statues.canvas.parentNode.style.height = '200px';
             statues.canvas.parentNode.style.width = '200px';

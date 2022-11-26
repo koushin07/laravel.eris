@@ -40,9 +40,6 @@
                                 <span class="text-xs text-gray-700 uppercase">{{ regional.owner }}</span>
                                     <span class="text-xs text-gray-700 uppercase">{{ regional.borrower }}</span>
                             </div>
-
-
-
                         </button>
 
                     </div>
@@ -58,7 +55,7 @@
                             class="flex justify-between  border-b  p-4 hover:bg-slate-200 border-grey-200 last:border-transparent">
 
                             <div class="grid grid-cols-1 text-start">
-                                <span class="font-bold text-base text-gray-700 uppercase">{{ report.sender.name }}</span>
+                                <span class="font-bold text-base text-gray-700 uppercase">{{ report.reciever.name }}</span>
                                 <span class="text-xs text-gray-700 uppercase">{{ report.filename }}</span>
                             </div>
 

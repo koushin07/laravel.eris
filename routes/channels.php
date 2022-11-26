@@ -35,3 +35,5 @@ Broadcast::channel('borrowing.{id}', fn($user, $id)=>  $user->id ==  $id);
 Broadcast::channel('child.transacton.{id}', fn($user, $id) => $user->id == $id);
 
 Broadcast::channel('incident.report.{id}', fn($user, $id) => $user->id == $id);
+
+Broadcast::channel('report.submitted.{id}', fn($user, $id)=>$user->id == $id);

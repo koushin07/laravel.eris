@@ -4,18 +4,22 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
-use App\Services\LocationService;
+use App\Models\IncidentReport;
+use App\Models\BorrowingDetails;
 use App\Http\Controllers\Users\PagesController;
 use App\Http\Controllers\Transactions\MunicipalityTransactionController;
 use App\Http\Controllers\Province\ProvinceController;
 use App\Http\Controllers\Office\OfficeController;
 use App\Http\Controllers\Municipality\MunicipalityController;
 use App\Http\Controllers\Municipality\EquipmentController;
-use App\Http\Controllers\Borrow\UnfinishTransactionController;
+use App\Http\Controllers\IncidentReportController;
 use App\Http\Controllers\Borrow\BorrowingController;
 use App\Http\Controllers\Borrow\BorrowHistoryController;
+use App\Http\Controllers\Borrow\BDController;
+use App\Http\Controllers\Admin\AdminPageController;
 use App\Events\NewEquipmentAdded;
-use App\Http\Controllers\IncidentReportController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,51 +32,29 @@ use App\Http\Controllers\IncidentReportController;
 |
 */
 
-// Route::get('/', function () {
-//     return Inertia::render('Welcome', [
-//         'canLogin' => Route::has('login'),
-//         'canRegister' => Route::has('register'),
-//         'laravelVersion' => Application::VERSION,
-//         'phpVersion' => PHP_VERSION,
-//     ]);
-// });
+
 Route::get('/', function () {
     return Inertia::render('LandingPage');
-})->name('landingPage');
+})->name('landingPage')->middleware('guest');
 
-/* Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
- */
+
 require __DIR__ . '/auth.php';
-Route::group(['middleware' => 'auth', 'verified'], function () {
 
-    Route::get('/upload', function () {
-        return inertia('municipality/Fileupload');
-    });
+Route::group(['middleware' => ['auth', 'isSetup']], function () {
 
-    Route::post('/uploading', function (Request $request) {
-        $request->validate([
-
-            'docs' => 'mimes:pdf,docx,docs|max:2048',
-        ]);
-
-        if ($request->hasFile('docs')) {
-            $doc_path = $request->file('docs')->store('docs', 'public');
-            dd($doc_path);
-        }
-        return;
-        // return inertia('municipality/Fileupload');
-    });
+    
     Route::group([
         'middleware' => 'role:RDRRMC_MUNICIPALITY',
         'prefix' => 'municipality',
         'as' => 'municipality.'
     ], function () {
-        Route::resource('office', OfficeController::class);
-
-        Route::resource('incident', IncidentReportController::class)->only(['store']);
+        
+        Route::resource('office', OfficeController::class)->only(['index']);
+        Route::get('/incident/download/{id}', [IncidentReportController::class, 'downloadFile']);
+        Route::resource('incident', IncidentReportController::class)->only(['index','store', 'update']);
         Route::get('/request', [PagesController::class, 'index']);
+        Route::get('/approval', [PagesController::class, 'approval']);
+        Route::resource('detail', BDController::class)->only(['update']);
         Route::resource('inventory', EquipmentController::class);
         Route::resource('transaction', BorrowingController::class);
         Route::resource('history', BorrowHistoryController::class);
@@ -80,7 +62,6 @@ Route::group(['middleware' => 'auth', 'verified'], function () {
 
 
 
-    Route::resource('borrowing', BorrowingController::class);
    
 
     Route::group(['middleware' => 'role:RDRRMC_PROVINCE', 'prefix' => 'province', 'as' => 'province.'], function () {
@@ -89,21 +70,45 @@ Route::group(['middleware' => 'auth', 'verified'], function () {
         Route::get('/dashboard', [App\Http\Controllers\Province\PagesController::class, 'dashboard'])->name('dashboard');
         Route::get('/consolidated', [App\Http\Controllers\Province\PagesController::class, 'consolidated'])->name('consolidated');
         Route::get('/transaction', [App\Http\Controllers\Province\PagesController::class, 'transaction'])->name('transaction');
-        Route::get('/request', [App\Http\Controllers\Province\PagesController::class, 'request'])->name('request');
+        // Route::get('/request', [App\Http\Controllers\Province\PagesController::class, 'request'])->name('request');
         Route::post('/incident', [IncidentReportController::class, 'request']);
-        
+    });
 
+    Route::group(['middleware' => 'role:RDRRMC', 'prefix' => 'rdrrmc', 'as' => 'rdrrmc.'], function () {
+
+        Route::get('/equipment-requests', [AdminPageController::class, 'transaction'])->name('transaction');
+        Route::get('/dashboard', [AdminPageController::class, 'dashboard'])->name('dashboard');
+        Route::get('/consolidated/equipment', [AdminPageController::class, 'consolidated'])->name('consolidated');
+        Route::get('/register', [OfficeController::class, 'create'])->name('register');
+        Route::get('/register/province', [OfficeController::class, 'create_province'])->name('register_province');
+        Route::get('/municipalities', [OfficeController::class, 'municipality'])->name('municipalities');
+        Route::get('/provinces', [OfficeController::class, 'province'])->name('provinces');
+        Route::get('/reports', [AdminPageController::class, 'report'])->name('report');
+        Route::get('/report/download/{id}', [IncidentReportController::class, 'downloadFile'])->name('download');
+        Route::resource('office', OfficeController::class)->only(['edit','update']);
+        Route::resource('report',IncidentReportController::class)->only('show');
+        
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.'], function () {
-        Route::post('/equipment/{name}/quantity/{quantity}', [EquipmentController::class, 'municipalityList']);
-        Route::post('/cross/equipment/{name}/quantity/{quantity}', [EquipmentController::class, 'CrossMunicipalityList']);
+        Route::post('/equipment', [EquipmentController::class, 'municipalityList']);
+        Route::post('/cross/equipment/{name}', [EquipmentController::class, 'CrossMunicipalityList']);
         Route::post('/equipmentAttr', [EquipmentController::class, 'equipmentAttr'])->name('attrs');
-        Route::post('/{name}/request/{id}/{quantity}', [BorrowingController::class, 'singleRequest']);
-        Route::post('/accepted', [UnfinishTransactionController::class, 'accepted']);
-        Route::post('/deny', [UnfinishTransactionController::class, 'deny']);
+        Route::get('/municipality/notification/count', [BorrowingController::class, 'notif']);
+        Route::post('/request', [BorrowingController::class, 'singleRequest']);
+        Route::post('/accepted', [BDController::class, 'accepted']);
+        Route::post('/deny', [BDController::class, 'deny']);
         Route::post('/requestAll', [BorrowingController::class, 'requestAll']);
     });
+    
+    Route::get('/viewFile', function () {
+        $report = IncidentReport::findOrFail('97be6896-5b89-4171-b0e8-0a96bf97c388');
+        $headers = array(
+            'Content-Type: application/pdf',
+        );
+        $cut = ltrim($report->file_path,"public/");
+        $path = "../public/storage/" . $cut;
+       
+        return response()->file('../public/storage/xJS1r89ziM1SkL7il4JG2C1Dnc8EqOEdRb1rFXMr.pdf',  $headers);
+    });
 });
-
-Route::get('/distance', [PagesController::class, 'distance']);

@@ -1,7 +1,9 @@
 <template>
     <div @click="openModal">
-
-        Create Form
+<button class="px-3 py-2 rounded-md bg-button text-white">
+    Update
+</button>
+      
 
     </div>
     <TransitionRoot appear :show="isOpen" as="template">
@@ -17,181 +19,177 @@
                         enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100"
                         leave-to="opacity-0 scale-95">
                         <DialogPanel
-                            class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                            <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
-                                Equipmet Details
+                            class="w-full max-w-md transform overflow-hidden rounded bg-white p-6 text-left align-middle shadow-xl transition-all">
+                            <DialogTitle as="h3" class="flex flex-row justify-between mx-4">
+
+                                <span class="text-lg font-medium leading-6 text-gray-900"> Equipmet Details</span>
+                                <button class="grid place-content-center hover:scale-110 hover:text-orange-500"
+                                    @click="closeModal">
+                                    <i class="fa-solid fa-x text-lg"></i>
+
+                                </button>
+
                             </DialogTitle>
                             <div class="mt-2">
 
 
-                                <form @submit.prevent="submit">
+                                <form @submit.prevent="handleSubmit">
 
-                                    <div class="px-4 py-5 bg-white sm:p-6">
-                                        <div class="grid grid-cols-6 gap-6">
-                                            <div class="col-span-12 sm:col-span-6 w-full">
-                                                <label for="equipment_name"
-                                                    class="block text-sm font-medium text-gray-700">Equipment
-                                                    Name</label>
-                                                <input type="text" name="equipment_name" id="equipment_name"
-                                                    vModel="form.equipment_name"
-                                                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                                    required="">
-                                                <InputError class="mt-2" :message="form.errors.equipment_name" />
+                                    <div class="">
+                                        <div class="px-4 py-5 bg-white sm:p-6">
+                                            <div class="grid grid-cols-6 gap-6">
+                                                <div class="col-span-6 sm:col-span-6">
+                                                    <label for="name"
+                                                        class="block text-sm font-medium text-gray-700">Equipment
+                                                        Name</label>
+                                                    <input type="text" name="name" id="name"
+                                                        class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                                        v-model="form.equipment_name" required="">
+
+                                                </div>
+
+                                                <div class="col-span-6 flex flex-col ">
+                                                    <span class="text-sm text-slate-500 ">Status</span>
+                                                    <div class="flex flex-row space-x-6 border-t-2">
+                                                        <div class="col-span-6 sm:col-span-6 lg:col-span-2">
+                                                            <label for="model_number"
+                                                                class="block text-sm font-medium text-gray-700">Serviceable</label>
+                                                            <input type="number" name="model_number" id="model_number"
+                                                                v-model="form.serviceable" required=""
+                                                                class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                                        </div>
+                                                        <div class="col-span-6 sm:col-span-6 lg:col-span-2">
+                                                            <label for="model_number"
+                                                                class="block text-sm font-medium text-gray-700">Unusable</label>
+                                                            <input type="number" name="model_number" id="model_number"
+                                                                v-model="form.unusable" required=""
+                                                                class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                                        </div>
+                                                        <div class="col-span-6 sm:col-span-6 lg:col-span-2">
+                                                            <label for="model_number"
+                                                                class="block text-sm font-medium text-gray-700">Poor</label>
+                                                            <input type="number" name="model_number" id="model_number"
+                                                                v-model="form.poor" required=""
+                                                                class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+
+                                                <div class="col-span-6 sm:col-span-6 lg:col-span-2">
+                                                    <label for="model_number"
+                                                        class="block text-sm font-medium text-gray-700">Model
+                                                        Number</label>
+                                                    <input type="number" name="model_number" id="model_number"
+                                                        v-model="form.model_number" required=""
+                                                        class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                                </div>
+
+
+
+                                                <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                                                    <label for="serial_number"
+                                                        class="block text-sm font-medium text-gray-700">Serial
+                                                        Number</label>
+                                                    <input type="text" name="serial_number" id="serial_number"
+                                                        v-model="form.serial_number" required=""
+                                                        class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                                </div>
+
+
+                                                <div class="col-span-6 sm:col-span-3 lg:col-span-2">
+                                                    <label for="unit"
+                                                        class="block text-sm font-medium text-gray-700">Unit
+                                                    </label>
+                                                    <input type="number" name="unit" id="unit" v-model="form.unit"
+                                                        required=""
+                                                        class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                                </div>
+
+                                                <div class="col-span-6 sm:col-span-3">
+                                                    <label for="code"
+                                                        class="block text-sm font-medium text-gray-700">Code
+                                                    </label>
+                                                    <input type="text" name="code" id="code"
+                                                        class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                                        v-model="form.code" required="">
+
+                                                </div>
+                                                <div class="col-span-6 sm:col-span-3">
+                                                    <label for="asset_id"
+                                                        class="block text-sm font-medium text-gray-700">asset ID
+                                                    </label>
+                                                    <input type="number" name="asset_id" id="asset_id"
+                                                        class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                                        v-model="form.asset_id" required="">
+
+                                                </div>
+
+
 
                                             </div>
 
-                                            <!-- <div class="col-span-6 sm:col-span-3">
-                                                <label for="status"
-                                                    class="block text-sm font-medium text-gray-700">Status</label>
-                                                <select name="status" id="status" v-model="form.status"
-                                                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                                    required="">
-                                                    <option value="status" selected hidden>
-
-                                                    </option>
-                                                    <option value="Serviceable">Serviceable</option>
-                                                    <option value="Poor">Poor</option>
-                                                    <option value="Unusable">Unusable</option>
-
-
-                                                </select>
-                                                <InputError class="mt-2" :message="form.errors.status" />
-                                            </div> -->
-
-
-                                            <div class="col-span-6 sm:col-span-6 lg:col-span-2">
-                                                <label for="serviceable"
-                                                    class="block text-sm font-medium text-gray-700">Seriveable</label>
-                                                <input type="number" name="serviceable" id="serviceable" required=""
-                                                    vModel="form.serviceable"
-                                                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                                <InputError class="mt-2" :message="form.errors.serviceable" />
-                                            </div>
-                                            <div class="col-span-6 sm:col-span-6 lg:col-span-2">
-                                                <label for="unusable"
-                                                    class="block text-sm font-medium text-gray-700">Unusable</label>
-                                                <input type="number" name="unusable" id="unusable" required=""
-                                                    vModel="form.unusable"
-                                                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                                <InputError class="mt-2" :message="form.errors.unusable" />
-                                            </div>
-
-
-
-                                            <div class="col-span-6 sm:col-span-3 lg:col-span-2">
-                                                <label for="poor"
-                                                    class="block text-sm font-medium text-gray-700">Poor</label>
-                                                <input type="number" name="poor" id="poor"
-                                                    vModel="form.poor"
-                                                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                                <InputError class="mt-2" :message="form.errors.poor" />
-                                            </div>
-
-                                            <div class="col-span-6 sm:col-span-6 lg:col-span-2">
-                                                <label for="model_number"
-                                                    class="block text-sm font-medium text-gray-700">Model
-                                                    Number</label>
-                                                <input type="number" name="model_number" id="model_number" required=""
-                                                    vModel="form.model_number"
-                                                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                                <InputError class="mt-2" :message="form.errors.model_number" />
-                                            </div>
-                                            <div class="col-span-6 sm:col-span-6 lg:col-span-2">
-                                                <label for="asset_id"
-                                                    class="block text-sm font-medium text-gray-700">asset ID</label>
-                                                <input type="number" name="asset_id" id="asset_id" required=""
-                                                    vModel="form.asset_id"
-                                                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                                <InputError class="mt-2" :message="form.errors.asset_id" />
-                                            </div>
-
-
-
-                                            <div class="col-span-6 sm:col-span-3 lg:col-span-2">
-                                                <label for="serial_number"
-                                                    class="block text-sm font-medium text-gray-700">Serial
-                                                    Number</label>
-                                                <input type="number" name="serial_number" id="serial_number"
-                                                    vModel="form.serial_number"
-                                                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                                <InputError class="mt-2" :message="form.errors.serial_number" />
-                                            </div>
-
-
-                                            <div class="col-span-6 sm:col-span-3 lg:col-span-2">
-                                                <label for="unit" class="block text-sm font-medium text-gray-700">Unit
-                                                </label>
-                                                <input type="number" name="unit" id="unit" vModel="form.unit"
-                                                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                                <InputError class="mt-2" :message="form.errors.unit" />
-                                            </div>
 
                                             <div class="col-span-6 sm:col-span-3">
-                                                <label for="code" class="block text-sm font-medium text-gray-700">Code
-                                                </label>
-                                                <input type="text" name="code" id="code" vModel="form.code"
-                                                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                                <InputError class="mt-2" :message="form.errors.code" />
+                                                <label for="category"
+                                                    class="block text-sm font-medium text-gray-700">Category</label>
 
+                                                <select
+                                                    class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                                    v-model="form.category" required>
+                                                    <option value="none" selected disabled hidden>
+                                                        {{ form.category }}
+                                                    </option>
+                                                    <option>category1</option>
+                                                    <option>category2</option>
+                                                    <option>category3</option>
+
+                                                </select>
                                             </div>
-                                            
+
+
+
+
+                                            <div class="col-span-6">
+                                                <label for="asset_desc"
+                                                    class="block text-sm font-medium text-gray-700">Asset
+                                                    Description</label>
+                                                <input type="text" name="asset_desc" id="asset_desc"
+                                                    v-model="form.asset_desc" required=""
+                                                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                            </div>
+
+                                            <div class="col-span-6">
+                                                <label for="remarks"
+                                                    class="block text-sm font-medium text-gray-700">Remarks</label>
+                                                <input type="text" name="remarks" id="remarks"
+                                                    v-model="form.remarks" required=""
+                                                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                            </div>
+
+
 
 
 
                                         </div>
 
 
-                                        <div class="col-span-6 sm:col-span-3">
-                                            <label for="category"
-                                                class="block text-sm font-medium text-gray-700">Category</label>
-                                            <select id="category" name="category" required="" v-model="form.category"
-                                                class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                                <option value="none" selected hidden>
-
-                                                </option>
-                                                <option value="Category1">Category 1</option>
-                                                <option value="Category2">Category 2</option>
-                                                <option value="Category3">Category 3</option>
-                                            </select>
-                                            <InputError class="mt-2" :message="form.errors.category" />
-                                        </div>
 
 
-
-
-                                        <div class="col-span-6">
-                                            <label for="asset_desc"
-                                                class="block text-sm font-medium text-gray-700">Asset
-                                                Description</label>
-                                            <input type="text" name="asset_desc" id="asset_desc" required=""
-                                                vModel="form.asset_desc"
-                                                class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                            <InputError class="mt-2" :message="form.errors.asset_desc" />
-                                        </div>
-
-                                        <div class="col-span-6">
-                                            <label for="remarks"
-                                                class="block text-sm font-medium text-gray-700">Remarks</label>
-                                            <input type="text" name="remarks" id="remarks" required=""
-                                                vModel="form.remarks"
-                                                class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                            <InputError class="mt-2" :message="form.errors.remarks" />
-                                        </div>
                                     </div>
+                                    <div class=" mr-7 flex justify-end">
 
-                                    <button type="submit"
-                                        class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
-                                        Save
-                                    </button>
-
+                                        <button type="submit"
+                                            class="inline-flex  justify-center rounded-md border border-transparent bg-orange-200 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
+                                            Update
+                                        </button>
+                                    </div>
                                 </form>
 
                             </div>
 
-                            <div class="mt-4">
 
-
-                            </div>
                         </DialogPanel>
                     </TransitionChild>
                 </div>
@@ -210,37 +208,75 @@ import {
     DialogPanel,
     DialogTitle,
 } from '@headlessui/vue'
-import InputError from '@/Components/InputError.vue';
 
-let form = useForm({
+const form = useForm({
+
     equipment_name: '',
-    status: '',
-    model_number: '',
-    serial_number: '',
-    unit: '',
     code: '',
-    asset_id: '',
-    category: '',
     asset_desc: '',
+    category: '',
+    unit: null,
+    model_number: null,
+    serial_number: null,
+    asset_id: null,
     remarks: '',
-    serviceable: '',
-    unusable: '',
-    poor: '',
-});
+    serviceable: null,
+    unusable: null,
+    poor: null
+}, {
+  remember: false,
+})
 
-const submit = () => {
-
-    console.log(form)
-    form.post(route('equipment.store'), {
-        onSuccess: () => {
-            alert('yey')
-            isOpen.value = false
+const handleSubmit = () => {
+    form.post(route('municipality.inventory.store'), {
+        onFinish:()=>{
             form.reset()
-
+            closeModal()
+            
+        },
+        onError: (e) => {
+            alert(Object.values(e))
+            form.clearErrors()
+            closeModal()
         },
 
+
     })
-};
+
+    //  form.get('/municipality/inventory/store',{
+    //     onFinish: ()=> {
+    //         /* reset only has error */
+    //         form.reset()
+    //     }
+    //  })
+    // const cookie = VueCookies.get('access_token')
+    // console.log(JSON.stringify(form.value))
+    // await axios.post('/owned/create',
+    //     JSON.stringify(form.value), {
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //         'Authorization': `Bearer ${cookie}`
+    //     }
+    // }
+    // ).then((res) => {
+
+
+    // }).catch((err) => {
+    //     if (err.request.status == 401) {
+    //         const refresh = VueCookies.get('refresh_token')
+    //         axios.get('/auth/refresh_token', {
+    //             headers: {
+    //                 'Authorization': `Bearer ${refresh}`
+    //             }
+    //         }).then((res) => {
+    //             VueCookies.remove('access_token')
+    //             VueCookies.set('access_token', res.data.ACCESS_TOKEN)
+    //             this.handleSubmit
+    //         })
+    //     }
+    // })
+
+}
 const isOpen = ref(false)
 
 function closeModal() {
@@ -249,5 +285,6 @@ function closeModal() {
 function openModal() {
     isOpen.value = true
 }
+
 </script>
     

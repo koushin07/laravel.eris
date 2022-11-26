@@ -1,7 +1,7 @@
 <template>
 
-    <section class="full-page flex justify-between " id="home">
-        <div class="flex flex-col animate-fade-in-down">
+    <section class="full-page flex justify-center md:justify-between  " id="home">
+        <div class="hidden md:flex flex-col animate-fade-in-down">
             <nav class=" navbar flex  p-7  antialiased font-sans">
 
                 <div class="hidden md:flex space-x-6 text-white">
@@ -16,7 +16,7 @@
 
         <div class="flex m-2 py-10 bg-white animate-fade-in-down">
 
-            <form class="flex flex-col justify-around pt-0 px-14 pb-2 font-sans" @submit.prevent="submit">
+            <form class="flex flex-col  justify-center pt-0 px-14 pb-2 font-sans" @submit.prevent="submit">
                 <h1 class="font-extrabold text-transparent text-center bg-clip-text bg-gradient-to-r from-orange-600 to-pink-400"
                     style="font-family:Courier; font-size: 3rem;">Login</h1>
                 <h4 v-if="!$page.props.auth.user"
@@ -26,7 +26,7 @@
                 <inertia-link href="/municipality/request"
                     v-if="$page.props.auth.user && $page.props.auth.user.role_id === 1"
                     class="font-extrabold text-transparent text-lg text-center bg-clip-text bg-gradient-to-r from-orange-600 to-pink-400"
-                    style="font-family:Courier; ">Click here to re direct</inertia-link>
+                    style="font-family:Courier; ">Click here to redirect</inertia-link>
 
                 <div class="relative flex flex-col z-0  " v-if="!$page.props.auth.user">
                     <InputLabel for="email" value="email" />

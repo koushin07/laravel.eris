@@ -1,4 +1,5 @@
 <template>
+    <head title="Update"/>
     <ContentBox>
 
         <form class="h-full " @submit.prevent="handleSubmit">
@@ -73,11 +74,11 @@
                         <input type="number" v-model="form.model_number" required
                             class="border-2 rounded-md px-2 py-1  focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-300">
                     </div>
-                    <div class="flex flex-col">
+                    <!-- <div class="flex flex-col">
                         <label class="text-sm font-bold">Quantity</label>
                         <input type="number" v-model="form.quantity" required
                             class="border-2 rounded-md px-2 py-1  focus:outline-none focus:border-transparent focus:ring-2 focus:ring-blue-300">
-                    </div>
+                    </div> -->
                 </div>
 
                 <div class="flex flex-col">
@@ -96,15 +97,13 @@
             </div>
         </form>
     </ContentBox>
-    <Content-box>
-
-    </Content-box>
 
 </template>
 
 <script>
 import axios from 'axios';
 import { ref, computed } from 'vue';
+import { Head } from '@inertiajs/inertia-vue3';
 import { useForm } from '@inertiajs/inertia-vue3';
 import ContentBox from '../../Components/ContentBox.vue';
 import municipalityLayout from '@/Layouts/MunicipalityLayout.vue'
@@ -113,7 +112,7 @@ import InputError from '@/Components/InputError.vue';
 
 export default {
     layout: municipalityLayout,
-    components: { ContentBox, InputError },
+    components: { ContentBox, InputError, Head },
     setup() {
 
         const form = useForm({
@@ -139,6 +138,7 @@ export default {
                     form.clearErrors()
 
                 },
+                
                
             })
 

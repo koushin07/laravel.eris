@@ -14,8 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::table('incident_reports', function (Blueprint $table) {
-            $table->foreignId('sender')->constrained('offices');
-            $table->foreignId('reciever')->constrained('offices');
+            $table->foreignUuid('sender')->constrained('offices');
+            $table->foreignUuid('reciever')->constrained('offices');
 
         });
     }

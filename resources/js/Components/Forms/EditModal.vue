@@ -37,12 +37,12 @@
                                         <div class="px-4 py-5 bg-white sm:p-6">
                                             <div class="grid grid-cols-6 gap-6">
                                                 <div class="col-span-6 sm:col-span-6">
-                                                    <label for="equipment_name"
+                                                    <label for="name"
                                                         class="block text-sm font-medium text-gray-700">Equipment
                                                         Name</label>
-                                                    <input type="text" name="equipment_name" id="equipment_name"
+                                                    <input type="text" name="name" id="name"
                                                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                                        v-model="updateForm.equipment_name" required="">
+                                                        v-model="updateForm.name" required="">
 
                                                 </div>
 
@@ -79,7 +79,7 @@
                                                     <label for="model_number"
                                                         class="block text-sm font-medium text-gray-700">Model
                                                         Number</label>
-                                                    <input type="number" name="model_number" id="model_number"
+                                                    <input type="text" name="model_number" id="model_number"
                                                         v-model="updateForm.model_number" required=""
                                                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                                 </div>
@@ -90,7 +90,7 @@
                                                     <label for="serial_number"
                                                         class="block text-sm font-medium text-gray-700">Serial
                                                         Number</label>
-                                                    <input type="number" name="serial_number" id="serial_number"
+                                                    <input type="text" name="serial_number" id="serial_number"
                                                         v-model="updateForm.serial_number" required=""
                                                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                                 </div>
@@ -118,7 +118,7 @@
                                                     <label for="asset_id"
                                                         class="block text-sm font-medium text-gray-700">asset ID
                                                     </label>
-                                                    <input type="number" name="asset_id" id="asset_id"
+                                                    <input type="text" name="asset_id" id="asset_id"
                                                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                                                         v-model="updateForm.asset_id" required="">
 
@@ -213,7 +213,8 @@ const props = defineProps({
 
 const updateForm = useForm({
     equipment_id: props.form.id,
-    equipment_name: props.form.equipment_name,
+    detail_id: props.form.detail_id,
+    name: props.form.name,
     code: props.form.code,
     asset_desc: props.form.asset_desc,
     category: props.form.category,
@@ -227,8 +228,12 @@ const updateForm = useForm({
     poor: props.form.poor
 })
 
+
 function handleSubmit() {
     updateForm.put(route('municipality.inventory.update', props.form.id), {
+        onSuccess: (e)=>{
+            closeModal()
+        },
         onError: (e) => {
             alert(Object.values(e))
 

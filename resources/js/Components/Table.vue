@@ -1,20 +1,24 @@
 <template>
-    <table class="table-auto  w-full text-sm  text-gray-500 dark:text-gray-400 border-2 border-orange-200">
-        <thead class="text-xs text-gray-700 text-center uppercase bg-orange-200 dark:bg-gray-700 dark:text-gray-400">
+    <table class="table-auto  w-full text-sm border-x text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 text-center uppercase bg-header dark:bg-gray-700 dark:text-gray-400">
             <tr>
                 <th scope="col" class="py-3 px-6" v-for="(head, key) in tableHeader" :key="key">
                     {{ head.name }}
+                   
+
+
                 </th>
 
             </tr>
         </thead>
-        <tbody >
-            <tr class="max-h-full  bg-white border-b dark:bg-gray-800 dark:border-gray-700" v-for="(body, key) in tableBody">
-                <td scope="row" class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    {{ body.equipment_name }}
+        <tbody>
+            <tr class="max-h-full even:bg-gray-200  bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                v-for="(body, key) in tableBody">
+                <td scope="row" class="py-4 px-6 font-medium  text-gray-900 whitespace-nowrap dark:text-white">
+                    {{ body.name }}
                 </td>
                 <td class="text-center">
-                    {{ body.unit }}
+                    {{ body.category }}
                 </td>
                 <td class="text-center">
                     {{ body.model_number }}
@@ -30,27 +34,22 @@
                 </td>
                 <td class="text-center">
                     {{ body.asset_id }}
+
                 </td>
-                <td class="text-center">
+                <td class="text-center" v-if="editable">
                     <button href="javascript:void(0)" type="button"
                         class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
                         <EditModal :form="body" />
 
                     </button>
-                    /
-                    <a type="button"
-                        class="cursor-pointer font-medium text-blue-600 dark:text-blue-500 hover:underline">delete</a>
+
 
                 </td>
             </tr>
-            
+
         </tbody>
     </table>
-    <!-- <div class="bg-white text-center">
-        <Pagination :links="links" />
 
-
-    </div> -->
 </template>
 
 <script setup>
@@ -65,6 +64,7 @@ import EditModal from './Forms/EditModal.vue';
 
 
 const props = defineProps({
+    editable: Boolean,
     links: Array,
     tableHeader: Array,
     tableBody: Array,

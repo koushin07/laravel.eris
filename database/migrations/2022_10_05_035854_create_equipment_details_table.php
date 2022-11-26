@@ -14,8 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::create('equipment_details', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('equipment_owner')->constrained('equipment_owneds');
+            $table->uuid('id')->primary();
+            $table->foreignUuid('equipment_owner')->constrained('equipment_owneds');
             $table->integer('serviceable');
             $table->integer('unusable');
             $table->integer('poor');

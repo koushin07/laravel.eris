@@ -2,30 +2,42 @@
 
 namespace App\Http\Controllers\Users;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use App\Services\LocationService;
+use App\Services\HistoryService;
 use App\Models\User;
+use App\Models\Role;
 use App\Models\Province;
+use App\Models\Office;
 use App\Models\Municipality;
 use App\Models\Equipment;
+use App\Models\Borrowing;
+use App\Models\BorrowHistory;
 use App\Http\Controllers\Controller;
 use App\Events\BCastingEvent;
-use App\Models\Borrowing;
-use App\Models\Office;
-use App\Services\LocationService;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class PagesController extends Controller
 {
+    protected $history;
+    public function __construct(HistoryService $historyService)
+    {
+        $this->history = $historyService;
+    }
     function index()
     {
-
+        // dd(auth()->user()->unreadNotifications);
+        // dd($this->history->fetchMyHistory());
+        // dd(Office::join('roles', 'roles.id' , '=', 'offices.role_id' )->where('roles.role_type',Role::PROVINCE)->get());
         return inertia('municipality/RequestPage', [
+            'histories' => $this->history->fetchMyHistory(),
             'equipments' => DB::table('equipment')
                 ->join('equipment_owneds', 'equipment_owneds.equipment_id', '=', 'equipment.id')
                 ->whereNot('equipment_owneds.office_id', '=', auth()->id())
-                ->select('equipment_name')
-                ->groupBy('equipment_name')->get(),
+                ->select('equipment.id', 'name')
+                ->groupBy('name')->get(),
+            'provinces' => Office::join('roles', 'roles.id', '=', 'offices.role_id')->where('roles.role_type', Role::PROVINCE)->get()
         ]);
     }
     public function returnedChart()
@@ -83,25 +95,6 @@ class PagesController extends Controller
 
     public function send()
     {
-        // abort_unless(auth()->check(), 403);
-        // $borrows = MunicipalityTransaction::select(
-        //     [
-        //         'municipality_transactions.id',
-        //         'municipality_transactions.created_at',
-        //         'municipality_transactions.quantity',
-        //         'municipalities.municipality_name',
-        //         'equipment.equipment_name',
-        //         'equipment.model_number',
-        //     ]
-        // )
-        //     ->join('equipment', 'municipality_transactions.equipment_id', '=', 'equipment.id')
-        //     ->where('equipment.municipality_id', '=', auth()->user()->municipality_id)
-        //     ->join('municipalities', 'equipment.municipality_id', '=', 'municipalities.id')
-        //     ->where('confirm', '=', 1)
-        //     ->limit(5)->latest()->get();
-
-        // return $borrows;
-
 
         $recieved = DB::select(
             "SELECT 
@@ -146,19 +139,35 @@ class PagesController extends Controller
         return collect($pendning);
     }
 
-    public function distance(LocationService $locService)
+
+    public function approval()
     {
-        $provinces = array(
-            'camiguin' => ['Catarman', 'Guinsiliban', 'Mahinog', 'Mambajao', 'Sagay'],
-            'Bukidnon' => ['Baungon', 'Cabanglasan', 'Damulog', 'Dangcagan', 'Don_Carlos', 'Impasug-Ong']
-        );
 
-        foreach ($provinces as $key => $province) {
-            foreach ($province as $municipality) {
+        return inertia('municipality/Transactions/ApprovalPage', [
+            'notifications' => Borrowing::select(
+                'borrowings.id as borrow_id',
+                'borrowings.borrower_personel',
+                'bd.reason',
+                'bd.id as detail_id',
+                'owner.name as owner',
+                'ao.municipality as borrower',
+                'e.name as equipment',
+                'bd.quantity as quantity',
+                'borrowings.created_at'
 
-                dd($municipality, $key);
-            }
-            dd($province);
-        }
+            )
+                ->join('offices as borrower', DB::raw('borrower.id'), '=', 'borrowings.borrower')
+                ->join('assign_offices as ao', DB::raw('ao.id'), '=', DB::raw('borrower.assign'))
+                ->join('offices as owner', DB::raw('owner.id'), '=', 'borrowings.owner')
+                ->join('borrowing_details as bd', DB::raw('bd.borrowing_id'), '=', 'borrowings.id')
+                ->join('equipment as e', DB::raw('e.id'), '=', DB::raw('bd.equipment_id'))
+                ->where('owner.id', '=', auth()->id())
+                ->where('bd.status', '=', 'pending')
+                // ->where('owner.id', auth()->id())
+                ->latest()
+                ->get()
+
+
+        ]);
     }
 }

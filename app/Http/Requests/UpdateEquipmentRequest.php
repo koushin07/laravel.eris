@@ -25,7 +25,7 @@ class UpdateEquipmentRequest extends FormRequest
     {
         return [
             'equipment_id'=> 'required',
-            'equipment_name' => 'required',
+            'name' => 'required',
             'code'  => 'string',
             'asset_desc'  => 'string',
             'category'  => 'string',

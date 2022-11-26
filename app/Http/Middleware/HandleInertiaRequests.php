@@ -38,9 +38,10 @@ class HandleInertiaRequests extends Middleware
         // 'notification' =>(Municipality::find(auth()->user()->municipality_id))->unreadNotifications,
         return array_merge(parent::share($request), [
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user() ? $request->user()->load('role') :$request->user(),
                
             ],
+            'csrf_token' =>$request->session()->token(),
             'ziggy' => function () use ($request) {
                 return array_merge((new Ziggy)->toArray(), [
                     'location' => $request->url(),

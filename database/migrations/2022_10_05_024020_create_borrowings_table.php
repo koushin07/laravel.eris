@@ -14,8 +14,11 @@ return new class extends Migration
     public function up()
     {
         Schema::create('borrowings', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('borrower')->constrained('offices');
+            $table->uuid('id')->primary();
+            $table->foreignUuid('borrower')->constrained('offices','id');
+            $table->string('borrower_personel')->nullable();
+            $table->string('owner_personel')->nullable();
+            $table->foreignUuid('owner')->constrained('offices','id');
             $table->timestamps();
         });
     }

@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\EquipmentOwned;
 use App\Models\Borrowing;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class BorrowingDetails extends Model
 {
-    use HasFactory;
-    protected $fillable= ['equipment_owned_id', 'borrowing_id', 'quantity'];
+    use HasFactory, HasUuids;
+    protected $fillable= ['borrowing_id', 'equipment_attrs', 'equipment_id', 'quantity', 'reason', 'status'];
 
     public function equipment_owned()
     {

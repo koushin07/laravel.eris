@@ -20,6 +20,7 @@
                     Send
                 </button>
             </div>
+        
 
         </form>
     </Content-box>
@@ -32,7 +33,7 @@ import layout from '@/Layouts/Province/ProvinceLayout.vue'
 import { useForm } from '@inertiajs/inertia-vue3';
 export default {
     props: {
-        municipalities: Array
+        municipalities: Array,
     },
     layout: layout,
     setup() {

@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('incident_reports', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('file_path')->nullable();
             $table->string('filename')->nullable();
             $table->string('reason');

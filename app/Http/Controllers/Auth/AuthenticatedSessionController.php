@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\Role;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -36,9 +37,12 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
-        // dd(auth()->user());
-        if (auth()->user()->role_id == 2) {
-            return redirect()->route('province.dashboard');
+       
+        if (auth()->user()->role()->where('role_type', Role::PROVINCE)->exists()) {
+            return redirect()->intended(RouteServiceProvider::PROVINCE);
+        }
+        if (auth()->user()->role()->where('role_type', Role::ADMIN)->exists()) {
+            return redirect()->intended(RouteServiceProvider::ADMIN);
         }
         return redirect()->intended(RouteServiceProvider::HOME);
     }
@@ -58,5 +62,13 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    public function resetPassword()
+    {
+        return inertia('Auth/ResetPassword');
+    }
+    public function storeNewPassword(Request $request){
+        
     }
 }

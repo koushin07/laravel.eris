@@ -17,31 +17,31 @@ class EquipmentFactory extends Factory
      */
     public function definition()
     {
-        $tools =[
-            'Axe for use of SAFG',
-            'Aerial Flare',
-            'Aircraft Assault Ladder',
-            'Ascending Device',
-            'Assault Rescue Harness',
-            'Basket Stretcher',
-            'Bolt Cutter, Heavy Duty',
-            'Cervical Extrication Collar',
-            'Carabiners (Snap Link)',
-            'Door Jamb Spreader',
-            'Emergency Stretcher',
+        $tools = [
+            'SILICON MANUAL RESUSCITATOR',
+            'CPR POCKET MASKe',
+            'AMARADA SOLAS LIFE VEST',
+            'ALUMINUM FOLDING STRETCHER W/ BAG',
+            '02 BACKPACK FIRST AID TRAUMA KIT',
+            'EMERGENCY SPINE BOARD X-RAY CLAIRVOYANT',
+            'MEGAPHONE BIG',
+            'ADJUSTABLE TRACTION SPLINT',
+            'HELMET',
+            'TRAFFIC VEST',
+            'CADAVER BAG',
+            'BANDAGE',
+            'SWEAT SHIRT UNIFORM',
+            'WHISTLE FOX 40',
+            'HAND GLOVES',
+            'LED HEAD LAMP',
+            'MULTI FUNCTIONAL DIMMING HY-1008',
+            'RAINCOAT',
+            'RUBBER BOOTS',
+            'FIRE EXTINGUISHER',
         ];
 
         return [
-           'equipment_name'=>$this->faker->randomElement($tools),
-            'code'=>$this->faker->randomDigitNotZero(),
-            'asset_desc'=>$this->faker->sentence(),
-            'category'=>$this->faker->sentence(),
-            'unit'=>$this->faker->randomDigitNotZero(),
-            'model_number'=>$this->faker->randomDigitNotZero(),
-            'serial_number'=>$this->faker->randomDigitNotZero(),
-            'asset_id'=>$this->faker->randomNumber(),
-            'remarks'=>$this->faker->sentence(),
-            
+            'name' => $this->faker->randomElement($tools),
         ];
     }
 }

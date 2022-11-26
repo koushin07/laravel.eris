@@ -2,18 +2,20 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class IncidentReport extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids;
 
     protected $fillable=[
         'reciever',
         'sender',
         'file_path',
-        'filename'
+        'filename',
+        'reason'
     ];
 
     public function reciever()

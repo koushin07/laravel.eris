@@ -3,14 +3,23 @@ import { ref } from "vue";
 
 export default () => {
     const municipalities = ref(null);
-
-    const getLocalMunicipality = async (equipment, quantity) => {
+   const loading = ref(false)
+   const notFound = ref(false)
+    const getLocalMunicipality = async (form) => {
+        loading.value =true
+        if(notFound.value){
+            notFound.value = false
+        }
         await axios
             .post(
-                `/api/equipment/${equipment}/quantity/${quantity}`
+                '/api/equipment', form
             )
             .then((res) => {
                 console.log(res.data)
+                loading.value = false
+                if(res.data.length ===0){
+                    notFound.value= true
+                }
                 municipalities.value = res.data
             });
     };
@@ -27,6 +36,8 @@ export default () => {
 
     return {
         municipalities,
+        notFound,
+        loading,
         getLocalMunicipality,
         getRegionalMunicipality,
     };

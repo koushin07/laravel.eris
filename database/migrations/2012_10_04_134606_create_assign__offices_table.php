@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('assign_offices', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('municipality')->nullable();
             $table->string('province')->nullable();
             $table->boolean('is_rdrrmc')->default(false);

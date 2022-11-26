@@ -4,8 +4,16 @@ import PendingTransactions from '../Components/PendingTransactions.vue'
 import { usePage } from '@inertiajs/inertia-vue3';
 import Dropdown from '@/Components/Dropdown.vue';
 import Notification from '@/Components/Notification.vue'
+import { onMounted, ref, watch } from 'vue'
+import useChannel from '@/Composables/useChannel';
+import { Head } from '@inertiajs/inertia-vue3'
+import useNotification from '@/Composables/useNotification';
+import { useToast } from "vue-toastification";
+import { emitter } from '@/Composables/useEventBus'
+
 export default {
     components: {
+        Head,
         Notification,
         Link,
         PendingTransactions,
@@ -14,6 +22,9 @@ export default {
 
 
     setup() {
+
+        const toast = useToast();
+
         console.log(`this is user ${usePage().props.value.auth.user.id}`)
         const navs = [
             { name: "Equipment", url: "/municipality/inventory" },
@@ -23,9 +34,80 @@ export default {
 
         ]
 
-        
+        const equipmentManagement = [
+            { name: "Inventory", url: "/municipality/inventory" },
+            { name: "Report", url: "/municipality/incident" }
+        ]
+
+        const transactions = [
+            { name: "Request", url: "/municipality/request", hasNotif: false },
+            { name: "Approvals", url: "/municipality/approval", hasNotif: true },
+            { name: "History", url: "/municipality/history", hasNotif: false },
+
+        ]
+
+
+        const { notif, equipmentRequest } = useChannel()
+        // window.Echo.private(
+        //     `borrowing.${usePage().props.value.auth.user.id}`
+        // ).listen(".borrow.recieved", (e) => {
+        //     console.log("this is e", e);
+
+
+        //     toast.info("Equipment Request Recieved", {
+        //         timeout: 5000,
+        //         icon: "fa-regular fa-envelope",
+        //     });
+
+        // });
+        const { notification, count } = useNotification()
+        emitter.on('badge', ()=>{
+            console.log('this is emmitter');
+            notification()
+        })
+        console.log(count.value);
+        onMounted(() => {
+            
+            window.Echo.private(
+                `borrowing.${usePage().props.value.auth.user.id}`
+            ).listen(".borrow.recieved", (e) => {
+                emitter.emit('refresh-approvals')
+                notification()
+
+                toast.info("Equipment Request Recieved", {
+                    timeout: 5000,
+                    icon: "fa-regular fa-envelope",
+                });
+
+            });
+
+            notification()
+
+        })
+        // const pop = ref(false)
+        // const read = ref(false)
+        // const startPop = () => {
+        //     setInterval(function () {
+
+        //         return pop.value = !pop.value
+        //     }, 1000)
+        // }
+        // document.addEventListener("visibilitychange", () => {
+
+        //     if(notif.value && !read.value){
+        //         startPop()
+        //     }
+        //     if(!document.hidden && notif.value){
+        //         read.value = true
+        //     }
+        // })
+
+
         return {
-            navs
+            navs,
+            equipmentManagement,
+            transactions,
+            count,
         }
     }
 
@@ -34,9 +116,11 @@ export default {
 </script>
 
 <template>
-   
+
+
     <div class="flex flex-col h-full md:h-screen">
-     
+
+
         <nav class="flex flex-row justify-between bg-white  border-b-2 p-5 w-full">
             <img src="../../css/eprris.png " class="h-12">
             <div class="grid grid-flow-col gap-2 align-middle">
@@ -47,7 +131,7 @@ export default {
                       dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600
                        dark:focus:ring-gray-700" type="button">
 
-                       <div class="text-orange-600">{{ $page.props.auth.user.email }}</div>
+                            <div class="text-orange-600">{{ $page.props.auth.user.name }}</div>
                             <svg class="ml-2 w-3 h-3" aria-hidden="true" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -63,33 +147,76 @@ export default {
                                     class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer">
                                     Account</inertia-link>
 
-                                <inertia-link  :href="route('logout')" method="post"
+                                <Link :href="route('logout')" method="post" as="Link"
                                     class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer">
-                                    Logout</inertia-link>
+                                Logout</Link>
                             </li>
                         </ul>
 
                     </template>
 
                 </Dropdown>
-                
-              
+
+
             </div>
 
         </nav>
-        <nav class="flex bg-white flex-row justify-end w-full">
+        <nav class="flex bg-white flex-row  w-full z-10">
             <div class="flex flex-row justify-center text-center  h-14">
-                <inertia-link :href="nav.url" :class="{ 'bg-gray-400 text-white': $page.url === nav.url }"
-                    class=" px-5 border-r-2 last:border-transparent text-center pt-4" v-for="(nav, key) in navs"
-                    :key="key">
-                    {{ nav.name }} </inertia-link>
 
+                <Dropdown align="left" class=" px-5  text-center pt-4">
+                    <template #trigger>
+                        <button>
+                            <p class="break-words">
+                                Equipment Management
+                            </p>
+                        </button>
+                    </template>
+                    <template #content class="mt-16">
+                        <ul class="py-1 text-sm text-start text-gray-700 dark:text-gray-200">
+                            <li>
+                                <inertia-link :href="management.url" v-for="management in equipmentManagement"
+                                    class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer">
+                                    {{ management.name }}</inertia-link>
+
+
+                            </li>
+                        </ul>
+                    </template>
+                </Dropdown>
+
+                <Dropdown align="left" class=" px-5 border-x-2 z-0  text-center pt-4">
+                    <template #trigger>
+                        <button>
+                            Transactions
+                        </button>
+                        <span v-if="count > 0"
+                            class="inline-block w-3 h-3 mr-3 bg-red-600 rounded-full -translate-y-1 translate-x-2"></span>
+                    </template>
+                    <template #content class="mt-16">
+                        <ul class="py-1 text-sm text-start text-gray-700 dark:text-gray-200">
+                            <li>
+                                <inertia-link :href="transaction.url" v-for="transaction in transactions"
+                                    class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer">
+                                    {{ transaction.name }}
+                                    <span v-if="transaction.hasNotif && count > 0"
+                                        class="inline-flex items-center justify-center px-2 py-1 mr-2 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full ml-10">{{
+        count
+                                        }}</span>
+                                </inertia-link>
+
+
+
+                            </li>
+                        </ul>
+                    </template>
+                </Dropdown>
             </div>
 
         </nav>
         <div class="flex flex-row h-full ">
 
-            <main class=" flex-col w-full  space-y-12 overflow-y-auto mt-10 mb-10 ml-10 mr-5 scrollbar">
+            <main class=" flex-col w-full  space-y-12 overflow-y-auto m-4 scrollbar shadow">
                 <slot />
             </main>
 
@@ -158,3 +285,8 @@ export default {
     </div>
   -->
 </template>
+<style scoped>
+.shadow {
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+</style>

@@ -85,4 +85,8 @@ class BorrowingService
             dd($th);
         }
     }
+    public function updateData($data)
+    {
+        
+    }
 }

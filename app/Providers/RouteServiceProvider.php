@@ -18,7 +18,9 @@ class RouteServiceProvider extends ServiceProvider
      * @var string
      */
     public const HOME = '/municipality/request';
-
+    public const PROVINCE = '/province/dashboard';
+    public const ADMIN = '/rdrrmc/dashboard';
+    public const SetupAccount ='/setup-account';
     /**
      * Define your route model bindings, pattern filters, and other route configuration.
      *

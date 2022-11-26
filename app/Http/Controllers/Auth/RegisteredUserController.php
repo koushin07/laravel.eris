@@ -17,6 +17,9 @@ use App\Models\AssignOffice;
 use App\Models\Office;
 use App\Models\Province;
 use App\Models\Role;
+use App\Rules\ProvinceMustExistRule;
+use App\Rules\ProvinceRule;
+use Illuminate\Support\Facades\DB;
 
 class RegisteredUserController extends Controller
 {
@@ -43,23 +46,35 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
 
-        $user = Office::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        $request->validate(
+            [
+                'name' => 'required|string|max:255|unique:App\Models\Office,name',
+                'email' => 'required|string|email|max:255|unique:offices',
+                'password' => ['required', 'confirmed', Rules\Password::defaults()],
 
-        event(new Registered($user));
+            ],
+            [
+                'name.unique' => 'this province is already registered'
+            ]
+        );
 
-        Auth::login($user);
-
-        return redirect(RouteServiceProvider::HOME);
+       
+        DB::transaction(function() use($request){
+            $role =  Role::where('role_type', Role::PROVINCE)->first();
+            $assign = AssignOffice::create([
+                'province' => $request->name
+            ]);
+            $user = Office::create([
+                'name' => $request->name,
+                'assign' => $assign->id,
+                'email' => $request->email,
+                'role_id' => $role->id,
+                'password' => Hash::make($request->password),
+            ]);
+        });
+    
+        return redirect(RouteServiceProvider::ADMIN);
     }
     public function store_municipality(Request $request)
     {
@@ -67,26 +82,36 @@ class RegisteredUserController extends Controller
         $request->validate([
             'email' => 'required|string|email|max:255|unique:offices',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'municipality_id' => [new MunicipalityRule]
-
+            'province' => ['required', 'exists:App\Models\AssignOffice,province'],
+            'name' => 'required|string|max:255|unique:App\Models\Office,name',
+            'lat' => ['required', 'numeric'],
+            'long' => ['required', 'numeric']
         ]);
 
-        // dd($request->municipality_id);
+      
 
-
-        //   dd('here');
-        $user = Office::create([
-            'name' => $request->name,
-            'assign' => $request->municipality_id,
-            'email' => $request->email,
-            'role_id' => 1,
-            'password' => Hash::make($request->password),
-        ]);
+      
+        DB::transaction(function() use($request){
+            $role =  Role::where('role_type', Role::MUNICIPALITY)->first();
+            $assign = AssignOffice::create([
+                'municipality' => $request->name,
+                'province'=> $request->province,
+                'latitude'=> $request->lat,
+                'longitude' => $request->long
+            ]);
+            $user = Office::create([
+                'name' => $request->name,
+                'assign' => $assign->id,
+                'email' => $request->email,
+                'role_id' => $role->id,
+                'password' => Hash::make($request->password),
+            ]);
+        });
+        
 
         // event(new Registered($user));
 
-        Auth::login($user);
 
-        return redirect(RouteServiceProvider::HOME);
+        return redirect(RouteServiceProvider::ADMIN);
     }
 }

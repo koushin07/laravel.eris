@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Office;
 use App\Models\EquipmentDetail;
 use App\Models\Equipment;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class EquipmentOwned extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids;
 
     protected $fillable=['equipment_id', 'office_id'];
 

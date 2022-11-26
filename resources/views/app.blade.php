@@ -21,7 +21,7 @@
 
 </head>
 
-<body class="font-sans antialiased bg-orange-100">
+<body class="font-sans antialiased " style="background-color: #EBECF0">
     @inertia
 
 </body>

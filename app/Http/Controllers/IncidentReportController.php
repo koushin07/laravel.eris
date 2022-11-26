@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Events\IncidentReportDemand;
+use App\Events\ReportSubmitted;
 use App\Models\BorrowingDetails;
 use App\Models\IncidentReport;
 use App\Models\Office;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class IncidentReportController extends Controller
 {
@@ -17,7 +19,13 @@ class IncidentReportController extends Controller
      */
     public function index()
     {
-        //
+        return inertia('municipality/ReportPage', [
+            'reports' => IncidentReport::with('sender')->where([
+                ['reciever', auth()->id()],
+                ['filename', null],
+                ['file_path', null]
+            ])->get(),
+        ]);
     }
 
     /**
@@ -44,21 +52,19 @@ class IncidentReportController extends Controller
         ]);
 
 
-        $rddrmc = Office::where('role_id', 3)->first();
+
 
         if ($request->hasFile('docs')) {
-            $doc_path = $request->file('docs')->store('docs');
+            $doc_path = $request->file('docs')->store('public');
             $file = $request->file('docs');
 
-          $incident =  IncidentReport::create([
-                'reciever' => $rddrmc->id,
-                'sender' => auth()->id(),
-                'filename' => $file->getClientOriginalName(),
-                'file_path' => $doc_path
-            ]);
-            $details = BorrowingDetails::find($request->details_id);
-            $details->incident_report = $incident->id;
-            $details->save();
+            $incident =  IncidentReport::find($request->id);
+            if ($incident) {
+                $incident->filename = $file->getClientOriginalName();
+                $incident->file_path = $doc_path;
+                $incident->save();
+            }
+            ReportSubmitted::dispatch(Office::find($incident->sender));
         }
         return;
     }
@@ -71,7 +77,14 @@ class IncidentReportController extends Controller
      */
     public function show($id)
     {
-        //
+        $report = IncidentReport::findOrFail($id);
+        $headers = array(
+            'Content-Type: application/pdf',
+        );
+        $cut = ltrim($report->file_path, "public/");
+        $path = "../public/storage/" . $cut;
+
+        return response()->file($path, $headers);
     }
 
     /**
@@ -94,7 +107,25 @@ class IncidentReportController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'docs' => ['mimes:pdf,docx,docs|max:2048', 'required'],
+        ]);
+
+        if ($request->hasFile('docs')) {
+            $doc_path = $request->file('docs')->store('public');
+
+            $file = $request->file('docs');
+
+            $incident =  IncidentReport::find($id);
+            dd($incident);
+            if ($incident) {
+
+                $incident->filename = $file->getClientOriginalName();
+                $incident->file_path = $doc_path;
+                $incident->save();
+            }
+        }
+        return;
     }
 
     /**
@@ -113,7 +144,6 @@ class IncidentReportController extends Controller
             'assign' => 'required',
             'reason' => 'required'
         ]);
-
         IncidentReport::create([
             'reciever' => $request->assign,
             'reason' => $request->reason,
@@ -122,5 +152,13 @@ class IncidentReportController extends Controller
 
         IncidentReportDemand::dispatch(Office::find($request->assign));
         return;
+    }
+    public function downloadFile($id)
+    {
+        $report = IncidentReport::findOrFail($id);
+        $headers = array(
+            'Content-Type: application/pdf',
+        );
+        return Storage::download($report->file_path, $report->filename, $headers);
     }
 }

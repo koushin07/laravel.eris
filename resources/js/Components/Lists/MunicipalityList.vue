@@ -7,7 +7,7 @@
         >
           <ComboboxInput
             class="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
-            :displayValue="(municipality) => municipality.name"
+            :displayValue="(municipality) => municipality.municipality"
             @change="query = $event.target.value"
           />
           <ComboboxButton
@@ -19,6 +19,7 @@
               
             /> -->
           </ComboboxButton>
+          
         </div>
         <TransitionRoot
           leave="transition ease-in duration-100"
@@ -42,7 +43,7 @@
               :key="municipality.id"
               :value="municipality"
               v-slot="{ selected, active }"
-              @click="label()" @keyup.enter="label()"
+            
             >
               <li
                 class="relative cursor-default select-none py-2 pl-10 pr-4"
@@ -55,7 +56,7 @@
                   class="block truncate"
                   :class="{ 'font-medium': selected, 'font-normal': !selected }"
                 >
-                  {{ municipality.name }}
+                  {{ municipality.municipality }}
                 </span>
                 <span
                   v-if="selected"
@@ -75,7 +76,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import {
   Combobox,
   ComboboxInput,
@@ -97,14 +98,15 @@ let filteredMuni = computed(() =>
   query.value === ''
     ? props.contents
     : props.contents.filter((municipality) =>
-        municipality.name
+        municipality.municipality
           .toLowerCase()
           .replace(/\s+/g, '')
           .includes(query.value.toLowerCase().replace(/\s+/g, ''))
       )
 )
 
-const label = () =>{
+watch(selected, (value)=>{
+  console.log('fired');
   emit('submit', selected.value)
-}
+})
 </script>

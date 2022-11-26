@@ -7,7 +7,7 @@
         <!-- Requests -->
         <div class="flex flex-col col-span-2  overflow-hidden h-full ">
             <span class="text-lg font-semibold font-sans text-center" v-if="notifications.length === 0">No Equipment
-                Request Accepted</span>
+                Request Recieve</span>
             <span class="text-lg font-semibold font-sans text-center" v-else>Requests</span>
             <div class=" flex flex-col justify-between overflow-y-auto border-2 rounded-lg    space-y-2 scrollbar">
                 <div v-for="(notification, key ) in notifications" :key="key"
@@ -21,7 +21,7 @@
                                 notification.data.borrower[0].municipality
                         }}</span>
                         <button class="font-bold text-sm text-gray-600 text-start hover:text-slate-900">{{
-                                notification.data.equipment
+                                notification.data.equipment.name
                         }}:
                             <span class="text-xs">{{ notification.data.quantity }}</span>
                         </button>
@@ -29,10 +29,10 @@
 
                     <div class="flex flex-col justify-between space-y-2">
                         <button
-                            @click="accept(notification.data.equipment, notification.data.borrower_id, notification.id, notification.data.borrower[0].municipality, notification.data.quantity)"
+                            @click="accept(notification.data.equipment.id, notification.data.borrower_id, notification.id, notification.data.borrower[0].municipality, notification.data.quantity)"
                             class=" text-sm  hover:bg-green-600  text-center bg-green-500 px-2 rounded-lg text-white tracking-wide">Accept</button>
                         <button
-                            @click="deny(notification.data.equipment, notification.data.borrower_id, notification.id, notification.data.borrower[0].municipality, notification.data.quantity)"
+                            @click="deny(notification.data.equipment.id, notification.data.borrower_id, notification.id, notification.data.borrower[0].municipality, notification.data.quantity)"
                             class="text-sm  hover:bg-red-600  text-center bg-red-500 px-2 rounded-lg text-white tracking-wide">Deny
 
                         </button>
@@ -51,20 +51,21 @@
 
     </Content-box>
     <Content-box>
-        <h1 class="text-semibold text-center tex-lg pb-10">U</h1>
+        <h1 class="text-semibold text-center tex-lg pb-10">Unfinish Transaction</h1>
         <div class="grid grid-cols-5 gap-5 place-content-center">
             <div class=" flex flex-col z-0  justify-between col-span-2">
-                <div class="flex flex-col  overflow-hidden h-[480px] ">
+                <div class="flex flex-col  overflow-hidden h-[450px] ">
 
                     <div class="flex flex-col justify-between overflow-y-auto border-2 rounded-lg  space-y-2 scrollbar">
 
-                        <button v-for="(unfin, key) in unfinish" :key="key" @click="openForm(unfin.equipment, unfin.id)"
+                        <button v-for="(unfin, key) in unfinish" :key="key" 
+                        @click="openForm(unfin.name, unfin.id)"
                             class="flex justify-between  border-b  p-4 hover:bg-slate-200 border-grey-200 last:border-transparent">
 
                             <div class="grid grid-cols-1 text-start">
                                 <span class="font-bold text-base text-gray-700 uppercase">{{ unfin.municipality
                                 }}</span>
-                                <span class="text-xs text-gray-700 uppercase">{{ unfin.equipment }}</span>
+                                <span class="text-xs text-gray-700 uppercase">{{ unfin.name }}</span>
                             </div>
 
 
@@ -141,7 +142,7 @@
 
     <Content-box>
         <h1 class="text-semibold text-center tex-lg pb-10"> Equipment Borrow type</h1>
-        <Unfinish-transaction :borrowings="borrowings" />
+        <Borrow-history :borrowings="borrowings" />
     </Content-box>
     <Content-box>
         <!-- <h1 class="font-semibold text-xl text-center">Incident Report</h1>
@@ -173,18 +174,18 @@ import axios from 'axios';
 import { ref } from 'vue';
 import { Inertia } from '@inertiajs/inertia'
 import { Head, useForm } from '@inertiajs/inertia-vue3';
-import UnfinishTransaction from '@/Components/Transactions/UnfinishTransaction.vue';
+import BorrowHistory from '@/Components/Transactions/BorrowHistory.vue';
 import IncidentReport from '@/Components/Transactions/IncidentReport.vue';
 
 
 export default {
     layout: MunicipalityLayout,
-    components: { ContentBox, Head, UnfinishTransaction, IncidentReport },
+    components: { ContentBox, Head, BorrowHistory, IncidentReport },
     props: {
         notifications: Array,
         unfinish: Array,
         borrowings: Array,
-        reports: Array,
+        reports: Object,
     },
     setup() {
 
@@ -210,7 +211,6 @@ export default {
                     toggleForm.value = !toggleForm.value
                 }
             })
-
 
         }
         const selectedEquipment = ref('')
@@ -244,7 +244,7 @@ export default {
             console.log(quantity)
             await axios.post(`/api/deny`, {
                 quantity: quantity,
-                equipment_name: equip,
+                equipment: equip,
                 borrower_id: id,
                 notif_id: notify_id,
                 municipality: muni

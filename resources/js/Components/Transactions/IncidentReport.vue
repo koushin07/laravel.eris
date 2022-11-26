@@ -6,17 +6,28 @@
 
                 <div class="flex flex-col justify-between overflow-y-auto border-2 rounded-lg  space-y-2 scrollbar">
 
-                    <button v-for="(report, key) in reports" :key="key"
+                    <button v-for="(report, key) in reports" :key="key" v-if="reports.length"
                         @click="openReport(report.id, report.equipment_name)"
                         class="flex justify-between  border-b  p-4 hover:bg-slate-200 border-grey-200 last:border-transparent">
 
                         <div class="grid grid-cols-1 text-start">
                             <span class="font-bold text-base text-gray-700 uppercase">
-                                {{ report.name }}
+                                {{ report.sender.name }}
                             </span>
-                            <span class="text-xs text-gray-700 uppercase">{{ report.equipment_name }}</span>
+                            <span class="text-xs text-gray-700 uppercase">{{ report.reason }}</span>
                         </div>
                     </button>
+                    <div v-else
+                        
+                        class="flex justify-between  border-b  p-4 border-grey-200 last:border-transparent">
+
+                        <div class="grid grid-cols-1 text-start">
+                            <span class="font-bold text-base text-gray-700 uppercase">
+                               No Incident Report Request Recieved
+                            </span>
+                            <span class="text-xs text-gray-700 uppercase"></span>
+                        </div>
+                    </div>
 
 
                 </div>
@@ -25,7 +36,7 @@
         <div class=" flex flex-col z-0 h-full  justify-between col-span-3">
             <div class="flex flex-col  overflow-hidden h-full ">
 
-                <form @submit.prevent="submitReport" v-if="incident.details_id"
+                <form @submit.prevent="submitReport" v-if="incident.id"
                     class=" flex flex-col animate-fade-in-down justify-between overflow-y-auto border-2 rounded-lg  space-y-2 scrollbar p-5 ">
                     <div class="flex flex-row justify-between">
                         <h1 class="font-bold text-2xl font-sans antialiased capitalize">
@@ -83,19 +94,18 @@
 
 <script>
 import { useForm } from '@inertiajs/inertia-vue3';
-
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 
 export default {
     props: {
-        reports: Array
+        reports: Object
     },
     setup() {
 
         const hover = ref(false)
         const selected = ref('')
         const incident = useForm({
-            details_id: null,
+            id: null,
             docs: '',
 
         })
@@ -104,7 +114,7 @@ export default {
         }
         const openReport = (id, equipment) => {
             selected.value = equipment
-            incident.details_id = id
+            incident.id = id
 
         }
         const drop = (e) => {
@@ -116,20 +126,16 @@ export default {
 
             incident.post(route('municipality.incident.store'), {
                 forceFormData: true,
-                onError: ()=>{
-                    console.log(error)
+                onError: (e)=>{
+                    console.log(e)
                 },
-                onSuccess: ()=>{
+                onFinish: ()=>{
                     incident.reset()
                 }
                 
                 
             })
         }
-
-
-        watch(incident, value => console.log(value))
-
 
         return {
             drop,

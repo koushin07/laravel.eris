@@ -11,11 +11,13 @@ use App\Events\BorrowRequestRecieve;
 
 class NotifyMunicipalityTransaction
 {
-    
+
     public function handle(BorrowRequestRecieve $event)
     {
-
-     Notification::sendNow($event->office, 
-     new MunicipalityTransactionNotification($event->equipment, $event->quantity));
+       
+        Notification::sendNow(
+            $event->office,
+            new MunicipalityTransactionNotification($event->equipment, $event->quantity, $event->incident, $event->person)
+        );
     }
 }

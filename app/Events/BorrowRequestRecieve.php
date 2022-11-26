@@ -20,7 +20,7 @@ class BorrowRequestRecieve implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(public $office, public $equipment, public $quantity)
+    public function __construct(public $office, public $equipment, public $quantity, public $incident, public $person)
     {
         //
     }

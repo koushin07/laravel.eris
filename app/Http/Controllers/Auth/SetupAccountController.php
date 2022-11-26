@@ -1,14 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\Province;
+namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Models\AssignOffice;
-use App\Models\Municipality;
-use App\Models\Province;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules;
+use App\Models\Role;
+use App\Http\Controllers\Controller;
+use App\Models\Office;
+use App\Providers\RouteServiceProvider;
+use Illuminate\Support\Facades\Hash;
 
-class ProvinceController extends Controller
+class SetupAccountController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,8 +20,7 @@ class ProvinceController extends Controller
      */
     public function index()
     {
-        // dd(auth()->user()->role()->where('role_type', '=', 'RDRRMC_PROVINCE')->exists());
-       return inertia('Province/Dashboard');
+        //
     }
 
     /**
@@ -28,7 +30,7 @@ class ProvinceController extends Controller
      */
     public function create()
     {
-        //
+        return inertia('Auth/SetupAccount');
     }
 
     /**
@@ -39,7 +41,27 @@ class ProvinceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'email' => ['required', 'email'],
+            'contact' => 'required',
+            'address' => 'required',
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
+    
+        $office = auth()->user()->update([
+           
+            'email' => $request->email,
+            'contact' => $request->contact,
+            'address' => $request->address,
+            'must_reset_password' => 1,
+            'password' =>  Hash::make($request->password)
+        ]);
+       
+        if (auth()->user()->role()->where('role_type', Role::PROVINCE)->exists()) {
+            return redirect(RouteServiceProvider::PROVINCE);
+        }
+
+        return redirect(RouteServiceProvider::HOME);
     }
 
     /**
@@ -48,11 +70,9 @@ class ProvinceController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($name)
+    public function show($id)
     {
-        abort_unless(auth()->check(), 403);
-
-        return AssignOffice::where('province', $name)->get(['id', 'municipality']);
+        //
     }
 
     /**

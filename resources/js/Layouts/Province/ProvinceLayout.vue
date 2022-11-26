@@ -3,6 +3,9 @@ import { Link } from '@inertiajs/inertia-vue3';
 import PendingTransactions from '@/Components/PendingTransactions.vue'
 import { usePage } from '@inertiajs/inertia-vue3';
 import Dropdown from '@/Components/Dropdown.vue';
+import useChannel from '@/Composables/useChannel'
+import { onMounted } from 'vue';
+
 export default {
     components: {
         Link,
@@ -14,20 +17,18 @@ export default {
 
     setup() {
         console.log(`this is user ${usePage().props.value.auth.user.id}`)
+        const {notifyProvince} = useChannel()
         const navs = [
             {name: "Dashboard", url: "/province/dashboard"},
             { name: "Equipment", url: "/province/consolidated" },
-            { name: "Request", url: "/province/request" },
+            // { name: "Request", url: "/province/request" },
             { name: "Transactions", url: "/province/transaction" },
 
         ]
+        onMounted(()=>{
+            notifyProvince()
+        })
 
-      
-        window.Echo.private(`borrowing.${usePage().props.value.auth.user.id}`)
-            .listen('.borrow.recieved', (e) => {
-                console.log('this is e', e)
-                alert('someone borrowed', e)
-            })
         return {
             navs
         }
@@ -79,7 +80,7 @@ export default {
             </div>
 
         </nav>
-        <nav class="flex bg-white flex-row justify-end w-full">
+        <nav class="flex bg-white flex-row  w-full">
             <div class="flex flex-row justify-center text-center  h-14">
                 <inertia-link :href="nav.url" :class="{ 'bg-gray-400 text-white': $page.url === nav.url }"
                     class=" px-5 border-r-2 last:border-transparent text-center pt-4" v-for="(nav, key) in navs"

@@ -20,8 +20,7 @@ class NotifyProvince implements ShouldBroadcast
      * @return void
      */
     public function __construct(
-        public $Office,
-        public $equipment,
+        public $province,
     ) {
     }
 
@@ -32,7 +31,8 @@ class NotifyProvince implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('child.transacton.' . $this->office->id);
+
+        return new PrivateChannel('child.transacton.' . $this->province->id);
     }
 
     public function broadcastAs()
