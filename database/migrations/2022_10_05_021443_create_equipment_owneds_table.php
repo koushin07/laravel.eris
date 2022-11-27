@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('equipment_owneds', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('equipment_id')->constrained('equipment', 'id');
+            $table->foreignUuid('equipment_attrs')->constrained('equipment_attributes');
             $table->foreignUuid('office_id')->constrained('offices','id');
             $table->timestamps();
         });

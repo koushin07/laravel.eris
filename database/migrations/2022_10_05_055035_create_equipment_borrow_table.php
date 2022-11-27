@@ -13,11 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('incident_reports', function (Blueprint $table) {
+        Schema::create('equipment_borrows', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('file_path')->nullable();
-            $table->string('filename')->nullable();
-            $table->string('reason');
+            $table->foreignUuid('equipment_id')->constrained();
+            $table->foreignUuid('equipment_attrs')->nullable()->constrained('equipment_attributes');
+            $table->foreignUuid('detail_id')->nullable()->constrained('borrowing_details');
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('incident_reports');
+        Schema::dropIfExists('equipment_borrows');
     }
 };

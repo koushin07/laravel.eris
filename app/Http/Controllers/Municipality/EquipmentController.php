@@ -42,7 +42,7 @@ class EquipmentController extends Controller
      */
     public function index()
     {
-  
+
         return inertia('municipality/InventoryPage', [
             'equipments' => DB::table('equipment')->select(
                 [
@@ -50,6 +50,7 @@ class EquipmentController extends Controller
                     'equipment_attributes.*',
                     'offices.name as owner',
                     'equipment_details.id as detail_id',
+                    'equipment_owneds.id as owned_id',
                     'equipment_details.serviceable',
                     'equipment_details.unusable',
                     'equipment_details.poor',
@@ -57,7 +58,7 @@ class EquipmentController extends Controller
             )
                 ->join('equipment_owneds', 'equipment_owneds.equipment_id', '=', 'equipment.id')
                 ->join('equipment_details', 'equipment_details.equipment_owner', '=', 'equipment_owneds.id')
-                ->join('equipment_attributes', 'equipment_attributes.equipment_id', '=', 'equipment.id')
+                ->join('equipment_attributes', 'equipment_attributes.id', '=', 'equipment_owneds.equipment_attrs')
                 ->join('offices', 'offices.id', '=', 'equipment_owneds.office_id')
                 ->when(
                     Request::input('search'),
@@ -85,10 +86,11 @@ class EquipmentController extends Controller
             'notification' => auth()->user()->unreadNotifications()->count(),
             'unfinish' => BorrowingDetails::where([
                 ['borrowings.owner', auth()->id()],
-                ['borrowing_details.equipment_attrs', null]
+                ['equipment_borrows.equipment_attrs', null]
             ])
+                ->join('equipment_borrows', 'equipment_borrows.detail_id', 'borrowing_details.id')
                 ->join('borrowings', 'borrowings.id', '=', 'borrowing_details.borrowing_id')
-                ->join('equipment', 'equipment.id', '=', 'borrowing_details.equipment_id')
+                ->join('equipment', 'equipment.id', '=', 'equipment_borrows.equipment_id')
                 ->join('offices', 'offices.id', 'borrowings.borrower')
                 ->join('assign_offices', 'assign_offices.id', '=', 'offices.assign')
                 ->count()
@@ -155,34 +157,37 @@ class EquipmentController extends Controller
     public function update(UpdateEquipmentRequest $request, $id)
     {
         $request->validated();
-       
-       DB::transaction(function() use($request, $id) {
-        $attrs = EquipmentAttribute::find($id);
-        $equipment = Equipment::find($attrs->equipment_id);
-        // dd($attrs, $equipment);
-        $attrs->update([
-             'code' => $request->code,
-            'asset_desc' =>$request->asset_desc,
-            'category'=>$request->category,
-            'unit' =>$request->unit,
-            'model_number' =>$request->model_number,
-            'serial_number' =>$request->serial_number,
-            'asset_id' =>$request->asset_id,
-            'remarks' =>$request->remarks,
-        ]);
-        $detail = EquipmentDetail::find($request->detail_id);
-        $detail->update([
-            'serviceable' => $request->serviceable,
-            'poor' => $request->poor,
-            'unusable' => $request->unusable
-        ]);
-        $equipment->update([
-            
-            'name' => $request->name,
-        ]);
+        // dd($request->validated());
+        DB::transaction(function () use ($request, $id) {
 
-       });
-        
+            $owned = EquipmentOwned::find($id);
+            $attrs = EquipmentAttribute::find($owned->equipment_attrs);
+            $equipment = Equipment::find($owned->equipment_id);
+            // $attrs = EquipmentAttribute::find($id);
+            // $equipment = Equipment::find($attrs->equipment_id);
+            $attrs->update([
+                 'code' => $request->code,
+                'asset_desc' =>$request->asset_desc,
+                'category'=>$request->category,
+                'unit' =>$request->unit,
+                'model_number' =>$request->model_number,
+                'serial_number' =>$request->serial_number,
+                'asset_id' =>$request->asset_id,
+                'remarks' =>$request->remarks,
+            ]);
+            $detail = EquipmentDetail::find($request->detail_id);
+            $detail->update([
+                'serviceable' => $request->serviceable,
+                'poor' => $request->poor,
+                'unusable' => $request->unusable
+            ]);
+            $equipment->update([
+
+                'name' => $request->name,
+            ]);
+
+        });
+
         // $equipment->update($request->validated());
         return redirect()->back();
     }
@@ -212,8 +217,7 @@ class EquipmentController extends Controller
 
     public function municipalityList(Req $request, LocationService $locationService)
     {
-
-        return response()->json($locationService->getDistance($request->equipment, $request->provinces));
+        return response()->json($locationService->getDistance($request->equipments, $request->provinces));
     }
 
     public function CrossMunicipalityList($name, $quantity, LocationService $locationService)

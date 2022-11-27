@@ -32,7 +32,7 @@ class EquipmentService
                 ['asset_id', $data->asset_id],
                 ['category', $data->category],
                 ['unit', $data->unit],
-                ['model_number',  $data->model_number],
+                ['serial_number',  $data->serial_number],
 
             ]
         )->first();
@@ -55,7 +55,6 @@ class EquipmentService
                 ]);
 
                 $attrs = EquipmentAttribute::create([
-                    'equipment_id' => $newequipment->id,
                     'code' => $data->code,
                     'asset_desc' => $data->asset_desc,
                     'category' => $data->category,
@@ -67,6 +66,7 @@ class EquipmentService
                 ]);
 
                 $EOwner = EquipmentOwned::create([
+                    'equipment_attrs'=> $attrs->id,
                     'equipment_id' => $newequipment->id,
                     'office_id' => auth()->id(),
 
@@ -81,7 +81,7 @@ class EquipmentService
                 $upCondition = EquipmentDetail::select(['equipment_details.*', 'equipment_owneds.*'])
                     ->join('equipment_owneds', 'equipment_details.equipment_owner', '=', 'equipment_owneds.id')
                     ->where([
-                        ['equipment_owneds.equipment_id', $equipmentAttrs->equipment_id],
+                        ['equipment_owneds.equipment_attrs', $equipmentAttrs->id],
                         ['equipment_owneds.office_id', auth()->id()]
                     ])->first();
 

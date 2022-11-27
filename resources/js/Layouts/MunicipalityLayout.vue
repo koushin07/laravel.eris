@@ -191,7 +191,7 @@ export default {
                             Transactions
                         </button>
                         <span v-if="count > 0"
-                            class="inline-block w-3 h-3 mr-3 bg-red-600 rounded-full -translate-y-1 translate-x-2"></span>
+                            class="inline-block w-3 h-3 mr-3 bg-red-600 rounded-full -translate-y-1 translate-x-2 "></span>
                     </template>
                     <template #content class="mt-16">
                         <ul class="py-1 text-sm text-start text-gray-700 dark:text-gray-200">

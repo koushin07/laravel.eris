@@ -1,5 +1,5 @@
 <template>
-    <div aria-label="Loading..." class="grid place-content-center py-10 h-full" role="status">
+    <div aria-label="Loading..." class="grid place-content-center py-10 h-full w-full   " role="status">
         <svg class="h-12 w-12 animate-spin stroke-gray-500" viewBox="0 0 256 256">
             <line x1="128" y1="32" x2="128" y2="64" stroke-linecap="round" stroke-linejoin="round" stroke-width="24">
             </line>
@@ -19,7 +19,7 @@
                 stroke-width="24"></line>
         </svg>
     </div>
-</template>
+</template> 
 
 <script setup>
 

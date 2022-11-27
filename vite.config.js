@@ -4,10 +4,10 @@ import vue from "@vitejs/plugin-vue";
 
 
 export default defineConfig({
-   server: {
-    host: "192.168.1.10",
-    port: "8081",
-},
+//    server: {
+//     host: "192.168.1.8",
+//     port: "8081",
+// },
     plugins: [
         laravel({
             input: "resources/js/app.js",

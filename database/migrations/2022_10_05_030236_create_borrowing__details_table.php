@@ -16,11 +16,12 @@ return new class extends Migration
         Schema::create('borrowing_details', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('borrowing_id')->constrained('borrowings', 'id');
-            $table->string('reason');
-            $table->string('status');
-            $table->foreignUuid('equipment_attrs')->nullable()->constrained('equipment_attributes');
-            $table->foreignUuid('equipment_id')->constrained('equipment');
+            $table->string('incident');
+            $table->string('incident_summary');
             $table->integer('quantity');
+            $table->integer('acquired');
+            $table->string('file_path')->nullable();
+            $table->string('filename')->nullable();
             $table->timestamps();
         });
         

@@ -166,6 +166,7 @@ class BDController extends Controller
     }
     public function deny(Request $request)
     {
+    
         auth()->user()->unreadNotifications->where('id', $request->notif_id)->markAsRead();
         $detail = BorrowingDetails::find($request->detail_id);
         $borrow = Borrowing::find($detail->borrowing_id)->update([

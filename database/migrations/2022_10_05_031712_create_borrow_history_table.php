@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('borrow_histories', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->boolean('is_returned')->default(false);
             $table->foreignUuid('borrowing_detail_id')->constrained('borrowing_details');
             $table->integer('serviceable');
             $table->integer('poor');

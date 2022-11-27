@@ -17,7 +17,7 @@ class Equipment extends Model
 
     ];
 
-
+    
     public function equipment_owned()
     {
         return $this->hasMany(EquipmentOwned::class);

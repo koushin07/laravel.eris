@@ -29,44 +29,24 @@
                 </button>
               </DialogTitle>
               <div class="flex flex-col gap-22" style="font-family:Arial, sans-serif">
-                <!-- <div class="flex flex-col">
-                  <span class="text-center text-3xl font-bold ">Municipality </span>
-                  <span class="text-3xl text-center ">
-                    {{ $page.props.auth.user.name }}
-                  </span>
-                </div> -->
+                
                 <div class="flex flx-row justify-between mt-11 border-b">
 
                   <div class="flex flex-col box-content ">
 
-                    <input class="focus:outline-none text-2xl font-bold tracking-wider" value="Incident" />
-                    <input class="focus:outline-none text-sm" value="incident detail" />
+                    <input v-model="incident"
+                      class="focus:outline-none text-2xl font-bold tracking-wider placeholder-stone-500"
+                      placeholder="Write your Incident Here" />
+                    <input v-model="incident_summary" class="focus:outline-none text-sm placeholder-stone-300"
+                      placeholder="Brief Summary" />
                   </div>
 
                 </div>
                 <div class="flex flex-col mt-11">
                   <div class="flex flex-row space-x-10">
                     <div class="relative z-0 mb-6 w-full group">
-                     
-                      
-                      <!-- <input type="email" name="equipment" 
-                        class="block py-2.5 px-0  text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                        placeholder=" " required />
-                      <label for="equipment"
-                        class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-                        Equipment</label> -->
-                      <!-- <div class="grid grid-rows-2 gap-2">
-                        <div class="my-1">
-                          <label class="text-sm w-full">Equipment</label>
-                          <v-select :options="props.equipments" label="name" />
-                        </div>
-                        <div class="my-1">
-                          <label class="text-sm">Province</label>
-                          <v-select :options="props.provinces" label="name" />
-                        </div>
 
 
-                      </div> -->
                       <LocalTransactions @submitted="getSubmit" :equipments="props.equipments"
                         :provinces="props.provinces" :incident="props.incident" />
 
@@ -81,13 +61,7 @@
               <div class="mt-4">
 
 
-                <div class="mt-4 grid place-content-center">
-                  <button type="button"
-                    class="inline-flex justify-center rounded-md border border-transparent bg-orange-300 px-4 py-2 text-sm font-medium  hover:bg-orange-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                    @click="submit">
-                    Request
-                  </button>
-                </div>
+
 
               </div>
             </DialogPanel>
@@ -100,9 +74,7 @@
     
 <script setup>
 import { ref } from 'vue'
-import { useForm } from '@inertiajs/inertia-vue3';
-import { emitter } from '@/Composables/useEventBus'
-import useFetchMunicipality from '@/Composables/useFetchMunicipality'
+
 import {
   TransitionRoot,
   TransitionChild,
@@ -111,6 +83,8 @@ import {
   DialogTitle,
 } from '@headlessui/vue'
 import LocalTransactions from './LocalTransactions.vue';
+import { useToast } from "vue-toastification";
+
 
 const emit = defineEmits(['request'])
 const props = defineProps({
@@ -118,14 +92,30 @@ const props = defineProps({
   equipments: Object,
   provinces: Object
 })
-const {  getLocalMunicipality } = useFetchMunicipality()
+
+const toast = useToast();
+
 
 const incident = ref('')
+const incident_summary = ref('')
 
 const isOpen = ref(false)
 
 function getSubmit(form) {
-  emit('submit', form)
+ 
+
+    form.incidents = incident.value
+    form.incident_summary = incident_summary.value
+
+    form.post('/api/request', {
+      onError: (error) => {
+        Object.keys(error).map((e)=> toast.info('please recheck ' + e + '!'))
+      
+      }
+    })
+ 
+
+  // emit('submit', form)
   // console.log('submit', form);
 }
 
@@ -142,18 +132,7 @@ function submit() {
   emit('request', incident.value)
   closeModal()
 }
-console.log(props.provinces);
-// const convertedProvince = Object.values(props.provinces).map((c) => c.name)
-// const convertedEquipment = Object.values(props.equipments).map((c) => c.name)
-      
-async function search() {
- 
-    if (requests.value.equipment.length !== 0) {
-      await getLocalMunicipality(requests.value)
-    }
 
-  
-}
 </script>
 <style scoped>
 

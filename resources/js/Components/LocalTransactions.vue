@@ -27,7 +27,7 @@
         <div class="grid grid-rows-2 gap-2">
             <div class="my-1">
                 <label class="text-sm w-full">Equipment</label>
-                <v-select multiple :options="convertedEquipment" v-model="requests.equipment" label="name"></v-select>
+                <v-select multiple :options="convertedEquipment" v-model="requests.equipments" label="name"></v-select>
             </div>
             <div class="my-1">
                 <label class="text-sm">Province</label>
@@ -59,14 +59,14 @@
 
                         </div> -->
 
+<!-- <div class="loader " v-if="loading"></div> -->
+                       
 
-                        <Loading v-if="loading" />
 
-
-                        <div v-else
+                        <div
                             class="flex flex-row lg:flex-col justify-between pr-2 border-b pb-2 border-red-200 last:border-transparent">
-
-                            <table class="table-auto  w-full text-sm  text-gray-500 dark:text-gray-400">
+                          
+                            <table   class="table-auto  w-full text-sm  text-gray-500 dark:text-gray-400">
                                 <thead
                                     class="text-xs text-gray-700 text-center uppercase bg-header dark:bg-gray-700 dark:text-gray-400">
                                     <tr>
@@ -79,8 +79,37 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="max-h-full even:bg-gray-100  bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                                   
+                                    <tr  v-if="loading" class="max-h-full even:bg-gray-100  bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                                      >
+                                     
+                                        <td scope="row" class="p-4 text-center">
+                                            
+                                        </td>
+                                        <td scope="row" class="text-center">
+                                            
+                                        </td>
+                                        <td class="text-center">
+                                            <Loading />
+                                        </td>
+                                        <td class="text-center">
+                                         
+                                        </td>
+                                        <td class="text-center">
+                                          
+                                        </td>
+                                        <td class="text-center">
+
+                                            
+
+                                        </td>
+
+
+                                    </tr>
+                                   
+                                    <tr v-else class="max-h-full even:bg-gray-100  bg-white border-b dark:bg-gray-800 dark:border-gray-700"
                                         v-for="(body, key) in municipalities" :key="key">
+                                     
                                         <td scope="row" class="p-4 text-center">
                                             {{ body.equipment }}
                                         </td>
@@ -97,12 +126,10 @@
                                             {{ body.owner_contact }}
                                         </td>
                                         <td class="text-center">
-                                            <button class="border-2 px-2">
-                                                Request
-                                            </button>
+
+                                            <Quantity-modal :muni="body" @submit="submit" />
+
                                         </td>
-
-
                                     </tr>
 
                                 </tbody>
@@ -187,7 +214,7 @@ export default {
         // const quantity = ref(0);
         const show = ref(false)
         const requests = ref({
-            equipment: [],
+            equipments: [],
             provinces: []
         })
         const tableHeader = [
@@ -203,31 +230,30 @@ export default {
             municipality_id: null,
             quantity: null,
             incidents: '',
-            person: ''
-
-
+            incident_summary: ''
         })
 
-
+      
 
         const getEquipment = async (equipment) => {
             equipment.value = equipment
-            requests.value.equipment = equipment.name
+            requests.value.equipments = equipment.name
         }
 
         const search = async () => {
-            if (requests.value.equipment.length !== 0) {
+            if (requests.value.equipments.length !== 0 && requests.value.provinces.length !== 0) {
                 await getLocalMunicipality(requests.value)
             }
 
         }
 
-        const submit = (quantity, muni, person) => {
-
-            form.equipment = requests.value.equipment
-            form.quantity = quantity
+        const submit = (quantity, muni) => {
+            console.log('this is muni', muni);
+            console.log('this is qty', quantity);
+            form.equipment = muni.equipment
+                form.quantity = quantity.value
             form.municipality_id = muni.municipality_id
-            form.person = person
+
             // console.log('this is ', muni);
             emit('submitted', form)
             // handleRequest(muni, quantity, person)
@@ -277,7 +303,7 @@ export default {
             await axios
                 .post(
                     `/api/request`, {
-                    equipment: requests.value.equipment,
+                    equipment: requests.value.equipments,
                     municipality_id: muni.municipality_id,
                     quantity: quantity.value,
                     incidents: incident,
@@ -341,5 +367,15 @@ export default {
 </script>
 
 <style scoped>
-
+.loader {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: block;
+  margin:15px auto;
+  position: relative;
+  color: #870C0D;
+  box-sizing: border-box;
+  animation: animloader 1s linear infinite alternate;
+}
 </style>

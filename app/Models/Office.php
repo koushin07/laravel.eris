@@ -7,14 +7,16 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use App\Traits\Approvals as hasApprovals;
+
 use App\Models\Municipality;
 use App\Models\Assign_Office;
 use App\Models\AssignOffice;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Office extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasUuids;
+    use HasApiTokens, HasFactory, Notifiable, HasUuids, hasApprovals;
 
     /**
      * The attributes that are mass assignable.

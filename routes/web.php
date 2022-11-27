@@ -1,9 +1,13 @@
 <?php
 
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
+use App\Services\MustApproved;
 use App\Models\IncidentReport;
 use App\Models\BorrowingDetails;
 use App\Http\Controllers\Users\PagesController;
@@ -18,8 +22,7 @@ use App\Http\Controllers\Borrow\BorrowHistoryController;
 use App\Http\Controllers\Borrow\BDController;
 use App\Http\Controllers\Admin\AdminPageController;
 use App\Events\NewEquipmentAdded;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use App\Services\HistoryService;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,7 +45,12 @@ require __DIR__ . '/auth.php';
 
 Route::group(['middleware' => ['auth', 'isSetup']], function () {
 
-    
+//    Route::get('/history', function(HistoryService $history){
+//     return dd(
+//         BorrowingDetails::get()->map(function($q)=)
+//     );
+//    });
+
     Route::group([
         'middleware' => 'role:RDRRMC_MUNICIPALITY',
         'prefix' => 'municipality',

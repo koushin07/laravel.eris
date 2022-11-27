@@ -15,13 +15,12 @@ return new class extends Migration
     {
         Schema::create('equipment_attributes', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('equipment_id')->constrained('equipment', 'id');
             $table->string('code');
             $table->string('asset_desc');
             $table->string('category');
             $table->integer('unit');
-            $table->integer('model_number');
-            $table->string('serial_number');
+            $table->string('model_number');
+            $table->string('serial_number')->unique();
             $table->integer('asset_id');
             $table->string('remarks');
             $table->timestamps();

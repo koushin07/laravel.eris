@@ -16,4 +16,8 @@ class EquipmentDetail extends Model
     {
         $this->belongsTo(EquipmentOwned::class, 'equipment_owner', 'id');
     }
+
+    public function equipment_borrow(){
+        return $this->hasMany(EquipmentBorrow::class, 'detail_id', 'id');
+    }
 }

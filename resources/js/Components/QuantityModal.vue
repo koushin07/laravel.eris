@@ -1,6 +1,6 @@
 <template>
   <div @click="openModal">
-<button class="bg-orange-300 px-3 py-1 rounded-lg">
+<button class="border-2 px-2">
   Request
 </button>
     
@@ -22,8 +22,7 @@
               class="grid place-content-center w-full max-w-md transform overflow-hidden rounded-2xl bg-slate-50 p-6 text-left align-middle shadow-xl transition-all">
               
               <div class="grid grid-flow-row gap-5">
-                <input type="number" name="quantity" class="rounded-full text-center" placeholder="Quantity" v-model="quantity">
-                <input type="text" name="quantity" class="rounded-full text-center" placeholder="Personel" v-model="person"/>
+                <input type="number" name="quantity" class="rounded text-center" placeholder="Quantity" v-model="quantity">
               </div>
 
               <div class="mt-4 grid place-content-center">
@@ -57,7 +56,6 @@ const props = defineProps({
 const emit = defineEmits(['submit'])
 const isOpen = ref(false)
 const quantity = ref(null)
-const person = ref('')
 function closeModal() { 
   
   isOpen.value = false
@@ -66,8 +64,16 @@ function openModal() {
   isOpen.value = true
 }
 function submit(){
-  emit('submit', quantity, props.muni, person.value )
-  closeModal()
+  // console.log(props.muni.quantity, quantity.value);
+  if(props.muni.quantity >= quantity.value)
+  {
+    emit('submit', quantity, props.muni )
+    closeModal()
+  }
+  else{
+    alert('only ' + props.muni.quantity + ' is available')
+  }
+  
 }
 
 </script>

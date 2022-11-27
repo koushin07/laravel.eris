@@ -230,7 +230,7 @@ const updateForm = useForm({
 
 
 function handleSubmit() {
-    updateForm.put(route('municipality.inventory.update', props.form.id), {
+    updateForm.put(route('municipality.inventory.update', props.form.owned_id), {
         onSuccess: (e)=>{
             closeModal()
         },

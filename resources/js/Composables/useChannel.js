@@ -18,7 +18,7 @@ export default () => {
             // alert("accepted");
            notif.value = true
             toast.success("Request Confirmed", {
-                timeout: 5000,
+                timeout: 7000,
                 icon: "fa-regular fa-circle-check",
             });
 
@@ -42,7 +42,7 @@ export default () => {
             `denied.${usePage().props.value.auth.user.id}`
         ).listen(".equipment.denied", (e) => {
             toast.error("Request Denied", {
-                timeout: 5000,
+                timeout: 7000,
                 icon: "fa-regular fa-circle-xmark",
             });
             console.log("this is", e);
@@ -69,7 +69,7 @@ export default () => {
           
             notif.value = true;
             toast.info("Equipment Request Recieved", {
-                timeout: 5000,
+                timeout: 7000,
                 icon: "fa-regular fa-envelope",
             });
            
@@ -87,16 +87,16 @@ export default () => {
         ).listen(".child.trans", (e) => {
             console.log("this is e", e);
             toast.info("Municipality Transactions Happen", {
-                timeout: 5000,
+                timeout: 7000,
                 icon: "fa-regular fa-envelope",
             });
         });
 
         window.Echo.private(`report.submitted.${usePage().props.value.auth.user.id}`)
         .listen(".report.sub", (e)=>{
-            alert('submitted')
+            
             toast.info('Municipality submitted report', {
-                timeout: 5000,
+                timeout: 7000,
                 icon: "fa-regular fa-envelope"
             })
         })

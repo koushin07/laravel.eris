@@ -13,7 +13,7 @@ class EquipmentOwned extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable=['equipment_id', 'office_id'];
+    protected $fillable=['equipment_id', 'office_id', 'equipment_attrs'];
 
     public function equipment()
     {

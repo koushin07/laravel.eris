@@ -24,7 +24,7 @@ class LocationService
         return $d;
     }
 
-    public function fetchAvailableOffices($equipment, $provinces)
+    public function fetchAvailableOffices($equipments, $provinces)
     {
 
         return Office::select(
@@ -32,6 +32,7 @@ class LocationService
             DB::raw('offices.address as owner_address'),
             DB::raw('offices.contact as owner_contact'),
             DB::raw('ao.municipality as municipality'),
+            DB::raw('ao.province as province'),
             'ao.province',
             DB::raw('e.name as equipment'),
             'e.id',
@@ -44,10 +45,10 @@ class LocationService
             ->join('equipment_details as ed', DB::raw('ed.equipment_owner'), '=', DB::raw('oe.id'))
             ->join('equipment as e', DB::raw('e.id'), '=', DB::raw('oe.equipment_id'))
             ->join('assign_offices as ao', DB::raw('ao.id'), '=', 'offices.assign')
-            ->where('e.name', $equipment)
             ->whereNot('offices.assign', auth()->user()->assign)
-            ->whereIn(DB::raw('ao.province'), $provinces)
-            ->groupBy('owner')
+            ->whereIn(DB::raw('e.name'), $equipments)
+            ->WhereIn(DB::raw('ao.province'), $provinces)
+            ->groupBy(['equipment', 'province'])
             ->get();
         // return  DB::select(
         //     "SELECT
@@ -99,22 +100,22 @@ class LocationService
             ->join('assign_offices as ao', DB::raw('ao.id'), '=', 'offices.assign')
             ->where('e.name', $equipment)
             ->whereNot('offices.assign', auth()->user()->assign)
-            ->groupBy('owner')
+            ->groupBy(['owner', ''])
             ->get();
     }
 
     public function getDistance($equipment, $provinces)
     {
-        //fetch data
-        //calculate data
+        
         $distance = collect();
         $myDistance = auth()->user()->assign_office()->first(['latitude', 'longitude']);
         if (empty($provinces)) {
             
             $data = $this->fetchCrossOffices($equipment);
-            // dd($data);
+          
         } else {
             $data = $this->fetchAvailableOffices($equipment, $provinces);
+            
         }
 
 

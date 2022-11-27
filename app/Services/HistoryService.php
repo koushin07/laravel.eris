@@ -4,6 +4,9 @@ namespace App\Services;
 
 use App\Models\BorrowHistory;
 use App\Models\Borrowing;
+use App\Models\BorrowingDetails;
+use App\Models\Equipment;
+use App\Models\EquipmentBorrow;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -108,15 +111,14 @@ class HistoryService
             // ->withCount('history')
             ->leftJoin('equipment_attributes as attrs', DB::raw('attrs.id'), '=', DB::raw('bd.equipment_attrs'))
             ->where('borrower.id', '=', auth()->id())
-            
+
             // ->where('owner.id', auth()->id())
             ->latest()
             ->get()
 
-            ->groupBy(function($incident){
-                return $incident->reason;   
+            ->groupBy(function ($incident) {
+                return $incident->reason;
             });
-
     }
     public function borrowed($request, $load = 1)
     {
@@ -128,4 +130,22 @@ class HistoryService
 
         return $total;
     }
+
+    public function byIncident()
+    {
+        return  BorrowingDetails::select(
+            'equipment_borrows.detail_id',
+            'borrowing_details.incident',
+            'borrowing_details.acquired',
+            'borrowing_details.quantity',
+
+
+
+        )
+            ->join('borrowings', 'borrowings.id', '=', 'borrowing_details.borrowing_id')
+            ->join('equipment_borrows', 'equipment_borrows.detail_id', '=', 'borrowing_details.id')
+            ->get();
+    }
+
+   
 }
