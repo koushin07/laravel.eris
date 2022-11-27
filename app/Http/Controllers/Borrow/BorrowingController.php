@@ -19,6 +19,9 @@ use App\Events\TransactionDenied;
 use App\Events\TransactionConfirmed;
 use App\Events\NewMunicipalityTransaction;
 use App\Events\BorrowRequestRecieve;
+use App\Models\Approvals;
+use App\Models\EquipmentBorrow;
+use App\Services\TempTable;
 
 class BorrowingController extends Controller
 {
@@ -167,24 +170,34 @@ class BorrowingController extends Controller
 
     public function singleRequest(Request $request)
     {
-        // dd($request);
-        $equipment = Equipment::where('name', $request->equipment)->first();
-        DB::transaction(function () use ($request) {
-            $borrowing = Borrowing::create([
-                'borrower' => auth()->id(),
-                'borrower_personel' =>$request->person,
-                'owner_personel' =>  '',
-                'owner' => $request->municipality_id,
-            ]);
-            $equipment = Equipment::where('name', $request->equipment)->first();
-            $details = BorrowingDetails::create([
-                'borrowing_id' => $borrowing->id,
-                'equipment_id' => $equipment->id,
-                'status' =>'pending',
-                'reason' => $request->incidents,
-                'quantity' =>  $request->quantity
-            ]);
-        });
+ 
+        $request->validate([
+            'equipment' => 'required',
+            'municipality_id' => 'required',
+            'quantity'=> 'required',
+            'incidents' => 'required',
+            'incident_summary' => 'string'
+        ]);
+      
+        Approvals::create([]);
+        
+        // DB::transaction(function () use ($request) {
+        //     $borrowing = Borrowing::create([
+        //         'borrower' => auth()->id(),
+        //         'owner' => $request->municipality_id,
+        //     ]);
+        //     $equipment = Equipment::where('name', $request->equipment)->first();
+           
+        //     $details = BorrowingDetails::create([
+        //         'borrowing_id' => $borrowing->id,            
+        //         'incident' => $request->incidents,
+        //         'quantity' =>  $request->quantity
+        //     ]);
+        //     $equipment_B = EquipmentBorrow::create([
+        //         'equipment_id' => $equipment->id,
+        //         'detail_id'=> $details->id,
+        //     ]);
+        // });
         BorrowRequestRecieve::dispatch(Office::find($request->municipality_id), $request->equipment, $request->quantity, $request->incidents, $request->person);
         return redirect('/municipality/request');
     }
