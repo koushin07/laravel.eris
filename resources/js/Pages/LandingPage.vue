@@ -16,48 +16,61 @@
 
         <div class="flex m-2 py-10 bg-white animate-fade-in-down">
 
-            <form class="flex flex-col  justify-center pt-0 px-14 pb-2 font-sans" @submit.prevent="submit">
-                <h1 class="font-extrabold text-transparent text-center bg-clip-text bg-gradient-to-r from-orange-600 to-pink-400"
+            <form class="flex flex-col   pt-0 px-14 pb-2 font-sans" @submit.prevent="submit">
+
+                <div class="flex flex-col space-y-10">
+                    <h1 class="font-extrabold text-transparent text-center bg-clip-text bg-gradient-to-r from-orange-600 to-pink-400"
                     style="font-family:Courier; font-size: 3rem;">Login</h1>
                 <h4 v-if="!$page.props.auth.user"
                     class="font-extrabold text-transparent text-center bg-clip-text bg-gradient-to-r from-orange-600 to-pink-400"
                     style="font-family:Courier; font-size: 2rem;">Log in to EPRRIS</h4>
-
-                <inertia-link href="/municipality/request"
-                    v-if="$page.props.auth.user && $page.props.auth.user.role_id === 1"
-                    class="font-extrabold text-transparent text-lg text-center bg-clip-text bg-gradient-to-r from-orange-600 to-pink-400"
-                    style="font-family:Courier; ">Click here to redirect</inertia-link>
-
-                <div class="relative flex flex-col z-0  " v-if="!$page.props.auth.user">
-                    <InputLabel for="email" value="email" />
-                    <TextInput id="email" type="email" class="mt-1 block w-full" v-model="form.email" required autofocus
-                        autocomplete="username" />
-
-                    <InputError class="mt-2" :message="form.errors.email" />
                 </div>
-                <div class="relative flex flex-col z-0  pb-10 space-y-2 " v-if="!$page.props.auth.user">
-                    <div class="flex justify-between">
-                        <!-- <label for="password" class="text-sm font-bold">Password</label> -->
-                        <InputLabel for="password" value="Password" />
-                        <a class="text-sm font-bold cursor-pointer" :class="showpassword ? 'text-blue-500' : ''"
-                            type="button" @click="showpassword = !showpassword">show</a>
+              
+
+
+                <div class="flex flex-col space-y-10">
+                    <div class="relative flex flex-col z-0  " v-if="!$page.props.auth.user">
+                        <InputLabel for="email" value="email" />
+                        <TextInput id="email" type="email" class="mt-1 block w-full" v-model="form.email" required
+                            autofocus autocomplete="username" />
+
+                        <InputError class="mt-2" :message="form.errors.email" />
                     </div>
+                    <div class="relative flex flex-col z-0  pb-10 space-y-2 " v-if="!$page.props.auth.user">
+                        <div class="flex justify-between">
+                            <!-- <label for="password" class="text-sm font-bold">Password</label> -->
+                            <InputLabel for="password" value="Password" />
+                            <a class="text-sm font-bold cursor-pointer" :class="showpassword ? 'text-blue-500' : ''"
+                                type="button" @click="showpassword = !showpassword">show</a>
+                        </div>
 
 
-                    <TextInput id="password" :type="showpassword ? 'text' : 'password'" class="mt-1 block w-full"
-                        v-model="form.password" required autocomplete="current-password" />
-                    <InputError class="mt-2" :message="form.errors.password" />
-                    <!-- <input v-if="showpassword" name="password" type="text" v-model="form.password"
+                        <TextInput id="password" :type="showpassword ? 'text' : 'password'" class="mt-1 block w-full"
+                            v-model="form.password" required autocomplete="current-password" />
+                        <InputError class="mt-2" :message="form.errors.password" />
+                        <!-- <input v-if="showpassword" name="password" type="text" v-model="form.password"
                         class="border-2 bg-transparent focus:outline-none focus:ring-0 py-2 px-1" />
                     <input v-else name="password" type="password" v-model="form.password"
                         class="border-2 bg-transparent focus:outline-none focus:ring-0 py-2 px-1" /> -->
 
-                </div>
-
-                <button v-if="!$page.props.auth.user" type="submit" class="text-white bg-orange-700 hover:bg-orange-800 focus:ring-4 
+                    
+                      
+                    
+                    </div>
+                    <div class="flex flex-col">
+                        <button v-if="!$page.props.auth.user" type="submit" class=" text-white bg-orange-700 hover:bg-orange-800 focus:ring-4 
                         focus:ring-orange-300 font-medium text-sm px-5 py-2.5 mx-5 mb-2 
                         dark:bg-orange-600 dark:hover:bg-orange-700 focus:outline-none dark:focus:ring-orange-800">Sign
-                    in</button>
+                        in</button>
+                        <inertia-link :href="route('register')" class="tex-lg text-orange-400 underline text-center font-semibold">
+                            Register Here
+                        </inertia-link>
+                    </div>
+                  
+                        
+                   
+                </div>
+
             </form>
 
         </div>
