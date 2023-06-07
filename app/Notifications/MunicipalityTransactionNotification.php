@@ -17,10 +17,8 @@ class MunicipalityTransactionNotification extends Notification
      * @return void
      */
     public function __construct(
-        public $equipment,
-        public $quantity,
-        public $incident,
-        public $person,
+        public $office,
+        
     )
     {
         //
@@ -61,12 +59,7 @@ class MunicipalityTransactionNotification extends Notification
     {
        
         return [
-            'equipment' => $this->equipment,
-            'quantity'=>$this->quantity,
-            'borrower_id'=>auth()->id(),
-            'personnel' => $this->person,
-            'incident'=>$this->incident,
-            'borrower' => auth()->user()->assign_office()->get('municipality')
+           'owner' =>$this->office
         ];
     }
 }

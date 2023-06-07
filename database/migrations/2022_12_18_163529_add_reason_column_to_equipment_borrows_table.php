@@ -13,9 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('approvals', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-          $table->foreignUuid('approval');
+        Schema::table('equipment_borrows', function (Blueprint $table) {
+            $table->string('reason')->nullable();
         });
     }
 
@@ -26,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('approvals');
+        Schema::table('equipment_borrows', function (Blueprint $table) {
+            //
+        });
     }
 };

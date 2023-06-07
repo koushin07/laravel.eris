@@ -10,7 +10,7 @@ class EquipmentDetail extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable=['equipment_owner', 'serviceable', 'unusable', 'poor'];
+    protected $fillable=['equipment_owner', 'serviceable', 'unserviceable', 'poor'];
 
     public function equipment_owned()
     {

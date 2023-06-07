@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Approval;
 use App\Models\BorrowHistory;
 use App\Models\Borrowing;
 use App\Models\BorrowingDetails;
@@ -18,11 +19,15 @@ class HistoryService
         return Borrowing::select(
             'borrowings.id as borrow_id',
             'bd.id as detail_id',
+            'bd.incident',
             'e.id as equipment_id',
-            'owner.name as owner',
-            'ao.municipality as borrower',
+            DB::raw(" CONCAT(owner.lastname , ' ' , owner.firstname , ' ' , owner.middlename, ' ' ,owner.suffix) as owner"),
+            DB::raw(" CONCAT(borrower.lastname , ' ' , borrower.firstname , ' ' , borrower.middlename, ' ' ,borrower.suffix) as borrower"),
+            'aob.municipality as borrower',
+            'oao.municipality as owner',
             'e.name as equipment',
-            'bd.quantity as quantity',
+            'eb.acquired as quantity',
+            DB::raw('SUM(bh.serviceable - eb.acquired  ) as damage'),
             'attrs.code',
             'attrs.asset_desc',
             'attrs.category',
@@ -33,22 +38,26 @@ class HistoryService
             'attrs.remarks',
             'bh.serviceable',
             'bh.poor',
-            'bh.unusable',
+            'bh.unserviceable',
             'borrowings.created_at'
 
         )
             ->addSelect([
                 'returned' => BorrowHistory::whereColumn('bd.id', 'borrow_histories.borrowing_detail_id')
-                    ->selectRaw('sum(borrow_histories.serviceable + borrow_histories.poor + borrow_histories.unusable)')
+                    ->selectRaw('sum(borrow_histories.serviceable + borrow_histories.poor + borrow_histories.unserviceable)')
             ])
-            ->join('offices as borrower', DB::raw('borrower.id'), '=', 'borrowings.borrower')
-            ->join('assign_offices as ao', DB::raw('ao.id'), '=', DB::raw('borrower.assign'))
             ->join('offices as owner', DB::raw('owner.id'), '=', 'borrowings.owner')
+            ->join('assign_offices as oao', DB::raw('oao.id'), '=',  DB::raw('owner.assign'))
+            ->join('assign_offices as ao', DB::raw('ao.id'), '=', DB::raw('owner.assign'))
             ->join('borrowing_details as bd', DB::raw('bd.borrowing_id'), '=', 'borrowings.id')
-            ->join('equipment as e', DB::raw('e.id'), '=', DB::raw('bd.equipment_id'))
+            ->join('approvals', 'approvals.id', '=', 'borrowings.approval_id')
+            ->join('offices as borrower', DB::raw('borrower.id'), '=', 'approvals.borrowee')
+            ->join('assign_offices as aob', DB::raw('aob.id'), '=', DB::raw('borrower.assign'))
+            ->join('equipment_borrows as eb', DB::raw('eb.detail_id'), '=', DB::raw('bd.id'))
+            ->join('equipment as e', DB::raw('e.id'), '=', DB::raw('eb.equipment_id'))
             ->Leftjoin('borrow_histories as bh', DB::raw('bh.borrowing_detail_id'), '=', DB::raw('bd.id'))
             // ->withCount('history')
-            ->leftJoin('equipment_attributes as attrs', DB::raw('attrs.id'), '=', DB::raw('bd.equipment_attrs'))
+            ->leftJoin('equipment_attributes as attrs', DB::raw('attrs.id'), '=', DB::raw('eb.equipment_attrs'))
             ->where('owner.id', '=', auth()->id())
             ->when($request->input('search'), function ($q, $search) {
                 $q->where('borrower.name', 'like', '%' . $search . '%');
@@ -58,19 +67,8 @@ class HistoryService
             ->paginate($load)->withQueryString()
 
             ->groupBy(function ($date) {
-                return Carbon::parse($date->created_at)->format('d F Y');
+                return Carbon::parse($date->created_at)->format('F d, Y');
             });
-
-
-
-        // $borrow = $borrow->map(function ($date) {
-        //      $date->map(function ($data) {
-        //         $data->created_at =  $data->created_at->format('h:i A');
-        //        return $data->created_at;
-        //     });
-        //     return $date;
-        // });
-        // dd($borrow);
     }
     public function fetchMyHistory()
     {
@@ -94,13 +92,13 @@ class HistoryService
             'attrs.remarks',
             'bh.serviceable',
             'bh.poor',
-            'bh.unusable',
+            'bh.unserviceable',
             'borrowings.created_at'
 
         )
             ->addSelect([
                 'returned' => BorrowHistory::whereColumn('bd.id', 'borrow_histories.borrowing_detail_id')
-                    ->selectRaw('sum(borrow_histories.serviceable + borrow_histories.poor + borrow_histories.unusable)')
+                    ->selectRaw('sum(borrow_histories.serviceable + borrow_histories.poor + borrow_histories.unserviceable)')
             ])
             ->join('offices as borrower', DB::raw('borrower.id'), '=', 'borrowings.borrower')
             ->join('assign_offices as ao', DB::raw('ao.id'), '=', DB::raw('borrower.assign'))
@@ -131,21 +129,70 @@ class HistoryService
         return $total;
     }
 
-    public function byIncident()
+
+    public function byIncident($request)
     {
-        return  BorrowingDetails::select(
-            'equipment_borrows.detail_id',
+
+        return EquipmentBorrow::select(
+            'borrowing_details.id',
+            'borrowing_details.incident_id',
             'borrowing_details.incident',
-            'borrowing_details.acquired',
-            'borrowing_details.quantity',
-
-
+            'borrowing_details.created_at'
 
         )
+            ->addSelect([
+                'authorize_quantity' => EquipmentBorrow::whereColumn('borrowing_details.id', 'equipment_borrows.detail_id')
+                    ->select(DB::raw('sum(equipment_borrows.authorize_quantity)'))
+            ])->addSelect([
+                'acquired' => EquipmentBorrow::whereColumn('borrowing_details.id', 'equipment_borrows.detail_id')
+                    ->select(DB::raw('sum(equipment_borrows.acquired)'))
+            ])->addSelect([
+                'count' => Equipment::whereColumn('equipment_borrows.equipment_id', 'equipment.id')
+                    ->select(DB::raw('count(equipment.name)'))
+            ])
+            ->when($request->input('date'), function ($q, $date) {
+                $q->whereDate('borrowing_details.created_at', '=', Carbon::parse($date)->addDay()->format('Y-m-d'));
+            })
+            ->when($request->input('filter'), function ($q, $filter) {
+                $q->where('borrowing_details.incident', '=', $filter);
+            })
+            ->join  ('equipment', 'equipment.id', '=', 'equipment_borrows.equipment_id')
+            ->join('borrowing_details', 'borrowing_details.id', '=', 'equipment_borrows.detail_id')
             ->join('borrowings', 'borrowings.id', '=', 'borrowing_details.borrowing_id')
-            ->join('equipment_borrows', 'equipment_borrows.detail_id', '=', 'borrowing_details.id')
-            ->get();
+            ->groupBy('borrowing_details.incident')
+            ->where('approval.borrowee', auth()->id())->latest()->paginate(10)->onEachSide(1);
     }
-
-   
 }
+// Approval::select(
+//     'borrowing_details.incident_id',
+//     'borrowing_details.id',
+//     'borrowing_details.incident',
+//     'borrowing_details.incident_summary',
+//     'borrowing_details.created_at',
+  
+// )
+// ->addSelect([
+//     'acquired' => EquipmentBorrow::whereColumn('borrowing_details.id', 'equipment_borrows.detail_id')
+//         ->select(DB::raw('equipment_borrows.acquired'))->where('equipment_borrows.acquired', '=', 0)->where('equipment_borrows.status', '=', 'accepted')
+// ])
+// ->addSelect([
+//     'quantity' => EquipmentBorrow::whereColumn('borrowing_details.id', 'equipment_borrows.detail_id')
+//         ->select( DB::raw('sum(equipment_borrows.quantity) as quantity'))
+// ])
+
+
+// ->when($request->input('date'), function ($q, $date) {
+//         $q->whereRaw('DATE(borrowing_details.created_at) = ?', Carbon::parse($date)->format('Y-m-d'));
+//     })
+//     ->when($request->input('name'), function ($q, $name) {
+//         $q->where('borrowing_details.incident', 'like', '%' . $name . '%');
+//     })
+  
+//     ->when($request->input('id'), function ($q, $id) {
+//         $q->where('borrowing_details.incident_id', '=', $id);
+//     })
+// ->join('borrowings', 'borrowings.approval_id', '=', 'approvals.id')
+// ->join('borrowing_details', 'borrowing_details.borrowing_id', '=', 'borrowings.id')
+// ->join('equipment_borrows', 'equipment_borrows.detail_id', '=', 'borrowing_details.id')
+   
+// ->where('approvals.borrowee', auth()->id())->latest()->paginate(10)->onEachSide(1);

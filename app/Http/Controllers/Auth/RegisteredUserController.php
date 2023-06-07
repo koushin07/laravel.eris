@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Events\NewOfficeRegistered;
+use App\Rules\MunicipalityAlreadyRegistered;
 use Inertia\Inertia;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Hash;
@@ -33,6 +35,10 @@ class RegisteredUserController extends Controller
 
         return Inertia::render('Auth/Register', [
             'municipalities' => AssignOffice::select(['id', 'municipality'])->get(),
+
+            'provinces' => AssignOffice::select(['id', 'province'])
+                ->whereNull('municipality')->whereNotNull('province')->get()
+
         ]);
     }
 
@@ -47,34 +53,48 @@ class RegisteredUserController extends Controller
     public function store(Request $request)
     {
 
-        $request->validate(
-            [
-                'name' => 'required|string|max:255|unique:App\Models\Office,name',
-                'email' => 'required|string|email|max:255|unique:offices',
-                'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        $request->validate([
+            'email' => 'required|string|email|max:255|unique:offices',
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'firstname' => 'required',
+            'lastname' => 'required',
+            'contact' => 'required',
+            'address' => 'required',
+            'province' => ['required', new MunicipalityAlreadyRegistered],
 
-            ],
-            [
-                'name.unique' => 'this province is already registered'
-            ]
-        );
 
-       
-        DB::transaction(function() use($request){
+        ]);
+
+
+        DB::transaction(function () use ($request) {
             $role =  Role::where('role_type', Role::PROVINCE)->first();
             $assign = AssignOffice::create([
                 'province' => $request->name
             ]);
             $user = Office::create([
-                'name' => $request->name,
-                'assign' => $assign->id,
+                'firstname' => $request->firstname,
+                'lastname' => $request->lastname,
+                'middlename' => $request->middlename,
+                'suffix' => $request->suffix,
+                'assign' => $request->province,
                 'email' => $request->email,
+                'address' => $request->address,
+                'contact' => $request->contact,
                 'role_id' => $role->id,
                 'password' => Hash::make($request->password),
             ]);
+            $office = collect([
+                'id' => $user->id,
+                'personnel' => $user->firstname . ' ' . $user->middlename . ' ' . $user->lastname . ' ' . $user->suffix,
+                'email' => $user->email,
+                'role' => $role->role_type,
+                'assign' => $assign->province
+
+            ]);
+            NewOfficeRegistered::dispatch($office);
         });
-    
-        return redirect(RouteServiceProvider::ADMIN);
+
+        return redirect('/');
     }
     public function store_municipality(Request $request)
     {
@@ -82,36 +102,55 @@ class RegisteredUserController extends Controller
         $request->validate([
             'email' => 'required|string|email|max:255|unique:offices',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'province' => ['required', 'exists:App\Models\AssignOffice,province'],
-            'name' => 'required|string|max:255|unique:App\Models\Office,name',
-            'lat' => ['required', 'numeric'],
-            'long' => ['required', 'numeric']
+            'firstname' => 'required',
+            'lastname' => 'required',
+            'contact' => 'required',
+            'address' => 'required',
+            'municipality' => ['required', new MunicipalityAlreadyRegistered],
+
+            // 'lat' => ['required', 'numeric'],
+            // 'long' => ['required', 'numeric']
         ]);
 
-      
 
-      
-        DB::transaction(function() use($request){
+
+
+        DB::transaction(function () use ($request) {
             $role =  Role::where('role_type', Role::MUNICIPALITY)->first();
-            $assign = AssignOffice::create([
-                'municipality' => $request->name,
-                'province'=> $request->province,
-                'latitude'=> $request->lat,
-                'longitude' => $request->long
-            ]);
+            // $assign = AssignOffice::create([
+            //     'municipality' => $request->name,
+            //     'province' => $request->province,
+            //     'latitude' => $request->lat,
+            //     'longitude' => $request->long
+            // ]);
             $user = Office::create([
-                'name' => $request->name,
-                'assign' => $assign->id,
+                'firstname' => $request->firstname,
+                'lastname' => $request->lastname,
+                'middlename' => $request->middlename,
+                'suffix' => $request->suffix,
+                'assign' => $request->municipality,
                 'email' => $request->email,
+                'address' => $request->address,
+                'contact' => $request->contact,
                 'role_id' => $role->id,
                 'password' => Hash::make($request->password),
             ]);
+            $assign = AssignOffice::find($request->municipality);
+            $office = collect([
+                'id' => $user->id,
+                'personnel' => $user->firstname . ' ' . $user->middlename . ' ' . $user->lastname . ' ' . $user->suffix,
+                'email' => $user->email,
+                'role' => $role->role_type,
+                'assign' => $assign->municipality
+
+            ]);
+            NewOfficeRegistered::dispatch($office);
         });
-        
+
 
         // event(new Registered($user));
 
 
-        return redirect(RouteServiceProvider::ADMIN);
+        return redirect('/');
     }
 }

@@ -26,7 +26,7 @@
                 </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row ">
+            <!-- <div class="flex flex-col sm:flex-row ">
                 <span class="text-4xl font-bold  sm:border-r-4  border-black py-2 pr-2">TOTAL
 
                 </span>
@@ -35,18 +35,19 @@
                     <span class="text-xl font-semibold">Returned: {{ totalReturned }}</span>
                 </div>
 
-            </div>
-            <div class="flex flex-col cols-span-3 w-fit sm:w-full rounded-2xl pb-7 history" v-for="(data, date) in histories"
-                :key="date">
-                <div class="box-content border-b-2 p-6"> <span class="text-lg font-semibold">{{ date }}</span>
+            </div> -->
+            <div class="flex flex-col cols-span-3 w-fit sm:w-full rounded pb-7 history"
+                v-for="(data, date) in histories" :key="date">
+                <div class="box-content  p-6 bg-slate-300"> <span class="text-lg font-semibold">{{ date }}</span>
                 </div>
                 <table class="table-auto">
                     <thead>
                         <tr>
-                            <th scope="col" class="py-3 px-6 text-gray-500">
-                                Municipality
+                            <th scope="col" class="py-3 px-6 text-gray-500 uppercase text-md"
+                                v-for="(header, key) in tableHeader" :key="key">
+                                {{ header.name }}
                             </th>
-                            <th scope="col" class="py-3 px-6 text-gray-500">
+                            <!-- <th scope="col" class="py-3 px-6 text-gray-500">
                                 Equipment
                             </th>
                             <th scope="col" class="py-3 px-6 text-gray-500">
@@ -60,37 +61,62 @@
                             </th>
                             <th scope="col" class="py-3 px-6 text-gray-500">
 
-                            </th>
+                            </th> -->
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(datum, key) in data" class="max-h-full  dark:bg-gray-800 dark:border-gray-700">
+                        <tr v-for="(datum, key) in data"
+                            class="max-h-full text-sm  dark:bg-gray-800 dark:border-gray-700 border-b-2 last:border-b-transparent">
                             <td class="text-center py-2 font-bold">
+                                {{ datum.incident }}
+                            </td>
+                            <td class="text-center py-2 text-gray-800">
                                 {{ datum.borrower }}
+                            </td>
+                            <td class="text-center py-2 text-gray-800">
+                                {{ datum.owner }}
                             </td>
                             <td class="text-center py-2 text-gray-800">
                                 {{ datum.equipment }}
                             </td>
                             <td class="text-center py-2 text-gray-800">
-                                {{ datum.quantity ? datum.quantity : 0 }}
+                                <!-- {{ datum.quantity ? datum.quantity : 0 }} -->
+                                {{ datum.quantity }}
                             </td>
                             <td class="text-center py-2 text-gray-800">
                                 {{ datum.returned ? datum.returned : 0 }}
                             </td>
                             <td class="text-center py-2 text-gray-800">
-                                {{ moment(datum.created_at).format('hh:mm A') }}
+                                <!-- {{ datum.quantity ? datum.quantity : 0 }} -->
+                                {{ datum.damage ? datum.damage : 0 }}
+                            </td>
+                            <td class="text-center py-2 text-gray-800">
+                                <!-- {{ moment(datum.created_at).format('hh:mm A') }} -->
+                                <div class="flex justify-center">
+                                    <button>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                                        </svg>
+                                    </button>
+
+
+                                </div>
+
+
                             </td>
                             <td class="text-center py-2 text-gray-800">
                                 <button>
 
                                     <Modal>
                                         <template #body>
-                                            <button @click="update = !update" 
+                                            <button @click="update = !update"
                                                 class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
                                                 <div v-if="!update">
-                                                    <i class="fa-solid fa-left-long" ></i>
+                                                    <i class="fa-solid fa-left-long"></i>
                                                 </div>
-                                               
+
                                                 <span v-else>update</span>
                                             </button>
                                             <div class="flex flex-col space-y-7 py-5" v-if="update">
@@ -146,7 +172,7 @@
                                                         <span class="text-sm font-normal text-center">
                                                             <span class="font-bold">
                                                                 Unusable:
-                                                            </span> {{ datum.unusable ? datum.unusable : '0' }}
+                                                            </span> {{ datum.unserviceable ? datum.unserviceable : '0' }}
                                                         </span>
                                                         <span class="text-sm font-normal text-center">
                                                             <span class="font-bold">
@@ -156,7 +182,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                           <Edit-history :form="datum" v-else/>
+                                            <Edit-history :form="datum" v-else />
                                         </template>
                                         <template #footer>
                                             <!-- <button @click="update = !update" 
@@ -200,18 +226,30 @@ import EditHistory from '@/Components/EditHistory.vue';
 export default {
     layout: Layout,
     components: {
-    Head,
-    ContentBox,
-    moment,
-    Modal,
-    EditHistory
-},
+        Head,
+        ContentBox,
+        moment,
+        Modal,
+        EditHistory
+    },
     props: {
         histories: Object,
 
         filters: [Array, Object]
     },
     setup({ filters, histories }) {
+
+        const tableHeader = [
+            { name: 'incident' },
+            { name: 'borrower' },
+            { name: 'borrowee' },
+            { name: 'equipment' },
+            { name: 'quantity' },
+            { name: 'returned' },
+            { name: 'damage' },
+            { name: 'set. rep' },
+
+        ]
 
         const update = ref(true)
         const totalReturned = computed(() => {
@@ -250,6 +288,7 @@ export default {
         })
 
         return {
+            tableHeader,
             totalReturned,
             moment,
             search,

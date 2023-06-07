@@ -18,14 +18,17 @@
 
             <form class="flex flex-col   pt-0 px-14 pb-2 font-sans" @submit.prevent="submit">
 
-                <div class="flex flex-col space-y-10">
-                    <h1 class="font-extrabold text-transparent text-center bg-clip-text bg-gradient-to-r from-orange-600 to-pink-400"
-                    style="font-family:Courier; font-size: 3rem;">Login</h1>
-                <h4 v-if="!$page.props.auth.user"
+                <!-- <h4 v-if="!$page.props.auth.user"
                     class="font-extrabold text-transparent text-center bg-clip-text bg-gradient-to-r from-orange-600 to-pink-400"
-                    style="font-family:Courier; font-size: 2rem;">Log in to EPRRIS</h4>
+                    style="font-family:Courier; font-size: 2rem;">Login </h4> -->
+                <div class="flex flex-col space-y-10 pt-10 pb-10 ">
+                    <h1 class="font-extrabold text-transparent text-center bg-clip-text bg-gradient-to-r from-orange-600 to-pink-400"
+                    style="font-family:Courier; font-size: 3rem;">
+                    <img src="../../css/eris.png"  class="mx-auto"/>
+                </h1>
+
                 </div>
-              
+
 
 
                 <div class="flex flex-col space-y-10">
@@ -48,27 +51,20 @@
                         <TextInput id="password" :type="showpassword ? 'text' : 'password'" class="mt-1 block w-full"
                             v-model="form.password" required autocomplete="current-password" />
                         <InputError class="mt-2" :message="form.errors.password" />
-                        <!-- <input v-if="showpassword" name="password" type="text" v-model="form.password"
-                        class="border-2 bg-transparent focus:outline-none focus:ring-0 py-2 px-1" />
-                    <input v-else name="password" type="password" v-model="form.password"
-                        class="border-2 bg-transparent focus:outline-none focus:ring-0 py-2 px-1" /> -->
 
-                    
-                      
-                    
                     </div>
                     <div class="flex flex-col">
-                        <button v-if="!$page.props.auth.user" type="submit" class=" text-white bg-orange-700 hover:bg-orange-800 focus:ring-4 
-                        focus:ring-orange-300 font-medium text-sm px-5 py-2.5 mx-5 mb-2 
+                        <button v-if="!$page.props.auth.user" type="submit" class=" text-white bg-orange-700 hover:bg-orange-800 focus:ring-4
+                        focus:ring-orange-300 font-medium text-sm px-5 py-2.5 mx-5 mb-2
                         dark:bg-orange-600 dark:hover:bg-orange-700 focus:outline-none dark:focus:ring-orange-800">Sign
                         in</button>
                         <inertia-link :href="route('register')" class="tex-lg text-orange-400 underline text-center font-semibold">
                             Register Here
                         </inertia-link>
                     </div>
-                  
-                        
-                   
+
+
+
                 </div>
 
             </form>
@@ -169,10 +165,10 @@
                                 <input type="text" name="full_name" id="floating_email" v-model="form.fullName"
                                     class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-black appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                                     placeholder=" " required />
-                                <label for="full_name" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 
-                                duration-300 transform -translate-y-6 scale-75 top-3 -z-10 
-                                origin-[0] peer-focus:left-0 peer-focus:text-blue-600 
-                                peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 
+                                <label for="full_name" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400
+                                duration-300 transform -translate-y-6 scale-75 top-3 -z-10
+                                origin-[0] peer-focus:left-0 peer-focus:text-blue-600
+                                peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100
                                 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
                                     Full Name</label>
                             </div>
@@ -180,10 +176,10 @@
                                 <input type="email" name="email" id="email" v-model="form.email"
                                     class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-black appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                                     placeholder=" " required />
-                                <label for="email" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 
-                                duration-300 transform -translate-y-6 scale-75 top-3 -z-10 
-                                origin-[0] peer-focus:left-0 peer-focus:text-blue-600 
-                                peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 
+                                <label for="email" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400
+                                duration-300 transform -translate-y-6 scale-75 top-3 -z-10
+                                origin-[0] peer-focus:left-0 peer-focus:text-blue-600
+                                peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100
                                 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
                                     Email</label>
                             </div>
@@ -192,10 +188,10 @@
                                     v-model="form.message"
                                     class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-black appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                                     placeholder=" " required />
-                                <label for="floating_password" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 
-                                duration-300 transform -translate-y-6 scale-75 top-3 -z-10 
-                                origin-[0] peer-focus:left-0 peer-focus:text-blue-600 
-                                peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 
+                                <label for="floating_password" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400
+                                duration-300 transform -translate-y-6 scale-75 top-3 -z-10
+                                origin-[0] peer-focus:left-0 peer-focus:text-blue-600
+                                peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100
                                 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
                                     Message</label>
                             </div>

@@ -14,8 +14,10 @@ class Equipment extends Model
 
     protected $fillable = [
         'name',
-
+        'recieved_at'
     ];
+
+    
 
     
     public function equipment_owned()
@@ -25,11 +27,27 @@ class Equipment extends Model
     
     public function borrowing_detail()
     {
-        return $this->hasMany(BorrowingDetails::class);
+        return $this->belongsToMany(
+            BorrowingDetails::class, 'equipment_borrows', 'equipment_id', 'detail_id', 'recieved_at'
+        );
     }
     
     public function equipment_attribute()
     {
-        return $this->hasMany(EquipmentAttribute::class);
+        return $this->belongsToMany(EquipmentAttribute::class, 'equipment_owneds', 'equipment_id', 'equipment_attrs',);
     }
+
+    public function equipment_detail()
+    {
+        return $this->hasManyThrough(EquipmentDetail::class, EquipmentOwned::class, 'equipment_id', 'equipment_owner');
+    }
+   
+    public function equipment_borrow()
+    {
+        return $this->hasMany(EquipmentBorrow::class);
+    }
+
+
+
+  
 }

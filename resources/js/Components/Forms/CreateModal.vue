@@ -1,9 +1,14 @@
 <template>
     <div @click="openModal">
-<button class="px-3 py-2 rounded-md bg-button text-white">
-    Update
-</button>
-      
+        <button class=" border-2 rounded px-2 w-fit py-1 text-white font-semibold flex border-orange-500 bg-orange-500">
+
+            <span>Add</span><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" />
+            </svg>
+
+        </button>
+
 
     </div>
     <TransitionRoot appear :show="isOpen" as="template">
@@ -38,6 +43,16 @@
                                     <div class="">
                                         <div class="px-4 py-5 bg-white sm:p-6">
                                             <div class="grid grid-cols-6 gap-6">
+                                                <div class="col-span-6 sm:col-span-3">
+                                                </div>
+                                                <div class="col-span-6 sm:col-span-3">
+                                                    <label for="name"
+                                                        class="block text-sm font-medium text-gray-700">Date
+                                                        Receive</label>
+                                                    <Datepicker v-model="form.date" show-now-button />
+                                                 
+
+                                                </div>
                                                 <div class="col-span-6 sm:col-span-6">
                                                     <label for="name"
                                                         class="block text-sm font-medium text-gray-700">Equipment
@@ -60,9 +75,10 @@
                                                         </div>
                                                         <div class="col-span-6 sm:col-span-6 lg:col-span-2">
                                                             <label for="model_number"
-                                                                class="block text-sm font-medium text-gray-700">Unusable</label>
+                                                                class="block text-sm font-medium text-gray-700">
+                                                            Unserviceable</label>
                                                             <input type="number" name="model_number" id="model_number"
-                                                                v-model="form.unusable" required=""
+                                                                v-model="form.unserviceable" required=""
                                                                 class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                                         </div>
                                                         <div class="col-span-6 sm:col-span-6 lg:col-span-2">
@@ -81,7 +97,7 @@
                                                     <label for="model_number"
                                                         class="block text-sm font-medium text-gray-700">Model
                                                         Number</label>
-                                                    <input type="number" name="model_number" id="model_number"
+                                                    <input type="text" name="model_number" id="model_number"
                                                         v-model="form.model_number" required=""
                                                         class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                                 </div>
@@ -141,9 +157,9 @@
                                                     <option value="none" selected disabled hidden>
                                                         {{ form.category }}
                                                     </option>
-                                                    <option>category1</option>
-                                                    <option>category2</option>
-                                                    <option>category3</option>
+                                                    <option>Water Rescue</option>
+                                                    <option>Fire and Rescue</option>
+                                                    <option>Protective Gears</option>
 
                                                 </select>
                                             </div>
@@ -163,8 +179,8 @@
                                             <div class="col-span-6">
                                                 <label for="remarks"
                                                     class="block text-sm font-medium text-gray-700">Remarks</label>
-                                                <input type="text" name="remarks" id="remarks"
-                                                    v-model="form.remarks" required=""
+                                                <input type="text" name="remarks" id="remarks" v-model="form.remarks"
+                                                    required=""
                                                     class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                             </div>
 
@@ -182,7 +198,7 @@
 
                                         <button type="submit"
                                             class="inline-flex  justify-center rounded-md border border-transparent bg-orange-200 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
-                                            Update
+                                            Add
                                         </button>
                                     </div>
                                 </form>
@@ -210,7 +226,7 @@ import {
 } from '@headlessui/vue'
 
 const form = useForm({
-
+    date: '',
     equipment_name: '',
     code: '',
     asset_desc: '',
@@ -221,18 +237,19 @@ const form = useForm({
     asset_id: null,
     remarks: '',
     serviceable: null,
-    unusable: null,
+    unserviceable: null,
     poor: null
-}, {
-  remember: false,
 })
 
 const handleSubmit = () => {
     form.post(route('municipality.inventory.store'), {
-        onFinish:()=>{
+        onFinish: () => {
             form.reset()
             closeModal()
-            
+
+        },
+        onSuccess: () => {
+            form.reset()
         },
         onError: (e) => {
             alert(Object.values(e))

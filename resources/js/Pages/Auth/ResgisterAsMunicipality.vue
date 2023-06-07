@@ -1,19 +1,64 @@
 <template>
-    <form @submit.prevent="submit">
-        
+    <form @submit.prevent="submit" autocomplete="off">
+
         <div>
-            <InputLabel for="name" value="Municipality Name" />
-            <MunicipalityList @submit="getMunicipality" :contents="props.municipalities" />
-            <InputError class="mt-2" :message="form.errors.municipality_id" />
+            <InputLabel for="name" value="Province" />
+            <v-select :options="convertedProvince" v-model="province" />
+
         </div>
 
         <div class="mt-4">
+            <InputLabel for="municipality" value="municipality" />
+            <v-select :options="municipality" v-model="form.municipality" label="municipality"
+                :reduce="municipality => municipality.id" />
+            <InputError class="mt-2" :message="form.errors.municipality" />
+        </div>
+        <div class="mt-4">
             <InputLabel for="email" value="Email" />
             <TextInput id="email" type="email" class="mt-1 block w-full" v-model="form.email" required
-                autocomplete="username" />
+                autocomplete="email" />
             <InputError class="mt-2" :message="form.errors.email" />
         </div>
-
+     
+        <div class="grid grid-cols-2 gap-2 w-fit border rounded mt-4 p-2">
+            <span class="mt-4 col-span-2">Personnel In-charge</span>
+            <div class="">
+                <InputLabel for="firstname" value="First Name" />
+                <TextInput id="firstname" type="text" class="mt-1 block w-full" v-model="form.firstname" 
+                    autocomplete="firstname" />
+                <InputError class="mt-2" :message="form.errors.firstname" />
+            </div>
+            <div class="">
+                <InputLabel for="lastname" value="Last Name" />
+                <TextInput id="lastname" type="text" class="mt-1 block w-full" v-model="form.lastname" 
+                    autocomplete="lastname" />
+                <InputError class="mt-2" :message="form.errors.lastname" />
+            </div>
+            <div class="mt-4">
+                <InputLabel for="middlename" value="middle Name" />
+                <TextInput id="middlename" type="text" class="mt-1 block w-full" v-model="form.middlename" 
+                    autocomplete="middlename" />
+                <InputError class="mt-2" :message="form.errors.middlename" />
+            </div>
+            <div class="mt-4">
+                <InputLabel for="suffix" value="Suffix" />
+                <TextInput id="suffix" type="text" class="mt-1 block w-full" v-model="form.suffix" 
+                    autocomplete="suffix" />
+                <InputError class="mt-2" :message="form.errors.suffix" />
+            </div>
+        </div>
+        <div class="mt-4">
+            <InputLabel for="contact" value="Contact" />
+            <TextInput id="contact" type="number" class="mt-1 block w-full"
+                v-model="form.contact" required autocomplete="contact" />
+            <InputError class="mt-2" :message="form.errors.contact" />
+        </div>
+        <div class="mt-4">
+            <InputLabel for="address" value="Address" />
+            <TextInput id="address" type="text" class="mt-1 block w-full"
+                v-model="form.address" required autocomplete="address" />
+            <InputError class="mt-2" :message="form.errors.address" />
+        </div>
         <div class="mt-4">
             <InputLabel for="password" value="Password" />
             <TextInput id="password" type="password" class="mt-1 block w-full" v-model="form.password" required
@@ -21,20 +66,17 @@
             <InputError class="mt-2" :message="form.errors.password" />
         </div>
 
+      
         <div class="mt-4">
             <InputLabel for="password_confirmation" value="Confirm Password" />
             <TextInput id="password_confirmation" type="password" class="mt-1 block w-full"
                 v-model="form.password_confirmation" required autocomplete="new-password" />
             <InputError class="mt-2" :message="form.errors.password_confirmation" />
         </div>
-
         <div class="flex items-center justify-end mt-4">
-            <Link :href="route('login')" class="underline text-sm text-gray-600 hover:text-gray-900">
-            Already registered?
-            </Link>
 
             <PrimaryButton class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                Register as Municipality
+                Register New Municipality
             </PrimaryButton>
         </div>
     </form>
@@ -47,31 +89,48 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Link, useForm } from '@inertiajs/inertia-vue3';
 import MunicipalityList from '@/Components/Lists/MunicipalityList.vue';
+import { watch, ref } from 'vue';
+import axios from 'axios';
 
 const props = defineProps({
-    municipalities: Array,
+    provinces: Array,
 })
-
 let form = useForm({
-    municipality_id:'',
-    name: '',
+    firstname: '',
+    lastname: '',
+    middlename: '',
+    address: '',
+    contact: '',
+    suffix: '',
     email: '',
     password: '',
     password_confirmation: '',
+    // lat: '',
+    // long: '',
+    municipality: '',
     terms: false,
 });
-
+const province = ref()
+const municipality = ref([])
 const submit = () => {
-//    console.log(props.municipalities)
-   form.post(route('municipalityRegistration'), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
+    //    console.log(props.municipalities)
+    form.post(route('municipalityRegistration'), {
+        onSuccess: () => { form.reset('password', 'password_confirmation') },
+        onError: (e) => {
+            console.log(Object.values(e));
+        }
+
 
     });
 }
 
-function getMunicipality(muni) {
-  form.municipality_id=muni.id
-  form.name=muni.municipality
+watch(province, (value) => {
+    axios.get('/api/municipalities/' + value).then((res) => municipality.value = res.data)
+})
+const convertedProvince = props.provinces ? Object.values(props.provinces).map((c) => c.province) : []
+function getProvince(province) {
+    form.province = province.province
+
 }
 
 </script>

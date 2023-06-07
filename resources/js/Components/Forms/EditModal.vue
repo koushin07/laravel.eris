@@ -1,7 +1,14 @@
 <template>
     <div @click="openModal">
+        <button>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+            </svg>
+        </button>
 
-        details
+
 
     </div>
     <TransitionRoot appear :show="isOpen" as="template">
@@ -36,31 +43,26 @@
                                     <div class="">
                                         <div class="px-4 py-5 bg-white sm:p-6">
                                             <div class="grid grid-cols-6 gap-6">
-                                                <div class="col-span-6 sm:col-span-6">
-                                                    <label for="name"
-                                                        class="block text-sm font-medium text-gray-700">Equipment
-                                                        Name</label>
-                                                    <input type="text" name="name" id="name"
-                                                        class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                                        v-model="updateForm.name" required="">
 
-                                                </div>
-
-                                                <div class="col-span-6 flex flex-col ">
-                                                    <span class="text-sm text-slate-500 ">Status</span>
-                                                    <div class="flex flex-row space-x-6 border-t-2">
+                                                <div class="col-span-6 flex flex-col border p-2 rounded">
+                                                    <span class="text-base text-slate-500 pb-2">Quantity: {{
+                                                            quantity
+                                                    }} </span>
+                                                    <div class="flex flex-row space-x-6 ">
                                                         <div class="col-span-6 sm:col-span-6 lg:col-span-2">
                                                             <label for="model_number"
                                                                 class="block text-sm font-medium text-gray-700">Serviceable</label>
                                                             <input type="number" name="model_number" id="model_number"
                                                                 v-model="updateForm.serviceable" required=""
+                                                                :class="updateForm.serviceable > quantity ? 'border-red' : ''"
                                                                 class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                                         </div>
                                                         <div class="col-span-6 sm:col-span-6 lg:col-span-2">
                                                             <label for="model_number"
                                                                 class="block text-sm font-medium text-gray-700">Unusable</label>
                                                             <input type="number" name="model_number" id="model_number"
-                                                                v-model="updateForm.unusable" required=""
+                                                                v-model="updateForm.unserviceable" required=""
+                                                                :class="updateForm.unserviceable > quantity ? 'border-red' : ''"
                                                                 class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                                         </div>
                                                         <div class="col-span-6 sm:col-span-6 lg:col-span-2">
@@ -72,7 +74,6 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
 
 
                                                 <div class="col-span-6 sm:col-span-6 lg:col-span-2">
@@ -139,9 +140,10 @@
                                                     <option value="none" selected disabled hidden>
                                                         {{ updateForm.category }}
                                                     </option>
-                                                    <option>category1</option>
-                                                    <option>category2</option>
-                                                    <option>category3</option>
+                                                    <option>Water Rescue</option>
+                                                    <option>Fire and Rescue</option>
+                                                    <option>Protective Gears</option>
+
 
                                                 </select>
                                             </div>
@@ -197,7 +199,7 @@
 </template>
     
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useForm } from '@inertiajs/inertia-vue3';
 import {
     TransitionRoot,
@@ -212,9 +214,8 @@ const props = defineProps({
 })
 
 const updateForm = useForm({
-    equipment_id: props.form.id,
+    attrs: props.form.attrs_id,
     detail_id: props.form.detail_id,
-    name: props.form.name,
     code: props.form.code,
     asset_desc: props.form.asset_desc,
     category: props.form.category,
@@ -224,23 +225,36 @@ const updateForm = useForm({
     asset_id: props.form.asset_id,
     remarks: props.form.remarks,
     serviceable: props.form.serviceable,
-    unusable: props.form.unusable,
+    unserviceable: props.form.unserviceable,
     poor: props.form.poor
 })
 
-
+// function quantity(serviceable, poor, unserviceable) {
+//     return serviceable + poor + unserviceable
+// }
+const qty = ref( )
+const quantity = computed(() => {
+    return props.form.serviceable + props.form.unserviceable + props.form.poor
+})
 function handleSubmit() {
-    updateForm.put(route('municipality.inventory.update', props.form.owned_id), {
-        onSuccess: (e)=>{
-            closeModal()
-        },
-        onError: (e) => {
-            alert(Object.values(e))
+   
+    if ( updateForm.serviceable + updateForm.unserviceable + updateForm.poor <= quantity.value) {
+        updateForm.put(route('municipality.inventory.update', props.form.id), {
+            onSuccess: (e) => {
+                closeModal()
+            },
+            onError: (e) => {
+                alert(Object.values(e))
 
 
-        },
-    })
+            },
+        })
+    }else{
+        alert('Quantity Exceed')
+    }
+
 }
+
 const isOpen = ref(false)
 
 function closeModal() {

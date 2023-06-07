@@ -15,7 +15,7 @@ export default {
             labels: ['Total', 'Serviceable', 'Poor', 'Unusable'],
             datasets: [{
                 label: '# Total',
-                data: [props.status.total, props.status.serviceable, props.status.poor, props.status.unusable],
+                data: [props.status.total, props.status.serviceable, props.status.poor, props.status.unserviceable],
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',

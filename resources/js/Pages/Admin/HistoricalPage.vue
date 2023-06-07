@@ -1,186 +1,77 @@
 <template>
 
     <Head title="History" />
-    <div class=" box-border bg-white h-full p-4 md:col-span-3 overflow-y-auto scrollbar ">
-        <div class="flex flex-col space-y-20 p-7 h-fit ">
+    <div class="flex flex-col pt-6">
+        <div class="my-1 w-44">
+            <v-select :options=municipalities v-model="municipality" placeholder="Municipalities" 
+                label="municipality"></v-select>
+        </div>
+        <table
+            class="table-auto  w-full text-sm border-x-2 border-b-2 border-orange-200 text-gray-500 dark:text-gray-400">
+            <thead
+                class="text-xs text-stone-900 text-center uppercase bg-orange-400 dark:bg-gray-700  dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="py-3 px-6" v-for="(head, key) in localHeader" :key="key">
+                        <div class="flex flex-row justify-center py-1">
+                            <span>
+                                {{ head.name }}
+                            </span>
 
 
-            <div class="grid lg:grid-cols-3 sm:gap-10">
-                <span class="text-3xl text-center font-bold">TRANSACTION HISTORY</span>
-                <label for="default-search"
-                    class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
-                <div class="relative col-span-2">
-                    <button class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ">
-                        <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                    </button>
-                    <input type="search" v-model="search"
-                        class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-full bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="Search Mockups, Logos..." required>
+                        </div>
 
-                    <!-- <button type="submit"
-                class="text-white absolute right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button> -->
-                </div>
-            </div>
+                    </th>
 
-            <div class="flex flex-col sm:flex-row ">
-                <span class="text-4xl font-bold  sm:border-r-4  border-black py-2 pr-2">TOTAL
-
-                </span>
-                <div class="flex flex-col pl-2 justify-between">
-                    <span class="text-xl font-semibold">Borrowed: {{ totalQuantity }}</span>
-                    <span class="text-xl font-semibold">Returned: {{ totalReturned }}</span>
-                </div>
-
-            </div>
-            <div class="flex flex-col cols-span-3 w-fit sm:w-full rounded-2xl pb-7 history" v-for="(data, date) in histories"
-                :key="date">
-                <div class="box-content border-b-2 p-6"> <span class="text-lg font-semibold">{{ date }}</span>
-                </div>
-                <table class="table-auto">
-                    <thead>
-                        <tr>
-                            <th scope="col" class="py-3 px-6 text-gray-500">
-                                Municipality
-                            </th>
-                            <th scope="col" class="py-3 px-6 text-gray-500">
-                                Equipment
-                            </th>
-                            <th scope="col" class="py-3 px-6 text-gray-500">
-                                Quantity
-                            </th>
-                            <th scope="col" class="py-3 px-6 text-gray-500">
-                                Returned
-                            </th>
-                            <th scope="col" class="py-3 px-6 text-gray-500">
-                                Time
-                            </th>
-                            <th scope="col" class="py-3 px-6 text-gray-500">
-
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(datum, key) in data" class="max-h-full  dark:bg-gray-800 dark:border-gray-700">
-                            <td class="text-center py-2 font-bold">
-                                {{ datum.borrower }}
-                            </td>
-                            <td class="text-center py-2 text-gray-800">
-                                {{ datum.equipment }}
-                            </td>
-                            <td class="text-center py-2 text-gray-800">
-                                {{ datum.quantity ? datum.quantity : 0 }}
-                            </td>
-                            <td class="text-center py-2 text-gray-800">
-                                {{ datum.returned ? datum.returned : 0 }}
-                            </td>
-                            <td class="text-center py-2 text-gray-800">
-                                {{ moment(datum.created_at).format('hh:mm A') }}
-                            </td>
-                            <td class="text-center py-2 text-gray-800">
-                                <button>
-
-                                    <Modal>
-                                        <template #body>
-                                            <button @click="update = !update" 
-                                                class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
-                                                <div v-if="!update">
-                                                    <i class="fa-solid fa-left-long" ></i>
-                                                </div>
-                                               
-                                                <span v-else>update</span>
-                                            </button>
-                                            <div class="flex flex-col space-y-7 py-5" v-if="update">
-                                                <!-- titles -->
-                                                <div class="grid grid-cols-2 place-content-center">
-                                                    <span class="text-2xl font-bold text-center">Attribute</span>
-                                                    <span class="text-2xl font-bold text-center">Status</span>
-                                                </div>
-                                                <!-- end of titles -->
-                                                <div class="grid grid-cols-2 place-content-center gap-1">
-                                                    <div class="grid grid-flow-row  gap-6">
-                                                        <span class="text-sm ">
-                                                            <span class="font-bold">
-                                                                Asset ID:
-                                                            </span>
-                                                            {{ datum.asset_id ? datum.asset_id : 'NaN' }}
-                                                        </span>
-                                                        <span class="text-sm font-normal">
-                                                            <span class="font-bold">
-                                                                Model Number:
-                                                            </span> {{ datum.model_number ? datum.model_number : 'NaN'
-                                                            }}
-                                                        </span>
-                                                        <span class="text-sm font-normal">
-                                                            <span class="font-bold">
-                                                                Serial Number:
-                                                            </span> {{ datum.serial_number ? datum.serial_number : 'NaN'
-                                                            }}
-                                                        </span>
-                                                        <span class="text-sm font-normal">
-                                                            <span class="font-bold">
-                                                                Category:
-                                                            </span> {{ datum.category ? datum.category : 'NaN' }}
-                                                        </span>
-                                                        <span class="text-sm font-normal">
-                                                            <span class="font-bold">
-                                                                Code:
-                                                            </span>:{{ datum.code ? datum.code : 'NaN' }}
-                                                        </span>
-                                                        <span class="text-sm font-normal">
-                                                            <span class="font-bold">
-                                                                Unit:
-                                                            </span> {{ datum.unit ? datum.unit : 'NaN' }}
-                                                        </span>
-                                                    </div>
-
-                                                    <div class="flex flex-col space-y-6 ">
-                                                        <span class="text-sm font-normal text-center">
-                                                            <span class="font-bold">
-                                                                Serviceable:
-                                                            </span> {{ datum.serviceable ? datum.serviceable : '0' }}
-                                                        </span>
-                                                        <span class="text-sm font-normal text-center">
-                                                            <span class="font-bold">
-                                                                Unusable:
-                                                            </span> {{ datum.unusable ? datum.unusable : '0' }}
-                                                        </span>
-                                                        <span class="text-sm font-normal text-center">
-                                                            <span class="font-bold">
-                                                                Poor:
-                                                            </span> {{ datum.poor ? datum.poor : '0' }}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                           <Edit-history :form="datum" v-else/>
-                                        </template>
-                                        <template #footer>
-                                            <!-- <button @click="update = !update" 
-                                                class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
-                                               {{ update ? '':'update'}}
-                                            </button> -->
-                                        </template>
-
-                                    </Modal>
-                                </button>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="max-h-full even:bg-orange-200  bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                    v-for="(body, key) in histories.data">
+                    <td scope="row" class="text-center p-4">
+                        {{ body.incident }}
+                    </td>
 
 
-                            </td>
-                        </tr>
+                    <td class="text-center">
+                        {{ body.borrower }}
+                    </td>
+                    <td class="text-center">
+                        {{ body.owner }}
+                    </td>
+
+                    <td class="text-center">
+                        {{ moment(body.created_at).format('MMMM DD Y') }}
+                    </td>
+                    <td class="text-center" v-if="body.filename">
+                        <a :href="('/report/' + body.id)" type="button" target="_blank"
+                            class="mr-4 font-medium text-green-600 dark:text-orange-500 hover:underline">
+                            <!-- <EditModal :form="body" /> -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
 
 
-                    </tbody>
-                </table>
-            </div>
-            <div class="grid grid-rows-1 place-content-center" v-if="histories.length !== 0">
-                <button @click="loadMore" class="bg-orange-300 px-4 py-2 text-black rounded-2xl">
-                    Load More
-                </button>
-            </div>
+
+
+                        </a>
+
+                    </td>
+                    <td class="text-center" v-else>
+                        Nothing Found
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+        </table>
+        <div class="bg-white ">
+            <Pagination :links="histories.links" />
+
 
         </div>
     </div>
@@ -200,19 +91,19 @@ import EditHistory from '@/Components/EditHistory.vue';
 export default {
     layout: Layout,
     components: {
-    Head,
-    ContentBox,
-    moment,
-    Modal,
-    EditHistory
-},
+        Head,
+        ContentBox,
+        moment,
+        Modal,
+        EditHistory
+    },
     props: {
         histories: Object,
-
+        municipalities: Array,
         filters: [Array, Object]
     },
     setup({ filters, histories }) {
-
+        const municipality = ref()
         const update = ref(true)
         const totalReturned = computed(() => {
             let total = Object.values(histories).map((date) => {
@@ -230,11 +121,22 @@ export default {
         })
         const search = ref(filters.search)
         const offset = ref(0);
-
+        const localHeader = [
+            { name: 'Subject' },
+            { name: 'From' },
+            { name: 'To' },
+            { name: 'Date' },
+            { name: 'sit. rep.' },
+        ]
         const loadMore = async () => {
 
             offset.value = offset.value + 10
         }
+        watch(municipality, value => {
+            Inertia.get(usePage().url.value, { municipality: value },{
+                preserveState: true
+            })
+        })
         watch(offset, value => {
             Inertia.get(usePage().url.value, { load: value }, {
                 preserveState: true
@@ -256,6 +158,8 @@ export default {
             loadMore,
             totalQuantity,
             update,
+            localHeader,
+            municipality,
         }
     }
 }

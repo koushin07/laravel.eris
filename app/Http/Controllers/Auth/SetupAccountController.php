@@ -44,6 +44,8 @@ class SetupAccountController extends Controller
         $request->validate([
             'email' => ['required', 'email'],
             'contact' => 'required',
+            'firstname' => 'required',
+            'lastname' => 'required',
             'address' => 'required',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
@@ -52,8 +54,12 @@ class SetupAccountController extends Controller
            
             'email' => $request->email,
             'contact' => $request->contact,
+            'firstname' => $request->firstname,
+            'lastname' => $request->lastname,
+            'middlename'=> $request->middlename,
+            'suffix' => $request->suffix,
             'address' => $request->address,
-            'must_reset_password' => 1,
+            'must_reset_password' => 0,
             'password' =>  Hash::make($request->password)
         ]);
        

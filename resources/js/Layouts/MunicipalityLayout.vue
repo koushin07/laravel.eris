@@ -10,6 +10,7 @@ import { Head } from '@inertiajs/inertia-vue3'
 import useNotification from '@/Composables/useNotification';
 import { useToast } from "vue-toastification";
 import { emitter } from '@/Composables/useEventBus'
+import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 
 export default {
     components: {
@@ -17,18 +18,23 @@ export default {
         Notification,
         Link,
         PendingTransactions,
-        Dropdown
+        Dropdown,
+        ResponsiveNavLink,
     },
 
 
     setup() {
+
+        // const { reconfirmed } = useChannel()
+        const show = ref(false);
+        const showTransaction = ref()
 
         const toast = useToast();
 
         console.log(`this is user ${usePage().props.value.auth.user.id}`)
         const navs = [
             { name: "Equipment", url: "/municipality/inventory" },
-            { name: "Request", url: "/municipality/request" },
+            { name: "incidents", url: "/municipality/request" },
             { name: "Forms", url: "/municipality/inventory/create" },
             { name: "Transactions", url: "/municipality/transaction" },
 
@@ -36,43 +42,44 @@ export default {
 
         const equipmentManagement = [
             { name: "Inventory", url: "/municipality/inventory" },
-            { name: "Report", url: "/municipality/incident" }
+            // { name: "Report", url: "/municipality/incident" }
         ]
 
         const transactions = [
-            { name: "Request", url: "/municipality/request", hasNotif: false },
-            { name: "Approvals", url: "/municipality/approval", hasNotif: true },
-            { name: "History", url: "/municipality/history", hasNotif: false },
+            { name: "My Requests", url: "/municipality/request", hasNotif: false },
+            { name: "In-Bound Requests", url: "/municipality/partials", hasNotif: false },
+            // { name: "Approvals", url: "/municipality/approval", hasNotif: false },
+
+            // { name: "History", url: "/municipality/history", hasNotif: false },
 
         ]
 
 
-        const { notif, equipmentRequest } = useChannel()
-        // window.Echo.private(
-        //     `borrowing.${usePage().props.value.auth.user.id}`
-        // ).listen(".borrow.recieved", (e) => {
-        //     console.log("this is e", e);
-
-
-        //     toast.info("Equipment Request Recieved", {
-        //         timeout: 5000,
-        //         icon: "fa-regular fa-envelope",
-        //     });
-
-        // });
-        const { notification, count } = useNotification()
-        emitter.on('badge', ()=>{
+       const { fetchPendingNotification, fetchReconfirmationotification,    notification } = useNotification()
+        emitter.on('*', () => {
             console.log('this is emmitter');
-            notification()
+            fetchPendingNotification()
         })
-        console.log(count.value);
+
+
+
         onMounted(() => {
-            
+            window.Echo.private(`reconfirm.${usePage().props.value.auth.user.id}`).listen('.reconfirm', (e)=>{
+            // alert(e)
+            // console.log(e);
+            // alert('notifyadmin')
+            toast.info("Transaction Completed", {
+                timeout: 10000,
+                icon: "fa-regular fa-envelope",
+            });
+        })
+            fetchPendingNotification()
+            fetchReconfirmationotification()
             window.Echo.private(
                 `borrowing.${usePage().props.value.auth.user.id}`
             ).listen(".borrow.recieved", (e) => {
                 emitter.emit('refresh-approvals')
-                notification()
+                fetchPendingNotification()
 
                 toast.info("Equipment Request Recieved", {
                     timeout: 5000,
@@ -81,33 +88,17 @@ export default {
 
             });
 
-            notification()
+
 
         })
-        // const pop = ref(false)
-        // const read = ref(false)
-        // const startPop = () => {
-        //     setInterval(function () {
-
-        //         return pop.value = !pop.value
-        //     }, 1000)
-        // }
-        // document.addEventListener("visibilitychange", () => {
-
-        //     if(notif.value && !read.value){
-        //         startPop()
-        //     }
-        //     if(!document.hidden && notif.value){
-        //         read.value = true
-        //     }
-        // })
-
 
         return {
             navs,
             equipmentManagement,
             transactions,
-            count,
+            notification,
+            show,
+            showTransaction,
         }
     }
 
@@ -116,9 +107,158 @@ export default {
 </script>
 
 <template>
+    <div class="flex h-screen bg-gray-50 dark:bg-gray-900 ">
+        <!-- Desktop sidebar -->
+        <aside class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-shrink-0">
+            <div class=" py-4 text-gray-500 dark:text-gray-400">
+                <div class="mx-auto  w-30 h-10">
+                    <inertia-link href="/municipality/request">
+                        <img src="../../css/eris.png " class="mx-auto">
+                    </inertia-link>
+
+                </div>
+
+                <ul class="mt-20 flex flex-col space-y-2">
+                    <!-- <ResponsiveNavLink href="/archive">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                        </svg>
+
+                        <span class="ml-4">Archive</span>
+
+                    </ResponsiveNavLink> -->
+                    <li class="relative px-6 py-3">
+                        <button
+                            class="dropdown-label inline-flex items-center justify-between w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                            @click="showTransaction = !showTransaction">
+                            <span class="inline-flex items-center">
+                                <svg class="w-5 h-5 " fill="none" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path
+                                        d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z">
+                                    </path>
+                                </svg>
+                                <span class="ml-1">Transactions</span>
+                            </span>
+                            <svg class="w-4 h-4" :class="showTransaction ? 'rotate-180' : ''" aria-hidden="true"
+                                fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
 
 
-    <div class="flex flex-col h-full md:h-screen">
+                        <ul v-if="showTransaction"
+                            class="dropdown-content p-2 mt-2 space-y-2 overflow-hidden text-sm font-medium text-gray-500 rounded-md shadow-inner bg-gray-50 dark:text-gray-400 dark:bg-gray-900"
+                            aria-label="submenu">
+                            <li v-for="trans in transactions"
+                                class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
+                                <inertia-link class="w-full" :href="trans.url">{{ trans.name }}</inertia-link>
+                            </li>
+
+                        </ul>
+                    </li>
+                    <li class="relative px-6 py-3">
+                        <button
+                            class="dropdown-label inline-flex items-center justify-between w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                            @click="show = !show">
+                            <span class="inline-flex items-center">
+                                <svg class="w-5 h-5 " fill="none" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path
+                                        d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z">
+                                    </path>
+                                </svg>
+                                <span class="ml-1">Equipment Management</span>
+                            </span>
+                            <svg class="w-4 h-4" :class="show ? 'rotate-180' : ''" aria-hidden="true"
+                                fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+
+
+                        <ul v-if="show"
+                            class="dropdown-content p-2 mt-2 space-y-2 overflow-hidden text-sm font-medium text-gray-500 rounded-md shadow-inner bg-gray-50 dark:text-gray-400 dark:bg-gray-900"
+                            aria-label="submenu">
+                            <li v-for="Em in equipmentManagement"
+                                class="px-2 py-1 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200">
+                                <inertia-link class="w-full" :href="Em.url">{{ Em.name }}</inertia-link>
+                            </li>
+
+                        </ul>
+                    </li>
+
+                </ul>
+
+            </div>
+        </aside>
+        <!-- Mobile sidebar -->
+        <!-- Backdrop -->
+
+
+        <div class="flex flex-col flex-1 w-full ">
+            <header class="z-10 py-4 bg-white shadow-md dark:bg-gray-800">
+                <div
+                    class="container flex items-center justify-end h-full px-6 mx-auto text-purple-600 dark:text-purple-300">
+                    <!-- Mobile hamburger -->
+
+
+
+                    <ul class="flex items-center flex-shrink-0 space-x-6 ">
+
+
+                        <!-- Notifications menu -->
+                      <Notification :reconfirm="notification.reconfirm"  :request="notification.request"/>
+                        <!-- Profile menu -->
+                        <Dropdown>
+                            <template #trigger>
+                                <button class="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none
+                     hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-3 py-1.5
+                      dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600
+                       dark:focus:ring-gray-700" type="button">
+
+                                    <span class="text-orange-600"> {{ $page.props.auth.user.assign_office.municipality
+                                    }}</span>
+                                    <svg class="ml-2 w-3 h-3" aria-hidden="true" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </template>
+                            <template #content>
+                                <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
+                                    <li>
+
+
+                                        <Link :href="route('logout')" method="post" as="Link"
+                                            class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer">
+                                        Logout</Link>
+
+                                    </li>
+                                </ul>
+
+                            </template>
+
+                        </Dropdown>
+                    </ul>
+                </div>
+            </header>
+            <main class="h-full bg-gray-50 overflow-y-auto">
+                <slot />
+            </main>
+        </div>
+    </div>
+
+    <!-- <div class="flex flex-col h-full md:h-screen">
 
 
         <nav class="flex flex-row justify-between bg-white  border-b-2 p-5 w-full">
@@ -131,7 +271,7 @@ export default {
                       dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600
                        dark:focus:ring-gray-700" type="button">
 
-                            <div class="text-orange-600">{{ $page.props.auth.user.name }}</div>
+                            <span class="text-orange-600"> {{ $page.props.auth.user.assign_office.municipality }}</span>
                             <svg class="ml-2 w-3 h-3" aria-hidden="true" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -143,9 +283,7 @@ export default {
                     <template #content>
                         <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
                             <li>
-                                <inertia-link :href="route('municipality.office.index')"
-                                    class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer">
-                                    Account</inertia-link>
+
 
                                 <Link :href="route('logout')" method="post" as="Link"
                                     class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer">
@@ -190,8 +328,7 @@ export default {
                         <button>
                             Transactions
                         </button>
-                        <span v-if="count > 0"
-                            class="inline-block w-3 h-3 mr-3 bg-red-600 rounded-full -translate-y-1 translate-x-2 "></span>
+
                     </template>
                     <template #content class="mt-16">
                         <ul class="py-1 text-sm text-start text-gray-700 dark:text-gray-200">
@@ -211,79 +348,23 @@ export default {
                         </ul>
                     </template>
                 </Dropdown>
+
+                <inertia-link href="/archive" class=" px-5 border-r-2 z-0  text-center pt-4 pb-4">
+                    Archive
+                </inertia-link>
             </div>
 
         </nav>
-        <div class="flex flex-row h-full ">
+        <div class="flex flex-row h-full bg-orange-100">
 
-            <main class=" flex-col w-full  space-y-12 overflow-y-auto m-4 scrollbar shadow">
+            <main class=" flex-col w-full  space-y-12 overflow-y-auto m-4 scrollbar ">
+
                 <slot />
             </main>
 
 
-            <!--             <div class="hidden md:flex box-border bg-orange-300 w-1/4 p-10  mt-10 mb-10 mr-10 ml-2.5">
-                <div class="flex flex-col space-y-8 justify-items-center">
-                
-                    <div class="    flex flex-col space-x-1">
-                        <div class="flex justify-between px-4">
-                            <span class="text-red-500 font-semibold">Pending</span>
-                            <span class="text-red-500 cursor-pointer">See All</span>
-                        </div>
-                        <Pending-transactions></Pending-transactions>
-                    </div>
-                    <div class="flex flex-col space-x-1">
-                        <div class="flex justify-between px-4">
-                            <span class="text-emerald-500">Send</span>
-                           
-                        </div>
-                       
-                    </div>
-
-                </div>
-
-            </div> -->
         </div>
-    </div>
-    <!-- <div class="flex body">
-        <div class="flex flex-row z-50">
-            <div
-                class="flex absolute flex-col hover:z-50 bg-gradient-to-t from-cyan-500 to-blue-500 h-screen w-14 transition-all duration-500  hover:left-0 hover:w-36 rounded-r-2xl">
-                <div class=" flex flex-col justify-between items-center ">
-                    <div class="flex flex-col items-center pt-48">
-
-                        <inertia-link href="/dashboard">
-                        <i class="fa-solid fa-house py-4 cursor-pointer hover:text-white"></i>
-                        </inertia-link>
-                        <inertia-link :href="route('equipment.index')">
-                        <i class="fa-solid fa-table-list py-4 cursor-pointer hover:text-white"></i>
-                        </inertia-link>
-                        <inertia-link :href="route('office.index')">
-                        <i class="fa-solid fa-map py-4 cursor-pointer hover:text-white"></i>
-                        </inertia-link>
-
-                        <inertia-link :href="route('borrowing.create')">
-                        <i class="fa-solid fa-tty py-4 cursor-pointer hover:text-white"></i>
-                        </inertia-link>
-
-                    </div>
-
-
-                </div>
-            </div>
-        </div>
-      
-        <div class="flex flex-col pl-14 h-screen scrollbar bg-transparent w-screen sm:w-9/12 overflow-y-auto ">
-
-            <div class=" flex-col mx-5 mt-9 max-h-screen content-center">
-                <slot />
-            </div>
-
-
-        </div>
-      
-        <TransactionCard />
-    </div>
-  -->
+    </div> -->
 </template>
 <style scoped>
 .shadow {

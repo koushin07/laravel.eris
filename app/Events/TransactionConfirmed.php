@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class TransactionConfirmed implements ShouldBroadcast
+    class TransactionConfirmed implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -21,7 +21,7 @@ class TransactionConfirmed implements ShouldBroadcast
      */
     public function __construct(
         public $office,
-        public $unfinish
+        
     )
     {
         

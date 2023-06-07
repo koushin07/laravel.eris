@@ -25,14 +25,14 @@ let registerAs = ref(true)
             role="tablist">
             <li class="nav-item flex-auto text-center" role="presentation" @click="registerAs = ! registerAs">
 
-                <a :class="{'border-b-blue-500': registerAs}"
+                <a :class="{'border-b-orange-500': registerAs}"
                     class="cursor-pointer nav-link w-full block font-medium text-xs leading-tight  uppercase border-x-0 border-t-0 border-b-2 border-transparent px-6 py-3 my-2 hover:bg-gray-100 focus:border-transparent   "
                     id="tabs-home-tabFill" data-bs-toggle="pill" data-bs-target="#tabs-homeFill" role="tab"
                     aria-controls="tabs-homeFill" aria-selected="true">Municipality</a>
             </li>
             <li class="nav-item flex-auto text-center" role="presentation"
              @click="registerAs = ! registerAs">
-                <a :class="{'border-b-blue-500': !registerAs}"
+                <a :class="{'border-b-orange-500': !registerAs}"
                 class="cursor-pointer nav-link w-full block font-medium text-xs leading-tight uppercase border-x-0 border-t-0  border-b-2 border-transparent px-6 py-3 my-2  hover:bg-gray-100 focus:border-transparent  "
                     id="tabs-profile-tabFill" data-bs-toggle="pill" data-bs-target="#tabs-profileFill" role="tab"
                     aria-controls="tabs-profileFill" aria-selected="false"> Province</a>
@@ -42,7 +42,7 @@ let registerAs = ref(true)
 
 
         <div v-if="registerAs">
-            <ResgisterAsMunicipality :municipalities="municipalities"/>
+            <ResgisterAsMunicipality  :provinces="provinces" />
         </div>
         <div v-else>
             <RegisterAsProvince  :provinces="provinces"/>

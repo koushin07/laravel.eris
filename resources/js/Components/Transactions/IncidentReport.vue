@@ -6,18 +6,18 @@
 
                 <div class="flex flex-col justify-between overflow-y-auto border-2 rounded-lg  space-y-2 scrollbar">
 
-                    <button v-for="(report, key) in reports" :key="key" v-if="reports.length"
-                        @click="openReport(report.id, report.equipment_name)"
+                    <button v-for="(report, key) in reports" :key="key" 
+                        @click="openReport(report.id, report.incident)"
                         class="flex justify-between  border-b  p-4 hover:bg-slate-200 border-grey-200 last:border-transparent">
 
                         <div class="grid grid-cols-1 text-start">
                             <span class="font-bold text-base text-gray-700 uppercase">
-                                {{ report.sender.name }}
+                                {{ report.incident }}
                             </span>
-                            <span class="text-xs text-gray-700 uppercase">{{ report.reason }}</span>
+                            <span class="text-xs text-gray-700 uppercase">{{ report.incident_summary }}</span>
                         </div>
                     </button>
-                    <div v-else
+                    <!-- <div v-else
                         
                         class="flex justify-between  border-b  p-4 border-grey-200 last:border-transparent">
 
@@ -27,13 +27,13 @@
                             </span>
                             <span class="text-xs text-gray-700 uppercase"></span>
                         </div>
-                    </div>
+                    </div> -->
 
 
                 </div>
             </div>
         </div>
-        <div class=" flex flex-col z-0 h-full  justify-between col-span-3">
+        <div class=" flex flex-col z-0 h-full  justify-between col-span-3" v-if="open">
             <div class="flex flex-col  overflow-hidden h-full ">
 
                 <form @submit.prevent="submitReport" v-if="incident.id"
@@ -95,14 +95,16 @@
 <script>
 import { useForm } from '@inertiajs/inertia-vue3';
 import { ref } from 'vue';
+import { useToast } from "vue-toastification";
 
 export default {
     props: {
         reports: Object
     },
     setup() {
+        const toast = useToast();
 
-        const hover = ref(false)
+        const open = ref(false)
         const selected = ref('')
         const incident = useForm({
             id: null,
@@ -115,6 +117,7 @@ export default {
         const openReport = (id, equipment) => {
             selected.value = equipment
             incident.id = id
+            open.value = true
 
         }
         const drop = (e) => {
@@ -130,7 +133,10 @@ export default {
                     console.log(e)
                 },
                 onFinish: ()=>{
-                    incident.reset()
+                    toast.success('Report submitted')
+                    open.value = false
+                    incident.reset('id', 'docs')
+
                 }
                 
                 
@@ -139,7 +145,7 @@ export default {
 
         return {
             drop,
-            hover,
+            open,
             selected,
             incident,
             submitReport,

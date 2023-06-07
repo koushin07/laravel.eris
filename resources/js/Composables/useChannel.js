@@ -1,10 +1,12 @@
 import { usePage } from "@inertiajs/inertia-vue3";
 import { ref } from "vue";
 import { useToast } from "vue-toastification";
-
+import { emitter } from "./useEventBus";
+import useNotification from "./useNotification";
 
 const toast = useToast();
-
+const emit = emitter
+const {  fetchPendingNotification, fetchReconfirmationotification } = useNotification()
 export default () => {
     const notif = ref(false);
     const pendings = ref([]);
@@ -12,14 +14,19 @@ export default () => {
   
 
     const confirmed = async () => {
-        await window.Echo.private(
+         window.Echo.private(
             `confirmed.${usePage().props.value.auth.user.id}`
         ).listen(".equipment.confirmed", (e) => {
             // alert("accepted");
            notif.value = true
+           fetchReconfirmationotification()
             toast.success("Request Confirmed", {
                 timeout: 7000,
                 icon: "fa-regular fa-circle-check",
+            },{
+                onClick: ()=>{
+                    alert('click')
+                }
             });
 
             console.log("this is", e);
@@ -48,15 +55,15 @@ export default () => {
             console.log("this is", e);
             Object.values(pendings.value).filter((p) => {
                 console.log('in');
-                if (
+                // if (
                   
-                    e.unfinish.owner === p.municipality_id &&
-                    e.unfinish.equipment === p.equipment &&
-                    p.status === "pending"
-                ) {
+                //     e.unfinish.owner === p.municipality_id &&
+                //     e.unfinish.equipment === p.equipment &&
+                //     p.status === "pending"
+                // ) {
                   
-                    p.status = "denied";
-                }
+                //     p.status = "denied";
+                // }
             });
         });
     };
@@ -65,11 +72,11 @@ export default () => {
         window.Echo.private(
             `borrowing.${usePage().props.value.auth.user.id}`
         ).listen(".borrow.recieved", (e) => {
-            console.log("this is e", e);
-          
+      
+            fetchPendingNotification()
             notif.value = true;
             toast.info("Equipment Request Recieved", {
-                timeout: 7000,
+                timeout: 10000,
                 icon: "fa-regular fa-envelope",
             });
            
@@ -87,7 +94,7 @@ export default () => {
         ).listen(".child.trans", (e) => {
             console.log("this is e", e);
             toast.info("Municipality Transactions Happen", {
-                timeout: 7000,
+                timeout: 10000,
                 icon: "fa-regular fa-envelope",
             });
         });
@@ -96,13 +103,40 @@ export default () => {
         .listen(".report.sub", (e)=>{
             
             toast.info('Municipality submitted report', {
-                timeout: 7000,
+              
+                timeout: 10000,
                 icon: "fa-regular fa-envelope"
             })
         })
     };
 
+    const notifyAdmin = () =>{
+        window.Echo.private(`notify.admin.${usePage().props.value.auth.user.id}`).listen('.borrow.recieved', (e)=>{
+            emit.emit('notify-admin')
+            alert('notifyadmin')
+            toast.info("Municipality Transactions Happen", {
+                timeout: 10000,
+                icon: "fa-regular fa-envelope",
+            });
+        })
+    }
+    const reconfirmed = () =>{
+        window.Echo.private(`reconfirm.${usePage().props.value.auth.user.id}`).listen('.reconfirm', (e)=>{
+            // alert(e)
+            console.log(e);
+            // alert('notifyadmin')
+            toast.info("", {
+                timeout: 10000,
+                icon: "fa-regular fa-envelope",
+            });
+        })
+    }
+
+   
+
     return {
+        reconfirmed,
+        notifyAdmin,
         pendings,
         notif,
         confirmed,

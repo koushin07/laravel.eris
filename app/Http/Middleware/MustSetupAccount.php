@@ -19,8 +19,9 @@ class MustSetupAccount
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!Auth::user()->must_reset_password) {
-            return redirect(RouteServiceProvider::SetupAccount);
+        if (Auth::user()->must_reset_password) {
+            return redirect('/Sorry');
+         
         }
         return $next($request);
     }

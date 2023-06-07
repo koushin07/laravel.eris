@@ -2,20 +2,24 @@
 
 namespace App\Http\Controllers\Borrow;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use App\Services\OfficeService;
 use App\Models\Office;
+use App\Models\EquipmentDetail;
+use App\Models\EquipmentBorrow;
+use App\Models\EquipmentAttribute;
+use App\Models\Equipment;
 use App\Models\BorrowingDetails;
 use App\Models\Borrowing;
+use App\Models\BorrowHistory;
+use App\Models\Approval;
+use App\Http\Requests\BorrowUpdate;
 use App\Http\Controllers\Controller;
 use App\Events\TransactionDenied;
 use App\Events\TransactionConfirmed;
 use App\Events\NotifyProvince;
-use App\Http\Requests\BorrowUpdate;
-use App\Models\BorrowHistory;
-use App\Models\Equipment;
-use App\Models\EquipmentAttribute;
-use Illuminate\Support\Facades\DB;
 
 class BDController extends Controller
 {
@@ -82,7 +86,7 @@ class BDController extends Controller
     {
 
 
-        DB::transaction(function () {
+        DB::transaction(function () use($request ,$id) {
             $detail = BorrowingDetails::find($id);
 
             $attr = EquipmentAttribute::where([
@@ -98,13 +102,13 @@ class BDController extends Controller
             ])->first();
             $detail->equipment_attrs = $attrs->id;
             $detail->save();
-            if (!is_null($request->serviceable) && !is_null($request->poor) && !is_null($request->unusable)) {
-                if ($request->serviceable + $request->poor + $request->unusable <= $details->quantity) {
+            if (!is_null($request->serviceable) && !is_null($request->poor) && !is_null($request->unserviceable)) {
+                if ($request->serviceable + $request->poor + $request->unserviceable <= $details->quantity) {
                     BorrowHistory::create([
                         'borrowing_detail_id' => $detail->id,
                         'is_returned' => true,
                         'serviceable' => $request->serviceable,
-                        'unusable' => $request->unusable,
+                        'unserviceable' => $request->unserviceable,
                         'poor' => $request->poor,
                     ]);
                 }
@@ -124,64 +128,58 @@ class BDController extends Controller
     {
         //
     }
-    public function accepted(Request $request, OfficeService $officeService)
+    public function accepted(Request $request, $id)
     {
-        DB::transaction(function () use ($request) {
-            // $borrowing = Borrowing::create([
-            //     'borrower' => $request->borrower_id,
-            //     'borrower_personel'=> $request->personel,
-            //     'owner_personel' => 'owner_personel',
-            //     'owner' => auth()->id(),
-            // ]);
-            // $equipment = Equipment::where('name', $request->equipment)->first();
-            // $details = BorrowingDetails::create([
-            //     'borrowing_id' => $borrowing->id,
-            //     'equipment_id' => $equipment->id,
-            //     'reason' => $request->incident,
-            //     'quantity' =>  $request->quantity
-            // ]);
-            $detail = BorrowingDetails::find($request->detail_id);
-            $borrow = Borrowing::find($detail->borrowing_id)->update([
-                'owner_personel' => $request->personel,
-            ]);
 
-            $detail->status = 'accepted';
-            $detail->save();
-        });
-        $borrower = Office::where('name', $request->borrower)->first();
-        // $unfinish = UnfinishTransaction::create([
-        //     'borrower' => $request->borrower_id,
-        //     'owner' => auth()->id(),
-        //     'quantity' => $request->quantity,
-        //     'equipment' => $request->equipment
-        // ]);
-        $unfinish = collect([
-            'owner' => auth()->id(),
-            'equipment' => $request->equipment,
-        ]);
+        $eb = EquipmentBorrow::find($id);
+        // $eb->acquired =$eb->quantity;
+        $detail = BorrowingDetails::find($eb->detail_id);
+        $borrowing = Borrowing::find($detail->borrowing_id);
+
+        $eb->authorize_quantity = $request->quantity;
+        // $approval->acknowledge_at =  Carbon::now();
+
+        $eb->status = 'accepted';
+       
+        $eb->save();
+
+        
         auth()->user()->unreadNotifications->where('id', $request->notif_id)->markAsRead();
-        TransactionConfirmed::dispatch($borrower, $unfinish);
-        NotifyProvince::dispatch($officeService->ProvinceOffices());
+        TransactionConfirmed::dispatch(Office::find($borrowing->borrower));
+        // NotifyProvince::dispatch($officeService->ProvinceOffices());
         return redirect()->back();
     }
-    public function deny(Request $request)
+    public function deny(Request $request, $id)
     {
-    
+        // dd($request);
+        $eb = EquipmentBorrow::find($id);
+        // $eb->acquired =$eb->quantity;
+        $detail = BorrowingDetails::find($eb->detail_id);
+        $borrowing = Borrowing::find($detail->borrowing_id);
+        // $borrowing->reason = $request->reason;
+        $eb->authorize_quantity = $request->quantity;
+        // $approval->acknowledge_at =  Carbon::now();
+        $eb->reason = $request->reason;
+        $eb->status = 'declined';
+       
+        $eb->save();
+
+        
         auth()->user()->unreadNotifications->where('id', $request->notif_id)->markAsRead();
-        $detail = BorrowingDetails::find($request->detail_id);
-        $borrow = Borrowing::find($detail->borrowing_id)->update([
-            'owner_personel' => $request->personel,
-        ]);
+        // $detail = BorrowingDetails::find($request->detail_id);
+        // $borrow = Borrowing::find($detail->borrowing_id)->update([
+        //     'owner_personel' => $request->personel,
+        // ]);
 
-        $detail->status = 'denied';
-        $detail->save();
-        $unfinish = collect([
-            'owner' => auth()->id(),
-            'equipment' => $request->equipment,
+        // $detail->status = 'denied';
+        // $detail->save();
+        // $unfinish = collect([
+        //     'owner' => auth()->id(),
+        //     'equipment' => $request->equipment,
 
-        ]);
-        $borrower = Office::where('name', $request->borrower)->first();
-        TransactionDenied::dispatch($borrower, $unfinish);
+        // ]);
+        // $borrower = Office::where('name', $request->borrower)->first();
+        TransactionDenied::dispatch(Office::find($eb->borrowee));
         return redirect()->back();
     }
 }

@@ -13,9 +13,9 @@ class BorrowHistory extends Model
 
     protected $fillable = [
         'borrowing_detail_id',
-        'is_returned',
+        'return_at',
         'serviceable',
-        'unusable',
+        'unserviceable',
         'poor',
     ];
 

@@ -18,7 +18,8 @@ return new class extends Migration
             $table->foreignUuid('borrowing_detail_id')->constrained('borrowing_details');
             $table->integer('serviceable');
             $table->integer('poor');
-            $table->integer('unusable');
+            $table->integer('unserviceable');
+            $table->timestamp('return_at');
             $table->timestamps();
         });
     }

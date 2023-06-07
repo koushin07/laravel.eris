@@ -26,8 +26,9 @@ class AttributeExistRule implements Rule
      */
     public function passes($attribute, $value)
     {
+        // dd($value);
         $attr = EquipmentAttribute::where([
-            ['equipment_id', $value['equipment_id']],
+            
             ['code', $value['code']],
             ['category', $value['category']],
             ['unit', $value['unit']],

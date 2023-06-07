@@ -24,7 +24,7 @@ class BorrowHistoryController extends Controller
     public function index(Request $request)
     {
 
-      
+        
         return inertia('municipality/Transactions/HistoricalPage', [
             'histories' => $this->history->fetchTransaction($request, $request->input('load')), 
             
@@ -54,7 +54,7 @@ class BorrowHistoryController extends Controller
             'borrowing_detail_id' => $request->id,
             'is_return' => true,
             'serviceable' => $request->serviceable,
-            'unusable' => $request->unusable,
+            'unserviceable' => $request->unserviceable,
             'poor' => $request->poor
         ]);
     }

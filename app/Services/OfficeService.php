@@ -25,4 +25,10 @@ class OfficeService
         $provinces = $this->ProvinceOffices();
         return  $provinces->firstWhere('province',  $myProvince->province);
     }
+
+    public function getAllMunicipalityOffices($province)
+    {
+        return Office::select()->join('assign_offics', 'assign_offices.id', 'offices.assign')->whereNotNull('assign_offices.municipality')
+        ->where('assign_offices.province', '=', $province)->get();
+    }
 }

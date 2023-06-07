@@ -24,6 +24,8 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
+
+                
                 if (Auth::user()->role()->where('role_type', Role::ADMIN)->exists()) {
                     return redirect(RouteServiceProvider::ADMIN);
                 } elseif (Auth::user()->role()->where('role_type', Role::PROVINCE)->exists()) {

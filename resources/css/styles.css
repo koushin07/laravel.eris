@@ -6,9 +6,6 @@
     background-color: #FFFBD6;
 }
 
-input::-webkit-calendar-picker-indicator {
-    opacity: 0;
-}
 
 .scrollbar::-webkit-scrollbar {
     width: 10px;

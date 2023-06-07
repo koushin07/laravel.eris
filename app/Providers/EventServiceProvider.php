@@ -2,13 +2,16 @@
 
 namespace App\Providers;
 
-use App\Events\BorrowRequestRecieve;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Auth\Events\Registered;
+use App\Listeners\SendNotifictionForReconfirm;
 use App\Listeners\NotifyMunicipalityTransaction;
+use App\Listeners\NotifyAdmin;
+use App\Events\TransactionConfirmed;
 use App\Events\NewMunicipalityTransaction;
+use App\Events\BorrowRequestRecieve;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -23,8 +26,13 @@ class EventServiceProvider extends ServiceProvider
         ],
        
         BorrowRequestRecieve::class => [
-            NotifyMunicipalityTransaction::class
+            NotifyMunicipalityTransaction::class,
+            NotifyAdmin::class
         ],
+
+        TransactionConfirmed::class =>[
+            SendNotifictionForReconfirm::class
+        ]
     ];
 
     /**

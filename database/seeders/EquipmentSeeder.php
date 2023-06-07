@@ -7,6 +7,10 @@ use Illuminate\Database\Seeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Container\Container;
 use Faker\Generator;
+use App\Models\Role;
+use App\Models\Office;
+use App\Models\EquipmentOwned;
+use App\Models\EquipmentDetail;
 use App\Models\EquipmentAttribute;
 use App\Models\Equipment;
 
@@ -72,25 +76,41 @@ class EquipmentSeeder extends Seeder
 
         foreach ($tools as $tool) {
             Equipment::create([
-                'name' => $tool
+                'name' => $tool,
+                'recieved_at' => $this->faker->dateTimeBetween('-2 years', '+1 year')
+
             ]);
         }
-        $equipment = Equipment::all();
-        $amount = 1;
 
-        do {
-            EquipmentAttribute::create([
+
+        $equipment = Equipment::all();
+
+
+        $office = Office::whereNot('role_id', Role::PROVINCE)->whereNot('role_id', Role::ADMIN)->get();
+        $count = EquipmentAttribute::count();
+        $attrs = EquipmentAttribute::all();
+        $amount = 0;
+        while ($count > $amount) {
+            EquipmentOwned::create([
                 'equipment_id' => $equipment->random()->id,
-                'code' => $this->faker->randomDigitNotZero(),
-                'asset_desc' => $this->faker->sentence(),
-                'category' => $this->faker->sentence(),
-                'unit' => $this->faker->randomDigitNotZero(),
-                'model_number' => $this->faker->randomDigitNotZero(),
-                'serial_number' => $this->faker->randomDigitNotZero(),
-                'asset_id' => $this->faker->randomNumber(),
-                'remarks' => $this->faker->sentence(),
+                'office_id' => $office->random()->id,
+                'equipment_attrs' =>$attrs->random()->id,
+
             ]);
             $amount++;
-        } while ($amount <= 1000);
+        }
+
+        $owned = EquipmentOwned::all();
+        $owned->each(function ($ow) {
+            EquipmentDetail::create([
+                'equipment_owner' => $ow->id,
+                'serviceable' => rand(1, 500),
+                'unserviceable' => rand(1, 500),
+                'poor' => rand(1, 500),
+            ]);
+        });
+
+
+
     }
 }

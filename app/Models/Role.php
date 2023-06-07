@@ -10,7 +10,7 @@ class Role extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $fillable=['role_type'];
+    protected $fillable = ['role_type'];
     public const MUNICIPALITY = 'RDRRMC_MUNICIPALITY';
     public const PROVINCE = 'RDRRMC_PROVINCE';
     public const ADMIN = 'RDRRMC';
@@ -18,4 +18,6 @@ class Role extends Model
     {
         return $this->hasMany(Office::class);
     }
+
+   
 }

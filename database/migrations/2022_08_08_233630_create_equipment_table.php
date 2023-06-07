@@ -17,6 +17,7 @@ return new class extends Migration
         Schema::create('equipment', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name')->unique();
+            $table->timestamp('recieved_at', 0);
             $table->timestamps();
         });
     }

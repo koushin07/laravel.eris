@@ -2,6 +2,9 @@
 
 namespace App\Console;
 
+use App\Models\Borrowing;
+use App\Models\BorrowingDetails;
+use App\Models\EquipmentBorrow;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -15,7 +18,18 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        $schedule->command('model:prune', [
+            '--model' => [EquipmentBorrow::class]
+        ]);
+        $schedule->command('model:prune', [
+            '--model' => [BorrowingDetails::class]
+        ])->everyMinute();
+        $schedule->command('model:prune', [
+            '--model' => [Borrowing::class]
+        ]);
         // $schedule->command('inspire')->hourly();
+
+       
     }
 
     /**

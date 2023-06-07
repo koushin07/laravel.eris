@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use App\Traits\Approvals as hasApprovals;
 
+use App\Models\Role;
 use App\Models\Municipality;
 use App\Models\Assign_Office;
 use App\Models\AssignOffice;
@@ -25,7 +26,10 @@ class Office extends Authenticatable
      */
     protected $fillable = [
         'assign',
-        'name',
+        'firstname',
+        'lastname',
+        'middlename',
+        'suffix',
         'email',
         'address',
         'contact',
@@ -62,4 +66,13 @@ class Office extends Authenticatable
     {
         return $this->belongsTo(Role::class);
     }
+
+    // public function admin()
+    // {
+    //     return $this->with([
+    //         'role' => function ($q) {
+    //             $q->where('role_type', Role::ADMIN);
+    //         }
+    //     ]);
+    // }
 }

@@ -2,14 +2,17 @@
 
 namespace App\Events;
 
-use App\Models\Equipment;
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Foundation\Events\Dispatchable;
+use App\Models\AssignOffice;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\Channel;
+use App\Models\Role;
+use App\Models\Office;
+use App\Models\Equipment;
 
 class BorrowRequestRecieve implements ShouldBroadcast
 {
@@ -20,7 +23,7 @@ class BorrowRequestRecieve implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(public $office, public $equipment, public $quantity, public $incident, public $person)
+    public function __construct(public $office)
     {
         //
     }
@@ -32,7 +35,9 @@ class BorrowRequestRecieve implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('borrowing.'.$this->office->id);
+       
+        return new PrivateChannel('borrowing.' . $this->office->id);
+
     }
     public function broadcastAs()
     {

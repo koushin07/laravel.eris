@@ -1,51 +1,10 @@
 <template>
-    <table class="table-auto  w-full text-sm border-x text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 text-center uppercase bg-header dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-                <th scope="col" class="py-3 px-6" v-for="(head, key) in tableHeader" :key="key">
-                    {{ head.name }}
-                   
-
-
-                </th>
-
-            </tr>
+    <table class="table-auto rounded  w-full text-sm border-x-2 border-b-2 border-orange-200 text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-stone-900 text-center uppercase bg-orange-300 dark:bg-gray-700  dark:text-gray-400">
+            <slot name="header"/>
         </thead>
         <tbody>
-            <tr class="max-h-full even:bg-gray-200  bg-white border-b dark:bg-gray-800 dark:border-gray-700"
-                v-for="(body, key) in tableBody">
-                <td scope="row" class="py-4 px-6 font-medium  text-gray-900 whitespace-nowrap dark:text-white">
-                    {{ body.name }}
-                </td>
-                <td class="text-center">
-                    {{ body.category }}
-                </td>
-                <td class="text-center">
-                    {{ body.model_number }}
-                </td>
-                <td class="text-center">
-                    {{ body.serial_number }}
-                </td>
-                <td class="text-center">
-                    {{ body.unit }}
-                </td>
-                <td class="text-center">
-                    {{ body.code }}
-                </td>
-                <td class="text-center">
-                    {{ body.asset_id }}
-
-                </td>
-                <td class="text-center" v-if="editable">
-                    <button href="javascript:void(0)" type="button"
-                        class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                        <EditModal :form="body" />
-
-                    </button>
-
-
-                </td>
-            </tr>
+         <slot name="body" />
 
         </tbody>
     </table>
@@ -56,11 +15,11 @@
 import Dropdown from '@/Components/Dropdown.vue';
 import { Inertia } from '@inertiajs/inertia';
 import { usePage } from '@inertiajs/inertia-vue3';
-
-import { ref, watch } from 'vue';
+import moment from 'moment'
+import { ref, watch, computed } from 'vue';
 
 import Pagination from './Pagination.vue';
-import EditModal from './Forms/EditModal.vue';
+
 
 
 const props = defineProps({
@@ -70,14 +29,43 @@ const props = defineProps({
     tableBody: Array,
     filters: Object
 })
+// const sortBy = ref('equipment')
+// const sortDirection = ref(1)
+// const type = ref()
+// const direction = ref()
+// const head = ref()
 
 
 
-const sortBy = [
-    { name: 'Serviceable' },
-    { name: 'Poor' },
-    { name: 'Unusable' }
-]
+// const sortAttr = computed(() => {
+//     type.value = sortBy === 'equipment' ? 'String' : 'Number'
+//     direction.value = sortDirection
+//     head.value = sortBy
+//     console.log('inisde');
+    
+//     return props.tableBody.sort(sortMethods(type, head, direction))
+// })
+// const sort = (attr) => {
+
+//     sortBy.value = attr
+//     sortDirection.value *= -1
+// }
+
+// const sortMethods = (type, head, direction) => {
+//     switch (type) {
+//         case 'String': {
+//             return direction === 1 ?
+//                 (a, b) => b[head] > a[head] ? -1 : a[head] > b[head] ? 1 : 0 :
+//                 (a, b) => a[head] > b[head] ? -1 : b[head] > a[head] ? 1 : 0
+//         }
+//         case 'Number': {
+//             return direction === 1 ?
+//                 (a, b) => Number(b[head]) - Number(a[head]) :
+//                 (a, b) => Number(a[head]) - Number(b[head])
+//         }
+//     }
+// }
+
 
 
 
@@ -86,6 +74,7 @@ const setStatus = (url, status) => {
     Inertia.get(url, { status }, {
         preserveScroll: true
     })
+
 
 
 
@@ -186,7 +175,7 @@ const setStatus = (url, status) => {
                 </td>
                 <td scope="row" class="items-center  text-gray-900 whitespace-nowrap dark:text-white">
 
-                    <div class="text-base font-semibold ">{{ body.unusable }}</div>
+                    <div class="text-base font-semibold ">{{ body.unserviceable }}</div>
 
                 </td>
                

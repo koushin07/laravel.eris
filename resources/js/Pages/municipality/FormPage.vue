@@ -2,6 +2,8 @@
     <head title="Update"/>
     <ContentBox>
 
+
+        
         <form class="h-full " @submit.prevent="handleSubmit">
             <div class="flex flex-row justify-between">
                 <h1 class="font-bold text-2xl font-sans antialiased">Update Inventory</h1>

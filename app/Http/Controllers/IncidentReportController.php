@@ -2,48 +2,51 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\IncidentReportDemand;
-use App\Events\ReportSubmitted;
-use App\Models\BorrowingDetails;
-use App\Models\IncidentReport;
-use App\Models\Office;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use Carbon\Carbon;
+use App\Models\Office;
+use App\Models\IncidentReport;
+use App\Models\EquipmentBorrow;
+use App\Models\Equipment;
+use App\Models\BorrowingDetails;
+use App\Models\Borrowing;
+use App\Models\AssignOffice;
+use App\Models\Approval;
+use App\Events\ReportSubmitted;
+use App\Events\IncidentReportDemand;
 
 class IncidentReportController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
         return inertia('municipality/ReportPage', [
-            'reports' => IncidentReport::with('sender')->where([
-                ['reciever', auth()->id()],
-                ['filename', null],
-                ['file_path', null]
-            ])->get(),
+            'reports' => BorrowingDetails::select(
+                'borrowing_details.file_path',
+                'borrowing_details.filename',
+                'approvals.borrowee as borrower',
+                'borrowing_details.INC_submitted_at as submitted_at',
+                'borrowing_details.incident',
+                'borrowing_details.incident_summary',
+                'borrowing_details.id',
+            )
+                ->join('borrowings', 'borrowings.id', '=', 'borrowing_details.borrowing_id')
+                ->join('approvals', 'approvals.id', '=', 'borrowings.approval_id')
+                ->where('approvals.borrowee', auth()->id())
+                ->whereNull('borrowing_details.filename')
+                ->whereNull('borrowing_details.file_path')->get()
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -52,39 +55,38 @@ class IncidentReportController extends Controller
         ]);
 
 
-
+        // dd($request);
 
         if ($request->hasFile('docs')) {
             $doc_path = $request->file('docs')->store('public');
             $file = $request->file('docs');
 
-            $incident =  IncidentReport::find($request->id);
+            $incident =  BorrowingDetails::find($request->id);
             if ($incident) {
                 $incident->filename = $file->getClientOriginalName();
                 $incident->file_path = $doc_path;
+                $incident->INC_submitted_at = Carbon::now();
                 $incident->save();
             }
-            ReportSubmitted::dispatch(Office::find($incident->sender));
+            // ReportSubmitted::dispatch(Office::find($incident->sender));
         }
-        return;
+        return redirect('/municipality/request');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function show($id)
     {
-        $report = IncidentReport::findOrFail($id);
-        $headers = array(
-            'Content-Type: application/pdf',
-        );
+        $report = BorrowingDetails::findOrFail($id);
+        // $headers = array(
+        //     'Content-Type: application/pdf',
+        // );
+
         $cut = ltrim($report->file_path, "public/");
+        // dd($cut, $report);
+
         $path = "../public/storage/" . $cut;
 
-        return response()->file($path, $headers);
+        return response()->file($path);
     }
 
     /**
@@ -128,15 +130,20 @@ class IncidentReportController extends Controller
         return;
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function destroy($id)
     {
-        //
+        $incident = BorrowingDetails::find($id);
+        DB::transaction(function () use ($incident) {
+
+            if (Storage::exists($incident->file_path)) {
+                Storage::delete($incident->file_path);
+                $incident->filename = null;
+                $incident->file_path = null;
+                $incident->INC_submitted_at = null;
+                $incident->save();
+            }
+        }, 2);
     }
     public function request(Request $request)
     {
@@ -153,12 +160,69 @@ class IncidentReportController extends Controller
         IncidentReportDemand::dispatch(Office::find($request->assign));
         return;
     }
+
     public function downloadFile($id)
     {
-        $report = IncidentReport::findOrFail($id);
+        $report = BorrowingDetails::findOrFail($id);
         $headers = array(
             'Content-Type: application/pdf',
         );
         return Storage::download($report->file_path, $report->filename, $headers);
+    }
+
+    public function archive(Request $request)
+    {
+        if ($request->input('municipality')) {
+            dd($request->input('municipality'));
+        }
+        $myMuni = AssignOffice::find(auth()->user()->assign);
+        return inertia('ArchivePage', [
+            'provinces' => DB::table('assign_offices')->select()->whereNull('municipality')->get(),
+            'incidents' => BorrowingDetails::select([
+                'borrowing_details.id',
+                'borrowing_details.incident',
+                'assign_offices.municipality',
+                'borrowing_details.filename',
+                'borrowing_details.file_path',
+                'borrowing_details.INC_submitted_at'
+            ])
+                ->join('borrowings', 'borrowings.id', '=', 'borrowing_details.borrowing_id')
+                ->join('approvals', 'approvals.id', '=', 'borrowings.approval_id')
+                ->join('offices', 'offices.id', '=', 'approvals.borrowee')
+                ->join('assign_offices', 'assign_offices.id', '=', 'offices.assign')
+                ->where('assign_offices.municipality', $myMuni->municipality)
+                ->whereNotNull(['assign_offices.municipality', 'borrowing_details.filename'])
+                ->when($request->input('date'), function ($q, $date) {
+                    $q->whereDate('borrowing_details.created_at', '=', Carbon::parse($date)->addDay()->format('Y-m-d'));
+                })
+
+                ->paginate(8)
+        ]);
+    }
+
+    public function newIncident(Request $request)
+    {
+        // dd($request);
+        $request->validate([
+            'incidents' => 'required',
+            'incident_summary' => 'string'
+        ]);
+        // dd($request->date);
+      
+
+        $borrowing = Borrowing::create([
+            'borrower' => auth()->id(),
+        ]);
+        $details = BorrowingDetails::create([
+            'incident_id' => 'IN-' . rand(pow(10, 5 - 1), pow(10, 5) - 1),
+            'borrowing_id' => $borrowing->id,
+            'incident' => $request->incidents,
+            'incident_summary' => $request->incident_summary,
+            'created_at' => Carbon::parse($request->date)
+
+        ]);
+        // dd($details);
+        // return redirect('/municipality/request/'. $details->id);
+        return back();
     }
 }

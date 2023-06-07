@@ -37,3 +37,15 @@ Broadcast::channel('child.transacton.{id}', fn($user, $id) => $user->id == $id);
 Broadcast::channel('incident.report.{id}', fn($user, $id) => $user->id == $id);
 
 Broadcast::channel('report.submitted.{id}', fn($user, $id)=>$user->id == $id);
+
+Broadcast::channel('notify.admin.{id}', fn($user, $id) => $user->id == $id);
+
+Broadcast::channel('reconfirm.{id}', fn($user, $id) => $user->id == $id);
+
+Broadcast::channel('notify.province.{id}', fn($user, $id) => $user->id == $id);
+
+Broadcast::channel('grandchild.transaction.{id}', fn($user, $id) => $user->id == $id);
+
+Broadcast::channel('reconfirm.{id}', fn($user, $id) => $user->id == $id);
+
+Broadcast::channel('register.{id}', fn($user, $id) => $user->id == $id);

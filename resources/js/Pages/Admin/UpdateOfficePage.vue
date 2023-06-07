@@ -1,64 +1,100 @@
+<!--
+  This example requires some changes to your config:
+  
+  ```
+  // tailwind.config.js
+  module.exports = {
+    // ...
+    plugins: [
+      // ...
+      require('@tailwindcss/forms'),
+    ],
+  }
+  ```
+-->
 <template>
-    <div class="flex items-center min-h-screen p-6 bg-gray-50 dark:bg-gray-900 z-0">
-        <div class="flex-1 h-full max-w-4xl mx-auto overflow-hidden bg-white rounded-lg shadow-xl dark:bg-gray-800">
-            <div class="flex flex-col overflow-y-auto md:flex-row">
-                <div class="h-32 md:h-auto md:w-1/2">
-                    <img aria-hidden="true" class="object-cover w-full h-full dark:hidden" src="/landingpage/binan.jpg"
-                        alt="Office">
-                    <img aria-hidden="true" class="hidden object-cover w-full h-full dark:block"
-                        src="/landingpage/binan.jpg" alt="Office">
-                </div>
-                <form @submit.prevent="handleSubmit" class="flex items-center justify-center p-6 sm:p-12 md:w-1/2">
-                    <div class="w-full">
-                        <h1 class="mb-4 text-xl font-semibold text-gray-700 dark:text-gray-200">
-                            Re-Assign {{ office.name }}'s Province
-                        </h1>
-                        <label class="block text-sm">
-                            <span class="text-gray-700 dark:text-gray-400">Province</span>
-                            <ProvinceList @submit="getProvince" :contents="provinces"></ProvinceList>
-                        </label>
 
-                        <!-- You should use a button here, as the anchor is only used for the example  -->
-                        <button @submit.prevent="handleSubmit" class="block w-full px-4 py-2 mt-4 text-sm font-medium leading-5 text-center text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
-                            >
-                            Save
-                        </button>
+
+
+
+    <div class="mt-10 sm:mt-0">
+        <div class="md:grid place-content-center">
+
+            <div class="mt-5 md:col-span-2 md:mt-0 w-full">
+                <form @submit.prevent="handleSubmit">
+                    <div class="overflow-hidden shadow sm:rounded-md w-[700px]">
+                        <div class="bg-white px-4 py-5 sm:p-6">
+                            <div class="grid grid-cols-2 gap-6 w-full">
+
+                                <div class="col-span-6">
+                                    <label for="first-name"
+                                        class="block text-sm font-medium text-gray-700">Municipality</label>
+                                    <input v-model="form.municipality" type="text" name="first-name" id="first-name" autocomplete="given-name"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                                </div>
+                                <div class="col-span-6">
+                                    <label for="first-name"
+                                        class="block text-sm font-medium text-gray-700">Province</label>
+                                   <v-select :options="convertedProvince" v-model="form.province"/>
+                                </div>
+
+                                
+                                
+
+                               
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 px-4 py-3 text-right sm:px-6">
+                            <button type="submit"
+                                class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Save</button>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+
+
 </template>
+  
 
 <script>
 import ProvinceList from '@/Components/Lists/ProvinceList.vue';
 import { useForm } from '@inertiajs/inertia-vue3';
 import { ref } from 'vue';
+import AdminLayout from '@/Layouts/AdminLayout.vue';
+import InputError from '@/Components/InputError.vue';
+import InputLabel from '@/Components/InputLabel.vue';
+import TextInput from '@/Components/TextInput.vue';
 
 export default {
+    layout: AdminLayout,
+    components: {
+        InputError,
+        TextInput,
+        InputLabel,
+    },
     props: {
         provinces: Object,
         office: Object
     },
-    setup({ office }) {
+    setup({ office, provinces }) {
         const selected = ref()
         const form = useForm({
+            municipality: '',
             province: ''
-           
+
         })
-        const handleSubmit = ()=>{
+        const handleSubmit = () => {
             form.put(route('rdrrmc.office.update', office.id))
         }
-        const getProvince = (province) => {
-            console.log(province);
-            selected.value = province.id
-            form.province = province.province
-            
-        }
-
+        
+        const convertedProvince = provinces ? Object.values(provinces).map((c) => c.province) : []
         return {
-            getProvince,
+            form,
             handleSubmit,
+            convertedProvince,
         };
     },
     components: { ProvinceList }

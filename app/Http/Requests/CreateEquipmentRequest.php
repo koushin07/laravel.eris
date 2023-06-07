@@ -24,17 +24,17 @@ class CreateEquipmentRequest extends FormRequest
     public function rules()
     {
         return [
-            'equipment_name' => 'required',
+            'equipment_name' => ['required'],
             'code'  => 'required',
             'asset_desc'  => 'required',
             'category'  => 'required',
             'unit' => 'required',
             'model_number'  => 'required',
-            'serial_number'  => 'required',
+            'serial_number'  => ['required', 'unique:equipment_attributes,serial_number'],
             'asset_id'  => 'required',
             'remarks'  => 'required',
             'serviceable' => 'required',
-            'unusable'=> 'required',
+            'unserviceable'=> 'required',
             'poor' => 'required'
             
         ];

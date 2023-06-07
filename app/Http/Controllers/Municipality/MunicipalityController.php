@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Municipality;
 
 use App\Http\Controllers\Controller;
-use App\Models\Municipality;
-use Illuminate\Http\Request;
+use App\Models\AssignOffice;
+
 
 class MunicipalityController extends Controller
 {
-    public function allMuniciplity($id)
+    public function allMuniciplity($province)
     {
-        return Municipality::where('province_id', $id)->get();
+        return response()->json(AssignOffice::where('province', $province)->whereNotNull('municipality')->get());
     }
 }

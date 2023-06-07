@@ -15,10 +15,13 @@ return new class extends Migration
     {
         Schema::create('offices', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name');
+            $table->string('firstname');
+            $table->string('lastname');
+            $table->string('middlename')->nullable();
+            $table->string('suffix')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->boolean('must_reset_password')->default(false);
+            $table->boolean('must_reset_password')->default(true);
             $table->string('address')->nullable();
             $table->string('contact')->nullable();
             $table->string('password');

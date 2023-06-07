@@ -21,7 +21,7 @@ class TransactionDenied implements ShouldBroadcast
      */
     public function __construct(
         public $office,
-        public $unfinish
+        
     )
     {
         

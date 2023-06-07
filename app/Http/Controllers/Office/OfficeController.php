@@ -14,70 +14,11 @@ use App\Models\Role;
 
 class OfficeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+   
     public function index(Request $request)
     {
 
-        return inertia('AccountPage', [
-            'reports' =>  IncidentReport::where([
-                ['reciever', auth()->id()],
-                ['filename', null],
-                ['file_path', null]
-            ])->count(),
-            'status' => DB::select(
-                "SELECT
-                SUM(serviceable + unusable + poor) AS total,
-                        SUM(serviceable) AS serviceable,
-                        SUM(unusable) AS unusable,
-                        SUM(poor) AS poor
-                      FROM equipment_details ed
-                      JOIN equipment_owneds eo ON eo.id = ed.equipment_owner
-                      JOIN offices o ON o.id = eo.office_id
-                       WHERE o.id = :myid",
-                [
-                    'myid' => auth()->id(),
-                ]
-            )[0],
-            'notification' => auth()->user()->unreadNotifications()->count(),
-            'unfinish' => BorrowingDetails::where([
-                ['borrowings.owner', auth()->id()],
-                ['borrowing_details.equipment_attrs', null]
-            ])
-                ->join('borrowings', 'borrowings.id', '=', 'borrowing_details.borrowing_id')
-                ->join('equipment', 'equipment.id', '=', 'borrowing_details.equipment_id')
-                ->join('offices', 'offices.id', 'borrowings.borrower')
-                ->join('assign_offices', 'assign_offices.id', '=', 'offices.assign')
-                ->count(),
-            'updateReport' => IncidentReport::where('reciever', auth()->id())->get(),
-            'equipments' => DB::table('equipment')->select(
-                [
-                    'equipment.name',
-                    'equipment_attributes.*',
-                    'offices.name as owner',
-                    'equipment_details.serviceable',
-                    'equipment_details.unusable',
-                    'equipment_details.poor',
-                ]
-            )
-                ->join('equipment_owneds', 'equipment_owneds.equipment_id', '=', 'equipment.id')
-                ->join('equipment_details', 'equipment_details.equipment_owner', '=', 'equipment_owneds.id')
-                ->join('equipment_attributes', 'equipment_attributes.equipment_id', '=', 'equipment.id')
-                ->join('offices', 'offices.id', '=', 'equipment_owneds.office_id')
-                ->when(
-                    $request->input('search'),
-                    function ($q, $search) {
-                        $q->where('equipment.name', 'like', '%' . $search . '%');
-                    }
-                )->where('equipment_owneds.office_id', auth()->id())
-                ->paginate(5)->onEachSide(1)->withQueryString(),
-
-            'filters' => $request->only(['search', 'status', 'owner'])
-
-        ]);
+        return inertia('AccountPage');
     }
 
     /**
@@ -145,7 +86,7 @@ class OfficeController extends Controller
         $assign = AssignOffice::find($office->assign);
 
         $assign->update($request->all());
-        return redirect('/rdrrmc/dashboard');
+        return redirect('/rdrrmc/municipalities');
     }
 
     /**
@@ -164,16 +105,6 @@ class OfficeController extends Controller
         // Office::
         // select('offices.*', 'assign_offices.province', DB::raw('count(equipment_owneds.id) as equipment'))
 
-        // ->join('equipment_owneds', 'equipment_owneds.office_id', '=', 'offices.id')
-        // ->join('assign_offices', 'assign_offices.id', '=', 'offices.assign')
-        // ->whereNotNull('assign_offices.municipality')
-        // ->whereNot('offices.name', 'RDRRMC')
-        // ->groupBy('offices.id')
-        //     ->when($request->input('search'), function ($q, $search) {
-        //         $q->where('name', 'like', '%' . $search . '%');
-        //     })
-        //     ->paginate(10)->onEachSide(1)->withQueryString(),
-        // 'filters' => $request->only(['search'])
 
         return inertia('Admin/MunicipalityPage', [
             'municipalities' => Office::select('offices.*', 'assign_offices.municipality', 'assign_offices.province',  DB::raw('count(equipment_owneds.id) as equipment'))
@@ -181,7 +112,9 @@ class OfficeController extends Controller
                 ->leftJoin('equipment_owneds', 'equipment_owneds.office_id', '=', 'offices.id')
                 ->join('assign_offices', 'assign_offices.id', '=', 'offices.assign')
                 ->whereNotNull('assign_offices.municipality')
-                ->whereNot('offices.name', 'RDRRMC')
+                ->whereNotNull('assign_offices.municipality')
+                ->whereNotNull('assign_offices.province')
+                ->where('assign_offices.is_rdrrmc', false)
                 ->groupBy('offices.id')
                 ->when($request->input('search'), function ($q, $search) {
                     $q->where('name', 'like', '%' . $search . '%');
@@ -211,9 +144,8 @@ class OfficeController extends Controller
                 ->where('roles.role_type', Role::PROVINCE)
                 ->select(
                     'assign_offices.province',
-                    'offices.name',
-                    'offices.email',
-                    'offices.contact'
+                    'offices.*',
+                    
                 )
 
                 ->when($request->input('search'), function ($q, $search) {
@@ -222,5 +154,9 @@ class OfficeController extends Controller
                 ->paginate(10)->onEachSide(1)->withQueryString(),
             'filters' => $request->only(['search'])
         ]);
+    }
+
+    public function profile(){
+
     }
 }

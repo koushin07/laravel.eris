@@ -17,6 +17,7 @@ use App\Models\Condition;
 use App\Models\BorrowingDetails;
 use App\Models\Borrowing;
 use App\Models\EquipmentAttribute;
+use Carbon\Carbon;
 
 class EquipmentService
 {
@@ -33,6 +34,7 @@ class EquipmentService
                 ['category', $data->category],
                 ['unit', $data->unit],
                 ['serial_number',  $data->serial_number],
+                ['model_number', $data->model_number]
 
             ]
         )->first();
@@ -46,12 +48,13 @@ class EquipmentService
 
             $equipmentAttrs = $this->checkEquipmentAttrs($data);
 
-
-
             if (is_null($equipmentAttrs)) {
                 $newequipment = Equipment::firstOrCreate([
                     'name' => $data->equipment_name,
+                    
 
+                ],[
+                    'recieved_at' => Carbon::parse($data->date)
                 ]);
 
                 $attrs = EquipmentAttribute::create([
@@ -74,7 +77,7 @@ class EquipmentService
                 $EDetail = EquipmentDetail::create([
                     'equipment_owner' => $EOwner->id,
                     'serviceable' => $data->serviceable,
-                    'unusable' => $data->unusable,
+                    'unserviceable' => $data->unserviceable,
                     'poor' => $data->poor
                 ]);
             } else {
@@ -88,7 +91,7 @@ class EquipmentService
                 if (!is_null($upCondition)) {
 
                     $upCondition->serviceable += $data->serviceable;
-                    $upCondition->unusable += $data->unusable;
+                    $upCondition->unserviceable += $data->unserviceable;
                     $upCondition->poor += $data->poor;
                     $upCondition->save();
                 };

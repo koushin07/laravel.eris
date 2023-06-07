@@ -1,22 +1,32 @@
 import axios from "axios";
+import { reactive } from "vue";
 import { ref } from "vue";
 
 export default () => {
-    const  count= ref(0);
-    const url = "/api/municipality/notification";
-    const notification = async () => {
-        const url = "/api/municipality/notification";
+    const notification =reactive({
+        reconfirm: 0,
+        request: 0,
+    })
+  
+    const url = "/api/notification";
+    const fetchPendingNotification = async () => {
+        axios.get(`${url}/request`).then((req) => {
+        //    console.log('this is for notif ', recon.data);
+            notification.request = req.data
+            console.log('this is for notif ', notification.reconfirm);
 
-
-        axios.get(`${url}/count`).then((c) => {
-            console.log('this is fired  ', c);
-            console.log(c.data);
-            count.value = c.data;
         });
     };
 
+    const fetchReconfirmationotification = async () => {
+        axios.get(`${url}/reconfirm`).then((rec)=>{
+            notification.reconfirm = rec.data
+        })
+    }
+
     return{
-        notification,
-        count
+        fetchPendingNotification,
+        fetchReconfirmationotification,
+        notification
     }
 };

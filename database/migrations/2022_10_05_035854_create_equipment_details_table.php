@@ -17,7 +17,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('equipment_owner')->constrained('equipment_owneds');
             $table->integer('serviceable');
-            $table->integer('unusable');
+            $table->integer('unserviceable');
             $table->integer('poor');
             $table->timestamps();
         });

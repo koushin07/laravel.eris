@@ -16,6 +16,11 @@ Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
 
+    Route::post('register', [RegisteredUserController::class, 'store'])
+        ->name('register');
+    Route::post('register_municipality', [RegisteredUserController::class, 'store_municipality'])
+     
+        ->name('municipalityRegistration');
 
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
@@ -36,11 +41,12 @@ Route::middleware('guest')->group(function () {
     //     ->name('password.update');
 });
 
+
 Route::middleware('auth')->group(function () {
 
     // Route::get('reset-password', [AuthenticatedSessionController::class, 'resetPassword']);
     // Route::post('store-new-password', [AuthenticatedSessionController::class, 'storeNewPassword']);
-    
+
     Route::get('setup-account', [SetupAccountController::class, 'create']);
     Route::post('setup-account', [SetupAccountController::class, 'store'])->name('setup');
 
@@ -50,11 +56,6 @@ Route::middleware('auth')->group(function () {
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.update');
 
-    Route::post('register', [RegisteredUserController::class, 'store'])
-        ->name('register');
-    Route::post('register_municipality', [RegisteredUserController::class, 'store_municipality'])
-        ->middleware('isAdmin')
-        ->name('municipalityRegistration');
 
 
     Route::get('verify-email', [EmailVerificationPromptController::class, '__invoke'])
@@ -75,6 +76,4 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
-
-   
 });

@@ -15,8 +15,9 @@ return new class extends Migration
     {
         Schema::create('borrowings', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('borrower')->constrained('offices','id');
-            $table->foreignUuid('owner')->constrained('offices','id');
+            $table->string('reason')->nullable();
+            $table->timestamp('acknowledge_at')->nullable();
+            $table->foreignUuid('borrower')->nullable()->constrained('offices','id');
             $table->timestamps();
         });
     }

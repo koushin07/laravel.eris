@@ -21,10 +21,10 @@
            
 
         </form> -->
-        <div class="flex justify-end">
-            <button @click="search" class="px-3 bg-button w-fit text-center text-black  py-2 rounded-lg">Search</button>
-        </div>
+
         <div class="grid grid-rows-2 gap-2">
+
+
             <div class="my-1">
                 <label class="text-sm w-full">Equipment</label>
                 <v-select multiple :options="convertedEquipment" v-model="requests.equipments" label="name"></v-select>
@@ -33,8 +33,10 @@
                 <label class="text-sm">Province</label>
                 <v-select multiple :options="convertedProvince" v-model="requests.provinces" label="name"></v-select>
             </div>
-
-
+        </div>
+        <div class="flex justify-end mt-2">
+            <button @click="search"
+                class="px-3 bg-button w-fit text-center text-white tracking-wider   py-2 rounded">Search</button>
         </div>
         <div class="grid grid-flow-row lg:grid-flow-col gap-10 pt-6">
             <div class=" lg:col-span-4 flex flex-col z-0 justify-between ">
@@ -59,14 +61,14 @@
 
                         </div> -->
 
-<!-- <div class="loader " v-if="loading"></div> -->
-                       
+                        <!-- <div class="loader " v-if="loading"></div> -->
+
 
 
                         <div
                             class="flex flex-row lg:flex-col justify-between pr-2 border-b pb-2 border-red-200 last:border-transparent">
-                          
-                            <table   class="table-auto  w-full text-sm  text-gray-500 dark:text-gray-400">
+
+                            <table class="table-auto  w-full text-sm  text-gray-500 dark:text-gray-400">
                                 <thead
                                     class="text-xs text-gray-700 text-center uppercase bg-header dark:bg-gray-700 dark:text-gray-400">
                                     <tr>
@@ -79,37 +81,38 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                   
-                                    <tr  v-if="loading" class="max-h-full even:bg-gray-100  bg-white border-b dark:bg-gray-800 dark:border-gray-700"
-                                      >
-                                     
+
+                                    <tr v-if="loading"
+                                        class="max-h-full even:bg-gray-100  bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+
                                         <td scope="row" class="p-4 text-center">
-                                            
+
                                         </td>
                                         <td scope="row" class="text-center">
-                                            
+
                                         </td>
                                         <td class="text-center">
                                             <Loading />
                                         </td>
                                         <td class="text-center">
-                                         
-                                        </td>
-                                        <td class="text-center">
-                                          
+
                                         </td>
                                         <td class="text-center">
 
-                                            
+                                        </td>
+                                        <td class="text-center">
+
+
 
                                         </td>
 
 
                                     </tr>
-                                   
-                                    <tr v-else class="max-h-full even:bg-gray-100  bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+
+                                    <tr v-else
+                                        class="max-h-full even:bg-gray-100  bg-white border-b dark:bg-gray-800 dark:border-gray-700"
                                         v-for="(body, key) in municipalities" :key="key">
-                                     
+
                                         <td scope="row" class="p-4 text-center">
                                             {{ body.equipment }}
                                         </td>
@@ -127,7 +130,14 @@
                                         </td>
                                         <td class="text-center">
 
-                                            <Quantity-modal :muni="body" @submit="submit" />
+                                            <Quantity-modal placeholder="Quantity" :muni="body" @submit="submit">
+                                                <template #trigger>
+                                                    <button class="border-2 px-2">
+                                                        Request
+                                                    </button>
+                                                </template>
+
+                                            </Quantity-modal>
 
                                         </td>
                                     </tr>
@@ -223,17 +233,19 @@ export default {
             { name: 'AVAILABLE' },
             { name: 'ADDRESS' },
             { name: 'CONTRACT NUMBER' },
-            { name: 'SELECT ALL' }
+            { name: 'ACTION' }
         ]
         const form = useForm({
             equipment: '',
             municipality_id: null,
             quantity: null,
             incidents: '',
-            incident_summary: ''
+            incident_summary: '',
+            date: ''
+
         })
 
-      
+
 
         const getEquipment = async (equipment) => {
             equipment.value = equipment
@@ -251,7 +263,7 @@ export default {
             console.log('this is muni', muni);
             console.log('this is qty', quantity);
             form.equipment = muni.equipment
-                form.quantity = quantity.value
+            form.quantity = quantity.value
             form.municipality_id = muni.municipality_id
 
             // console.log('this is ', muni);
@@ -320,8 +332,8 @@ export default {
         //     console.log('this is th evalue', value);
         //     window.localStorage.setItem('municipality', JSON.stringify(value))
         // })
-
-        const convertedProvince = Object.values(provinces).map((c) => c.name)
+        console.log(provinces);
+        const convertedProvince = Object.values(provinces).map((c) => c.province)
         const convertedEquipment = Object.values(equipments).map((c) => c.name)
         console.log('converted ', convertedProvince);
         onMounted(() => {
@@ -368,14 +380,14 @@ export default {
 
 <style scoped>
 .loader {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  display: block;
-  margin:15px auto;
-  position: relative;
-  color: #870C0D;
-  box-sizing: border-box;
-  animation: animloader 1s linear infinite alternate;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: block;
+    margin: 15px auto;
+    position: relative;
+    color: #870C0D;
+    box-sizing: border-box;
+    animation: animloader 1s linear infinite alternate;
 }
 </style>

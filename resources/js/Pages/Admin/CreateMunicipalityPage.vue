@@ -3,7 +3,7 @@
 
         <div>
             <InputLabel for="name" value="Province" />
-            <ProvinceList @submit="getProvince" :contents="provinces" />
+            <v-select :options="convertedProvince" v-model="form.province"/>
             <InputError class="mt-2" :message="form.errors.province" />
         </div>
 
@@ -30,12 +30,13 @@
                 </div>
                 <div>
                     <InputLabel for="longitute" value="longitute" />
-                    <TextInput id="latitude" type="text" class="mt-1 w-full block" v-model="form.long" required
+                    <TextInput id="longitute" type="text" class="mt-1 w-full block" v-model="form.long" required
                         autocomplete="longitute" />
                     <InputError class="mt-2" :message="form.errors.long" />
                 </div>
+               
             </div>
-
+            <span class="text-sm text-slate-300">Get Coordintes <a href="https://www.gps-coordinates.net/" target="_blank" class="text-blue-500 underline">Here</a> </span>
         </div>
 
         <div class="mt-4">
@@ -86,8 +87,8 @@ export default {
     props: {
         provinces: Array,
     },
-    setup() {
-
+    setup({provinces}) {
+console.log(provinces);
         let form = useForm({
             name: '',
             email: '',
@@ -107,13 +108,14 @@ export default {
 
             });
         }
-
+        const convertedProvince = provinces ? Object.values(provinces).map((c) => c.province) : []
         function getProvince(province) {
             form.province = province.province
 
         }
 
         return {
+            convertedProvince,
             form,
             submit,
             getProvince

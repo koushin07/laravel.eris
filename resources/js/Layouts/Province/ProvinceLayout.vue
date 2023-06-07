@@ -21,8 +21,8 @@ export default {
         const navs = [
             {name: "Dashboard", url: "/province/dashboard"},
             { name: "Equipment", url: "/province/consolidated" },
-            // { name: "Request", url: "/province/request" },
-            { name: "Transactions", url: "/province/transaction" },
+            // { name: "Archived", url: "/province/archive" },
+            // { name: "Transactions", url: "/province/transaction" },
 
         ]
         onMounted(()=>{
@@ -40,8 +40,8 @@ export default {
 
 <template>
     <div class="flex flex-col h-full md:h-screen">
-        <nav class="flex flex-row justify-between bg-white  border-b-2 p-5 w-full">
-            <img src="../../../css/eprris.png" class="h-12">
+        <nav class="flex flex-row justify-between  bg-white  border-b-2 p-5 w-full">
+            <img src="../../../css/eris.png" class="h-12">
             <div class="grid grid-flow-col gap-2 align-middle">
                 <Dropdown>
                     <template #trigger>
@@ -50,7 +50,7 @@ export default {
                       dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600
                        dark:focus:ring-gray-700" type="button">
 
-                       <div class="text-orange-600">{{ $page.props.auth.user.email }}</div>
+                            <span class="text-orange-600"> {{ $page.props.auth.user.assign_office.province }}</span>
                             <svg class="ml-2 w-3 h-3" aria-hidden="true" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -62,25 +62,25 @@ export default {
                     <template #content>
                         <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
                             <li>
-                                <inertia-link :href="route('municipality.office.index')"
+                                <!-- <inertia-link :href="route('municipality.office.index')"
                                     class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer">
-                                    Account</inertia-link>
+                                    Account</inertia-link> -->
 
-                                <inertia-link  :href="route('logout')" method="post"
+                                <Link :href="route('logout')" method="post" as="Link"
                                     class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer">
-                                    Logout</inertia-link>
+                                Logout</Link>
                             </li>
                         </ul>
 
                     </template>
 
                 </Dropdown>
-                
-              
+
+
             </div>
 
         </nav>
-        <nav class="flex bg-white flex-row  w-full">
+        <nav class="flex bg-white flex-row  w-full shadow-lg">
             <div class="flex flex-row justify-center text-center  h-14">
                 <inertia-link :href="nav.url" :class="{ 'bg-gray-400 text-white': $page.url === nav.url }"
                     class=" px-5 border-r-2 last:border-transparent text-center pt-4" v-for="(nav, key) in navs"
@@ -88,18 +88,21 @@ export default {
                     {{ nav.name }} </inertia-link>
 
             </div>
+             <!-- <inertia-link href="" class=" px-5 border-x-2 z-0  text-center pt-4 pb-4">
+                    Archive
+                </inertia-link> -->
 
         </nav>
-        <div class="flex flex-row h-full ">
+        <div class="flex flex-row h-full">
 
-            <main class=" flex-col w-full  space-y-12 overflow-y-auto mt-10 mb-10 ml-10 mr-5 scrollbar">
+            <main class=" flex-col w-full  space-y-12 overflow-y-auto mt-5 mb-5 ml-5 mr-5 scrollbar">
                 <slot />
             </main>
 
 
             <!--             <div class="hidden md:flex box-border bg-orange-300 w-1/4 p-10  mt-10 mb-10 mr-10 ml-2.5">
                 <div class="flex flex-col space-y-8 justify-items-center">
-                
+
                     <div class="    flex flex-col space-x-1">
                         <div class="flex justify-between px-4">
                             <span class="text-red-500 font-semibold">Pending</span>
@@ -110,9 +113,9 @@ export default {
                     <div class="flex flex-col space-x-1">
                         <div class="flex justify-between px-4">
                             <span class="text-emerald-500">Send</span>
-                           
+
                         </div>
-                       
+
                     </div>
 
                 </div>
@@ -147,7 +150,7 @@ export default {
                 </div>
             </div>
         </div>
-      
+
         <div class="flex flex-col pl-14 h-screen scrollbar bg-transparent w-screen sm:w-9/12 overflow-y-auto ">
 
             <div class=" flex-col mx-5 mt-9 max-h-screen content-center">
@@ -156,7 +159,7 @@ export default {
 
 
         </div>
-      
+
         <TransactionCard />
     </div>
   -->

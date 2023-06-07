@@ -17,7 +17,7 @@ class NotifyMunicipalityTransaction
        
         Notification::sendNow(
             $event->office,
-            new MunicipalityTransactionNotification($event->equipment, $event->quantity, $event->incident, $event->person)
+            new MunicipalityTransactionNotification($event->office)
         );
     }
 }

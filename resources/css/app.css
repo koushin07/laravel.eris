@@ -2,9 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-input::-webkit-calendar-picker-indicator {
-    opacity: 0;
-}
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;

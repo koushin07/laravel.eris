@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('category');
             $table->integer('unit');
             $table->string('model_number');
-            $table->string('serial_number')->unique();
+            $table->string('serial_number')->unique()->nullable();
             $table->integer('asset_id');
             $table->string('remarks');
             $table->timestamps();

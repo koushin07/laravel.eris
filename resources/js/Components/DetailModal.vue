@@ -1,6 +1,6 @@
 <template>
-    <div @click="openModal">
-        <button class="text-blue-400">
+    <div @click="fetchEquipment">
+        <button class="text-blue-400" >
             details
         </button>
 
@@ -19,18 +19,79 @@
                         enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100"
                         leave-to="opacity-0 scale-95">
                         <DialogPanel
-                            class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                            class="w-fit  transform overflow-hidden rounded bg-white p-2 text-left align-middle shadow-xl transition-all">
 
-                            <DialogTitle as="h3" class="flex flex-row justify-end mx-4">
+                            <div class="flex flex-row justify-between p-2">
+                                <span class="text-lg font-bold">{{ props.incident }}</span>
 
-                                <button class=" flex justify-end text-e hover:scale-110 hover:text-orange-500"
-                                    @click="closeModal">
-                                    <i class="fa-solid fa-x text-lg"></i>
 
-                                </button>
+                            </div>
 
-                            </DialogTitle>
-                            <StatusCard/>
+                            <table class="table-auto pt-2 w-full text-sm border-x text-gray-500 dark:text-gray-400"
+                                v-if="status">
+                                <thead
+                                    class="text-xs text-gray-700 text-center uppercase bg-header dark:bg-gray-700 dark:text-gray-400">
+                                    <tr>
+                                        <th scope="col" class="py-3 px-10 capitalize                " v-for="(head, key) in tableHeader"
+                                            :key="key">
+                                            {{ head.name }}
+                                        </th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="max-h-full even:bg-gray-200  bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                                        v-for="(body, key) in equipments">
+                                        <td scope="row" class="text-center p-4">
+                                            {{ body.name }}
+                                        </td>
+                                        <td class="text-center">
+                                            {{ body.municipality }}
+                                        </td>
+                                        <td class="text-center ">
+                                            <span class="text-green-500 " v-if="body.status === 'accepted'">
+                                                {{ body.status }}
+                                            </span>
+                                            <span class="text-red-500 " v-if="body.status === 'denied'">
+                                                {{ body.status }}
+                                            </span>
+                                            <span class="text-gray-500 " v-if="body.status === 'pending'">
+                                                {{ body.status }}
+                                            </span>
+
+                                        </td>
+                                        <td class="text-center">
+                                            {{ body.quantity }}
+                                        </td>
+                                        <!-- <td class="text-center">
+                                            {{ body.incident }}
+                                        </td> -->
+                                        <td class="text-center">
+                                            {{ body.contact }}
+                                        </td>
+                                        <td class="text-center">
+                                            {{ body.address }}
+                                        </td>
+                                        <td class="text-center">
+                                            {{ body.owner }}
+                                        </td>
+                                        <td class="text-center">
+                                            <add-incident :detail="props.detail" :equipments="equipments" :incident="body.incident"  :incident_summary="body.incident_summary" :provinces="provinces">
+                                                <template #trigger>
+                                                    <button
+                                                        class=" text-green-500 ">
+                                                        <span class="text-center">add</span>
+                                                       
+                                                    </button>
+
+                                                </template>
+                                            </add-incident>
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+                            </table>
 
 
                         </DialogPanel>
@@ -42,7 +103,7 @@
 </template>
     
 <script setup>
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import {
     TransitionRoot,
     TransitionChild,
@@ -51,13 +112,33 @@ import {
     DialogTitle,
 } from '@headlessui/vue'
 import StatusCard from './Transactions/StatusCard.vue';
+import axios from 'axios';
+import AddIncident from './AddIncident.vue';
+
 const props = defineProps({
-    muni: Object
+    incident: String,
+    detail: String,
+    name: String,
+    equipments: Object,
+    provinces: Object,
+
 })
 
 const emit = defineEmits(['submit'])
 const isOpen = ref(false)
 const quantity = ref(null)
+const equipments = ref({})
+const fetchEquipment = () => {
+    console.log(props.detail);
+    axios.get('/api/requestEquip/' + props.detail).then((res) => {
+        equipments.value = res.data
+        console.log(res.data);
+        openModal()
+    })
+
+}
+// console.log(props.equipments);
+// const incident = ref(props.equipments)
 function closeModal() {
 
     isOpen.value = false
@@ -75,7 +156,19 @@ function submit() {
         alert('only ' + props.muni.quantity + ' is available')
     }
 
-}
+} const tableHeader = [
+    { name: 'equipment' },
+    { name: 'municipality' },
+    { name: 'status' },
+    { name: 'borrowed quantity' },
+    { name: 'contact' },
+    { name: 'address' },
+    { name: 'personel' },
+    { name: 'action' },
+
+]
+
+const status = ref(true)
 
 </script>
     

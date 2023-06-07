@@ -27,7 +27,12 @@ class EquipmentOwned extends Model
 
     public function equipment_detail()
     {
-        return $this->hasMany(EquipmentDetail::class, 'equipment_owner');
+        return $this->hasOne(EquipmentDetail::class, 'equipment_owner');
+    }
+
+    public function equipment_attribute()
+    {
+        return $this->belongsTo(EquipmentAttribute::class,'equipment_attrs');
     }
 }
 
