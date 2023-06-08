@@ -17,9 +17,9 @@ Route::middleware('guest')->group(function () {
         ->name('register');
 
     Route::post('register', [RegisteredUserController::class, 'store'])
-        ->name('register');
+        ->name('registerstore');
     Route::post('register_municipality', [RegisteredUserController::class, 'store_municipality'])
-     
+
         ->name('municipalityRegistration');
 
 
