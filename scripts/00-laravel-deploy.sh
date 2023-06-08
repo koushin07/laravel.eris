@@ -1,5 +1,5 @@
 echo "Running composer"
-composer install --no-dev --working-dir=/var/www/html
+composer install --no-dev --working-dir=/var/www/html --ignore-platform-req=ext-gd
 echo "this is the version of your composer"
 composer --version
 
